@@ -115,7 +115,7 @@ def load_json_data(json_file):
         print(f"Error loading {json_file}: {e}")
         return None
 
-# ============= NEW: Generate TextGrid from frames =============
+# ============= Generate TextGrid from frames =============
 def generate_textgrid(frames, duration, sentence, annotator, full_sequence):
     """
     Generate a Praat TextGrid file from frames data
@@ -175,22 +175,23 @@ def generate_textgrid(frames, duration, sentence, annotator, full_sequence):
     
     return "\n".join(tg_lines)
 
-# ============= NEW: Save to MOBILE_DATASET with audio and TextGrid =============
-def save_to_mobile_dataset(submitted_data, username, original_wav_path, json_filename):
+# ============= Save to MOBILE_DATASET with annotated JSON, WAV, and TextGrid =============
+def save_to_mobile_dataset(annotated_data, username, original_wav_path, json_filename):
     """
     Save the submitted annotation to MOBILE_DATASET folder with:
-    - JSON file (using original filename)
-    - WAV file (copied using original filename)
-    - TextGrid file (generated using original filename)
+    - Annotated JSON file (corrected/annotated version from UI)
+    - WAV file (copied from original)
+    - TextGrid file (generated from annotated data)
     """
     try:
         # Get base name without extension (keep original name)
         base_name = json_filename.replace('.json', '')
         
-        # 1. Save JSON file to MOBILE_DATASET (using original name)
+        # 1. Save ANNOTATED JSON file to MOBILE_DATASET (using original name)
+        # This is the corrected/annotated data from the UI, not the original
         json_output_path = os.path.join(MOBILE_DATASET_FOLDER, json_filename)
         with open(json_output_path, 'w', encoding='utf-8') as f:
-            json.dump(submitted_data, f, indent=2, ensure_ascii=False)
+            json.dump(annotated_data, f, indent=2, ensure_ascii=False)
         
         # 2. Copy WAV file to MOBILE_DATASET (using original name)
         wav_filename = f"{base_name}.wav"
@@ -198,15 +199,15 @@ def save_to_mobile_dataset(submitted_data, username, original_wav_path, json_fil
             wav_output_path = os.path.join(MOBILE_DATASET_FOLDER, wav_filename)
             shutil.copy2(original_wav_path, wav_output_path)
         
-        # 3. Generate and save TextGrid file (using original name)
-        frames = submitted_data.get('frames', [])
-        duration = submitted_data.get('duration_ms', 0) / 1000.0
+        # 3. Generate and save TextGrid file from ANNOTATED data (using original name)
+        frames = annotated_data.get('frames', [])
+        duration = annotated_data.get('duration_ms', 0) / 1000.0
         if duration == 0 and frames:
             duration = frames[-1].get('end_ms', 0) / 1000.0
         
-        sentence = submitted_data.get('sentence', '')
-        full_sequence = submitted_data.get('full_sequence', '')
-        annotator = submitted_data.get('annotator', username)
+        sentence = annotated_data.get('sentence', '')
+        full_sequence = annotated_data.get('full_sequence', '')
+        annotator = annotated_data.get('annotator', username)
         
         textgrid_content = generate_textgrid(
             frames=frames,
@@ -220,7 +221,7 @@ def save_to_mobile_dataset(submitted_data, username, original_wav_path, json_fil
         with open(textgrid_output_path, 'w', encoding='utf-8') as f:
             f.write(textgrid_content)
         
-        print(f"✅ Saved to MOBILE_DATASET: {base_name}")
+        print(f"✅ Saved annotated data to MOBILE_DATASET: {base_name}")
         return True
         
     except Exception as e:
@@ -369,7 +370,7 @@ def update_frame():
     
     return jsonify({"success": False, "error": "Update failed"})
 
-# Submit annotation - UPDATED with user subfolders and MOBILE_DATASET (NO timestamps)
+# Submit annotation - UPDATED: Saves ANNOTATED/CORRECTED data from UI
 @app.route("/submit", methods=["POST"])
 @login_required
 def submit():
@@ -377,10 +378,12 @@ def submit():
     json_file = data.get('json_file')
     username = session.get('username')
     
-    # Get original WAV file path
+    # Get original WAV file path (only for copying the audio)
     wav_file = data.get('wav_file', json_file.replace('.json', '.wav'))
     original_wav_path = os.path.join(AUDIO_FOLDER, wav_file)
     
+    # IMPORTANT: data already contains the corrected/annotated frames from the UI
+    # This is the annotated data that the user just submitted
     # Add submission metadata with user info
     data["status"] = "submitted"
     data["submitted_at"] = datetime.now().isoformat()
@@ -388,7 +391,7 @@ def submit():
     data["submitted_by_phone"] = session.get('phone', '')
     data["annotator"] = username
     
-    # ===== 1. Save to user-specific subfolder (using original filename) =====
+    # ===== 1. Save annotated data to user-specific subfolder (using original filename) =====
     user_submit_folder = os.path.join(USER_SUBMISSIONS_FOLDER, username)
     os.makedirs(user_submit_folder, exist_ok=True)
     
@@ -401,7 +404,8 @@ def submit():
     with open(old_submit_path, "w", encoding='utf-8') as f:
         json.dump(data, f, indent=2, ensure_ascii=False)
     
-    # ===== 3. Save to MOBILE_DATASET with JSON + WAV + TextGrid (using original names) =====
+    # ===== 3. Save to MOBILE_DATASET with annotated JSON + WAV + TextGrid =====
+    # This uses the annotated/corrected data from the UI
     save_to_mobile_dataset(data, username, original_wav_path, json_file)
     
     # Mark as completed
