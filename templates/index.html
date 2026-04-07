@@ -510,9 +510,8 @@ function showErrorScreen(message) {
   `;
 }
 
-// FIXED: Function to save all pending frame edits before submission
+// Function to save all pending frame edits before submission
 function saveAllPendingEdits() {
-  // Get all editable divs and update currentData
   const editDivs = document.querySelectorAll('.edit-text');
   let updated = false;
   
@@ -528,13 +527,64 @@ function saveAllPendingEdits() {
     }
   });
   
-  // Update full_sequence if any changes were made
   if (updated && currentData) {
     const fullSequence = currentData.frames.map(f => f.text || '').filter(t => t !== '').join(' ');
     currentData.full_sequence = fullSequence;
   }
   
   return updated;
+}
+
+// FIXED: Function to play segment - now can be called from anywhere
+function playSegmentByIndex(frameIndex) {
+  if (!currentData || !currentAudio) {
+    showMessage('Audio not ready', 'error');
+    return;
+  }
+  
+  const frame = currentData.frames[frameIndex];
+  if (!frame) return;
+  
+  // Stop any currently playing audio
+  if (currentPlayTimeout) {
+    clearTimeout(currentPlayTimeout);
+    currentPlayTimeout = null;
+  }
+  
+  const startSec = frame.start_ms / 1000;
+  const endSec = frame.end_ms / 1000;
+  const durationSec = endSec - startSec;
+  
+  // Update active card styling
+  document.querySelectorAll('.frame-card').forEach(card => card.classList.remove('active'));
+  const activeCard = document.querySelector(`.frame-card[data-frame-index="${frameIndex}"]`);
+  if (activeCard) activeCard.classList.add('active');
+  
+  currentAudio.pause();
+  currentAudio.currentTime = startSec;
+  
+  const playPromise = currentAudio.play();
+  if (playPromise !== undefined) {
+    playPromise.then(() => {
+      currentPlayTimeout = setTimeout(() => {
+        if (currentAudio && !currentAudio.paused) {
+          currentAudio.pause();
+        }
+        currentPlayTimeout = null;
+      }, durationSec * 1000);
+    }).catch(err => {
+      console.warn('Playback error:', err);
+      showMessage('Cannot play segment', 'error');
+      if (activeCard) activeCard.classList.remove('active');
+    });
+  }
+  
+  currentAudio.onended = () => {
+    if (currentPlayTimeout) {
+      clearTimeout(currentPlayTimeout);
+      currentPlayTimeout = null;
+    }
+  };
 }
 
 function renderAnnotationInterface(data) {
@@ -590,25 +640,29 @@ function renderAnnotationInterface(data) {
     editDiv.innerText = currentText;
     editDiv.setAttribute('data-frame-idx', idx);
     
-    // FIXED: Update on input (real-time) instead of just on blur
+    // Update on input (real-time)
     editDiv.addEventListener('input', (e) => {
       const newText = e.target.innerText || '';
       if (currentData && currentData.frames[idx]) {
         currentData.frames[idx].text = newText;
-        // Update full_sequence
         const fullSequence = currentData.frames.map(f => f.text || '').filter(t => t !== '').join(' ');
         currentData.full_sequence = fullSequence;
       }
     });
     
-    editDiv.addEventListener('click', (e) => e.stopPropagation());
+    // FIXED: When clicking on the input box, play the segment
+    editDiv.addEventListener('click', (e) => {
+      e.stopPropagation();
+      playSegmentByIndex(idx);
+    });
     
     frameCard.appendChild(headerDiv);
     frameCard.appendChild(editDiv);
     
+    // When clicking on the card (but not on input), play the segment
     frameCard.addEventListener('click', (e) => {
       if (e.target === editDiv || editDiv.contains(e.target)) return;
-      playSegment(idx, frameCard);
+      playSegmentByIndex(idx);
     });
     
     framesGrid.appendChild(frameCard);
@@ -660,50 +714,8 @@ async function updateFrameText(index, newText) {
 }
 
 function playSegment(frameIndex, cardElement) {
-  if (currentPlayTimeout) {
-    clearTimeout(currentPlayTimeout);
-    currentPlayTimeout = null;
-  }
-  if (!currentAudio) {
-    showMessage('Audio player not ready', 'error');
-    return;
-  }
-  
-  const frame = currentData.frames[frameIndex];
-  if (!frame) return;
-  
-  const startSec = frame.start_ms / 1000;
-  const endSec = frame.end_ms / 1000;
-  const durationSec = endSec - startSec;
-  
-  document.querySelectorAll('.frame-card').forEach(card => card.classList.remove('active'));
-  if (cardElement) cardElement.classList.add('active');
-  
-  currentAudio.pause();
-  currentAudio.currentTime = startSec;
-  
-  const playPromise = currentAudio.play();
-  if (playPromise !== undefined) {
-    playPromise.then(() => {
-      currentPlayTimeout = setTimeout(() => {
-        if (currentAudio && !currentAudio.paused) {
-          currentAudio.pause();
-        }
-        currentPlayTimeout = null;
-      }, durationSec * 1000);
-    }).catch(err => {
-      console.warn('Playback error:', err);
-      showMessage('Cannot play segment', 'error');
-      if (cardElement) cardElement.classList.remove('active');
-    });
-  }
-  
-  currentAudio.onended = () => {
-    if (currentPlayTimeout) {
-      clearTimeout(currentPlayTimeout);
-      currentPlayTimeout = null;
-    }
-  };
+  // Legacy function - kept for compatibility, but now using playSegmentByIndex
+  playSegmentByIndex(frameIndex);
 }
 
 async function submitAnnotation() {
@@ -712,7 +724,7 @@ async function submitAnnotation() {
     return;
   }
   
-  // FIXED: Save all pending edits from the UI before submission
+  // Save all pending edits from the UI before submission
   saveAllPendingEdits();
   
   // Ensure all frames have text property (null/undefined -> empty string)
