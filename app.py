@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, jsonify, send_from_directory,
 import wave
 import math
 import os
+import shutil
 from datetime import datetime
 import json
 import glob
@@ -25,8 +26,13 @@ AUDIO_FOLDER = "data"
 SUBMIT_FOLDER = "annotation_submitted"
 USERS_FILE = "users.json"
 COMPLETED_LOG = "completed_files.json"
+MOBILE_DATASET_FOLDER = "MOBILE_DATASET"  # NEW: Central folder for all submitted data
+USER_SUBMISSIONS_FOLDER = "user_submissions"  # NEW: User-specific submissions
 
+# Create all necessary folders
 os.makedirs(SUBMIT_FOLDER, exist_ok=True)
+os.makedirs(MOBILE_DATASET_FOLDER, exist_ok=True)
+os.makedirs(USER_SUBMISSIONS_FOLDER, exist_ok=True)
 
 from werkzeug.middleware.proxy_fix import ProxyFix
 
@@ -109,6 +115,118 @@ def load_json_data(json_file):
         print(f"Error loading {json_file}: {e}")
         return None
 
+# ============= NEW: Generate TextGrid from frames =============
+def generate_textgrid(frames, duration, sentence, annotator, full_sequence):
+    """
+    Generate a Praat TextGrid file from frames data
+    """
+    tg_lines = []
+    
+    tg_lines.append('File type = "ooTextFile"')
+    tg_lines.append('Object class = "TextGrid"\n')
+    
+    tg_lines.append(f"xmin = 0")
+    tg_lines.append(f"xmax = {duration}")
+    tg_lines.append("tiers? <exists>")
+    tg_lines.append("size = 3")
+    tg_lines.append("item []:")
+    
+    # Tier 1: sentence
+    tg_lines.append("    item [1]:")
+    tg_lines.append('        class = "IntervalTier"')
+    tg_lines.append('        name = "sentence"')
+    tg_lines.append(f"        xmin = 0")
+    tg_lines.append(f"        xmax = {duration}")
+    tg_lines.append("        intervals: size = 1")
+    tg_lines.append("        intervals [1]:")
+    tg_lines.append(f"            xmin = 0")
+    tg_lines.append(f"            xmax = {duration}")
+    tg_lines.append(f'            text = "{sentence if sentence else full_sequence}"')
+    
+    # Tier 2: annotations (frames)
+    tg_lines.append("    item [2]:")
+    tg_lines.append('        class = "IntervalTier"')
+    tg_lines.append('        name = "annotations"')
+    tg_lines.append(f"        xmin = 0")
+    tg_lines.append(f"        xmax = {duration}")
+    tg_lines.append(f"        intervals: size = {len(frames)}")
+    
+    for i, frame in enumerate(frames, 1):
+        start = frame.get("start_ms", 0) / 1000.0
+        end = frame.get("end_ms", 0) / 1000.0
+        text = frame.get("text", "") if frame.get("text") else ""
+        
+        tg_lines.append(f"        intervals [{i}]:")
+        tg_lines.append(f"            xmin = {start}")
+        tg_lines.append(f"            xmax = {end}")
+        tg_lines.append(f'            text = "{text}"')
+    
+    # Tier 3: annotator
+    tg_lines.append("    item [3]:")
+    tg_lines.append('        class = "IntervalTier"')
+    tg_lines.append('        name = "annotator"')
+    tg_lines.append(f"        xmin = 0")
+    tg_lines.append(f"        xmax = {duration}")
+    tg_lines.append("        intervals: size = 1")
+    tg_lines.append("        intervals [1]:")
+    tg_lines.append(f"            xmin = 0")
+    tg_lines.append(f"            xmax = {duration}")
+    tg_lines.append(f'            text = "{annotator}"')
+    
+    return "\n".join(tg_lines)
+
+# ============= NEW: Save to MOBILE_DATASET with audio and TextGrid =============
+def save_to_mobile_dataset(submitted_data, username, original_wav_path, json_filename):
+    """
+    Save the submitted annotation to MOBILE_DATASET folder with:
+    - JSON file (using original filename)
+    - WAV file (copied using original filename)
+    - TextGrid file (generated using original filename)
+    """
+    try:
+        # Get base name without extension (keep original name)
+        base_name = json_filename.replace('.json', '')
+        
+        # 1. Save JSON file to MOBILE_DATASET (using original name)
+        json_output_path = os.path.join(MOBILE_DATASET_FOLDER, json_filename)
+        with open(json_output_path, 'w', encoding='utf-8') as f:
+            json.dump(submitted_data, f, indent=2, ensure_ascii=False)
+        
+        # 2. Copy WAV file to MOBILE_DATASET (using original name)
+        wav_filename = f"{base_name}.wav"
+        if original_wav_path and os.path.exists(original_wav_path):
+            wav_output_path = os.path.join(MOBILE_DATASET_FOLDER, wav_filename)
+            shutil.copy2(original_wav_path, wav_output_path)
+        
+        # 3. Generate and save TextGrid file (using original name)
+        frames = submitted_data.get('frames', [])
+        duration = submitted_data.get('duration_ms', 0) / 1000.0
+        if duration == 0 and frames:
+            duration = frames[-1].get('end_ms', 0) / 1000.0
+        
+        sentence = submitted_data.get('sentence', '')
+        full_sequence = submitted_data.get('full_sequence', '')
+        annotator = submitted_data.get('annotator', username)
+        
+        textgrid_content = generate_textgrid(
+            frames=frames,
+            duration=duration,
+            sentence=sentence,
+            annotator=annotator,
+            full_sequence=full_sequence
+        )
+        
+        textgrid_output_path = os.path.join(MOBILE_DATASET_FOLDER, f"{base_name}.TextGrid")
+        with open(textgrid_output_path, 'w', encoding='utf-8') as f:
+            f.write(textgrid_content)
+        
+        print(f"✅ Saved to MOBILE_DATASET: {base_name}")
+        return True
+        
+    except Exception as e:
+        print(f"❌ Error saving to MOBILE_DATASET: {e}")
+        return False
+
 # ============= ROUTES =============
 
 @app.route("/")
@@ -163,6 +281,10 @@ def api_register():
         "created_at": datetime.now().isoformat()
     }
     save_users(users)
+    
+    # Create user-specific submission folder
+    user_folder = os.path.join(USER_SUBMISSIONS_FOLDER, username)
+    os.makedirs(user_folder, exist_ok=True)
     
     return jsonify({"message": "Account created successfully"})
 
@@ -221,6 +343,11 @@ def get_next_file():
     json_data['wav_file'] = next_file['wav_file']
     json_data['json_file'] = next_file['json_file']
     
+    # Calculate duration in ms for TextGrid generation
+    wav_path = os.path.join(AUDIO_FOLDER, next_file['wav_file'])
+    duration_ms = get_audio_length(wav_path)
+    json_data['duration_ms'] = duration_ms
+    
     return jsonify(json_data)
 
 # Update frame text
@@ -242,27 +369,40 @@ def update_frame():
     
     return jsonify({"success": False, "error": "Update failed"})
 
-# Submit annotation
+# Submit annotation - UPDATED with user subfolders and MOBILE_DATASET (NO timestamps)
 @app.route("/submit", methods=["POST"])
 @login_required
 def submit():
     data = request.json
     json_file = data.get('json_file')
+    username = session.get('username')
+    
+    # Get original WAV file path
+    wav_file = data.get('wav_file', json_file.replace('.json', '.wav'))
+    original_wav_path = os.path.join(AUDIO_FOLDER, wav_file)
     
     # Add submission metadata with user info
     data["status"] = "submitted"
     data["submitted_at"] = datetime.now().isoformat()
-    data["submitted_by"] = session.get('username')
+    data["submitted_by"] = username
     data["submitted_by_phone"] = session.get('phone', '')
-    data["annotator"] = session.get('username')
+    data["annotator"] = username
     
-    # Save to submitted folder
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S_%f")
-    submitted_filename = f"{timestamp}_{session.get('username')}_{json_file}"
-    submitted_path = os.path.join(SUBMIT_FOLDER, submitted_filename)
+    # ===== 1. Save to user-specific subfolder (using original filename) =====
+    user_submit_folder = os.path.join(USER_SUBMISSIONS_FOLDER, username)
+    os.makedirs(user_submit_folder, exist_ok=True)
     
-    with open(submitted_path, "w", encoding='utf-8') as f:
+    user_submit_path = os.path.join(user_submit_folder, json_file)
+    with open(user_submit_path, "w", encoding='utf-8') as f:
         json.dump(data, f, indent=2, ensure_ascii=False)
+    
+    # ===== 2. Also save to the old SUBMIT_FOLDER for backward compatibility =====
+    old_submit_path = os.path.join(SUBMIT_FOLDER, f"{username}_{json_file}")
+    with open(old_submit_path, "w", encoding='utf-8') as f:
+        json.dump(data, f, indent=2, ensure_ascii=False)
+    
+    # ===== 3. Save to MOBILE_DATASET with JSON + WAV + TextGrid (using original names) =====
+    save_to_mobile_dataset(data, username, original_wav_path, json_file)
     
     # Mark as completed
     completed_files.add(json_file)
@@ -273,7 +413,8 @@ def submit():
     
     return jsonify({
         "message": "Submitted successfully", 
-        "file": submitted_filename,
+        "file": json_file,
+        "user_folder": f"user_submissions/{username}",
         "has_more": has_more,
         "remaining": len(available_files)
     })
@@ -300,6 +441,56 @@ def progress():
 @login_required
 def serve_audio(filename):
     return send_from_directory(AUDIO_FOLDER, filename)
+
+# NEW: Endpoint to list user submissions
+@app.route("/api/my-submissions")
+@login_required
+def get_my_submissions():
+    username = session.get('username')
+    user_folder = os.path.join(USER_SUBMISSIONS_FOLDER, username)
+    
+    submissions = []
+    if os.path.exists(user_folder):
+        for file in os.listdir(user_folder):
+            if file.endswith('.json'):
+                file_path = os.path.join(user_folder, file)
+                stat = os.stat(file_path)
+                submissions.append({
+                    "filename": file,
+                    "size": stat.st_size,
+                    "modified": stat.st_mtime,
+                    "path": f"user_submissions/{username}/{file}"
+                })
+    
+    submissions.sort(key=lambda x: x['modified'], reverse=True)
+    return jsonify({"submissions": submissions, "username": username})
+
+# NEW: Endpoint to list MOBILE_DATASET files
+@app.route("/api/mobile-dataset")
+@login_required
+def get_mobile_dataset():
+    """List all files in MOBILE_DATASET folder"""
+    files = []
+    if os.path.exists(MOBILE_DATASET_FOLDER):
+        for file in os.listdir(MOBILE_DATASET_FOLDER):
+            file_path = os.path.join(MOBILE_DATASET_FOLDER, file)
+            stat = os.stat(file_path)
+            files.append({
+                "filename": file,
+                "size": stat.st_size,
+                "modified": stat.st_mtime,
+                "extension": file.split('.')[-1] if '.' in file else 'unknown'
+            })
+    
+    files.sort(key=lambda x: x['modified'], reverse=True)
+    return jsonify({"files": files, "total": len(files)})
+
+# NEW: Download from MOBILE_DATASET
+@app.route("/mobile-dataset/<filename>")
+@login_required
+def download_mobile_dataset(filename):
+    """Download a file from MOBILE_DATASET folder"""
+    return send_from_directory(MOBILE_DATASET_FOLDER, filename, as_attachment=True)
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8889, debug=False)
