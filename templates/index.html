@@ -510,6 +510,33 @@ function showErrorScreen(message) {
   `;
 }
 
+// FIXED: Function to save all pending frame edits before submission
+function saveAllPendingEdits() {
+  // Get all editable divs and update currentData
+  const editDivs = document.querySelectorAll('.edit-text');
+  let updated = false;
+  
+  editDivs.forEach((div, idx) => {
+    const frameIndex = parseInt(div.getAttribute('data-frame-idx'));
+    const newText = div.innerText || '';
+    
+    if (currentData && currentData.frames[frameIndex]) {
+      if (currentData.frames[frameIndex].text !== newText) {
+        currentData.frames[frameIndex].text = newText;
+        updated = true;
+      }
+    }
+  });
+  
+  // Update full_sequence if any changes were made
+  if (updated && currentData) {
+    const fullSequence = currentData.frames.map(f => f.text || '').filter(t => t !== '').join(' ');
+    currentData.full_sequence = fullSequence;
+  }
+  
+  return updated;
+}
+
 function renderAnnotationInterface(data) {
   currentData = data;
   
@@ -563,12 +590,18 @@ function renderAnnotationInterface(data) {
     editDiv.innerText = currentText;
     editDiv.setAttribute('data-frame-idx', idx);
     
-    editDiv.addEventListener('click', (e) => e.stopPropagation());
-    editDiv.addEventListener('blur', (e) => {
-      let newText = e.target.innerText;
-      if (newText === null || newText === undefined) newText = '';
-      updateFrameText(idx, newText);
+    // FIXED: Update on input (real-time) instead of just on blur
+    editDiv.addEventListener('input', (e) => {
+      const newText = e.target.innerText || '';
+      if (currentData && currentData.frames[idx]) {
+        currentData.frames[idx].text = newText;
+        // Update full_sequence
+        const fullSequence = currentData.frames.map(f => f.text || '').filter(t => t !== '').join(' ');
+        currentData.full_sequence = fullSequence;
+      }
     });
+    
+    editDiv.addEventListener('click', (e) => e.stopPropagation());
     
     frameCard.appendChild(headerDiv);
     frameCard.appendChild(editDiv);
@@ -679,6 +712,10 @@ async function submitAnnotation() {
     return;
   }
   
+  // FIXED: Save all pending edits from the UI before submission
+  saveAllPendingEdits();
+  
+  // Ensure all frames have text property (null/undefined -> empty string)
   for (let i = 0; i < currentData.frames.length; i++) {
     if (currentData.frames[i].text === undefined || currentData.frames[i].text === null) {
       currentData.frames[i].text = '';
