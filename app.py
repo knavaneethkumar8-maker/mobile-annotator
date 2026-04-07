@@ -26,8 +26,10 @@ AUDIO_FOLDER = "data"
 SUBMIT_FOLDER = "annotation_submitted"
 USERS_FILE = "users.json"
 COMPLETED_LOG = "completed_files.json"
-MOBILE_DATASET_FOLDER = "MOBILE_DATASET"  # NEW: Central folder for all submitted data
-USER_SUBMISSIONS_FOLDER = "user_submissions"  # NEW: User-specific submissions
+MOBILE_DATASET_FOLDER = "MOBILE_DATASET"
+USER_SUBMISSIONS_FOLDER = "user_submissions"
+FILE_ASSIGNMENTS_FILE = "file_assignments.json"  # NEW: Track which file is assigned to which user
+USER_STATS_FILE = "user_stats.json"  # NEW: Track user statistics
 
 # Create all necessary folders
 os.makedirs(SUBMIT_FOLDER, exist_ok=True)
@@ -63,7 +65,141 @@ def save_completed_files(completed_set):
 
 completed_files = load_completed_files()
 
-# Login required decorator - FIXED with BASE_PATH
+# ============= NEW: File Assignment Tracking =============
+def load_file_assignments():
+    """Load file assignments from JSON file"""
+    if os.path.exists(FILE_ASSIGNMENTS_FILE):
+        with open(FILE_ASSIGNMENTS_FILE, 'r') as f:
+            return json.load(f)
+    return {}
+
+def save_file_assignments(assignments):
+    """Save file assignments to JSON file"""
+    with open(FILE_ASSIGNMENTS_FILE, 'w') as f:
+        json.dump(assignments, f, indent=2)
+
+def load_user_stats():
+    """Load user statistics from JSON file"""
+    if os.path.exists(USER_STATS_FILE):
+        with open(USER_STATS_FILE, 'r') as f:
+            return json.load(f)
+    return {}
+
+def save_user_stats(stats):
+    """Save user statistics to JSON file"""
+    with open(USER_STATS_FILE, 'w') as f:
+        json.dump(stats, f, indent=2)
+
+def update_user_stats(username, json_file, duration_seconds):
+    """Update user statistics when a file is completed"""
+    stats = load_user_stats()
+    
+    if username not in stats:
+        stats[username] = {
+            "completed_files": [],
+            "total_files_completed": 0,
+            "total_duration_seconds": 0,
+            "total_duration_formatted": "0s",
+            "last_active": None
+        }
+    
+    # Add file to completed list if not already there
+    if json_file not in stats[username]["completed_files"]:
+        stats[username]["completed_files"].append(json_file)
+        stats[username]["total_files_completed"] += 1
+        stats[username]["total_duration_seconds"] += duration_seconds
+        
+        # Format duration
+        total_secs = stats[username]["total_duration_seconds"]
+        if total_secs < 60:
+            stats[username]["total_duration_formatted"] = f"{total_secs:.1f}s"
+        elif total_secs < 3600:
+            mins = int(total_secs // 60)
+            secs = int(total_secs % 60)
+            stats[username]["total_duration_formatted"] = f"{mins}m {secs}s"
+        else:
+            hours = int(total_secs // 3600)
+            mins = int((total_secs % 3600) // 60)
+            stats[username]["total_duration_formatted"] = f"{hours}h {mins}m"
+        
+        stats[username]["last_active"] = datetime.now().isoformat()
+    
+    save_user_stats(stats)
+    return stats[username]
+
+def get_user_stats(username):
+    """Get statistics for a specific user"""
+    stats = load_user_stats()
+    return stats.get(username, {
+        "completed_files": [],
+        "total_files_completed": 0,
+        "total_duration_seconds": 0,
+        "total_duration_formatted": "0s",
+        "last_active": None
+    })
+
+def assign_file_to_user(username):
+    """
+    Assign a new file to the user that hasn't been completed or assigned to anyone else
+    """
+    file_assignments = load_file_assignments()
+    user_stats = get_user_stats(username)
+    completed_by_user = set(user_stats.get("completed_files", []))
+    
+    # Get all available files
+    all_json_files = glob.glob(os.path.join(AUDIO_FOLDER, "*.json"))
+    available_files = []
+    
+    for json_path in all_json_files:
+        base_name = os.path.basename(json_path)
+        wav_name = base_name.replace('.json', '.wav')
+        wav_path = os.path.join(AUDIO_FOLDER, wav_name)
+        
+        if os.path.exists(wav_path):
+            # Check if file is already completed globally
+            if base_name in completed_files:
+                continue
+            
+            # Check if file is already assigned to someone else and not expired
+            if base_name in file_assignments:
+                assignment = file_assignments[base_name]
+                # Check if assignment is older than 30 minutes (timeout)
+                assigned_time = datetime.fromisoformat(assignment["assigned_at"])
+                if datetime.now().timestamp() - assigned_time.timestamp() > 1800:  # 30 minutes timeout
+                    # Assignment expired, can reassign
+                    pass
+                elif assignment["assigned_to"] != username:
+                    # Assigned to someone else and not expired
+                    continue
+            
+            # Check if user already completed this file
+            if base_name in completed_by_user:
+                continue
+            
+            available_files.append(base_name)
+    
+    if not available_files:
+        return None
+    
+    # Assign the first available file
+    assigned_file = available_files[0]
+    file_assignments[assigned_file] = {
+        "assigned_to": username,
+        "assigned_at": datetime.now().isoformat(),
+        "status": "assigned"
+    }
+    save_file_assignments(file_assignments)
+    
+    return assigned_file
+
+def release_file_assignment(json_file):
+    """Release a file assignment (when skipped or expired)"""
+    file_assignments = load_file_assignments()
+    if json_file in file_assignments:
+        del file_assignments[json_file]
+        save_file_assignments(file_assignments)
+
+# Login required decorator
 def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
@@ -75,7 +211,7 @@ def login_required(f):
         return f(*args, **kwargs)
     return decorated_function
 
-# Get all available JSON files (not completed)
+# Get all available JSON files (not completed) - DEPRECATED, use assign_file_to_user instead
 def get_available_files():
     all_json_files = glob.glob(os.path.join(AUDIO_FOLDER, "*.json"))
     available = []
@@ -115,7 +251,7 @@ def load_json_data(json_file):
         print(f"Error loading {json_file}: {e}")
         return None
 
-# ============= Generate TextGrid from frames =============
+# Generate TextGrid from frames
 def generate_textgrid(frames, duration, sentence, annotator, full_sequence):
     """
     Generate a Praat TextGrid file from frames data
@@ -175,31 +311,26 @@ def generate_textgrid(frames, duration, sentence, annotator, full_sequence):
     
     return "\n".join(tg_lines)
 
-# ============= Save to MOBILE_DATASET with annotated JSON, WAV, and TextGrid =============
+# Save to MOBILE_DATASET with annotated JSON, WAV, and TextGrid
 def save_to_mobile_dataset(annotated_data, username, original_wav_path, json_filename):
     """
-    Save the submitted annotation to MOBILE_DATASET folder with:
-    - Annotated JSON file (corrected/annotated version from UI)
-    - WAV file (copied from original)
-    - TextGrid file (generated from annotated data)
+    Save the submitted annotation to MOBILE_DATASET folder
     """
     try:
-        # Get base name without extension (keep original name)
         base_name = json_filename.replace('.json', '')
         
-        # 1. Save ANNOTATED JSON file to MOBILE_DATASET (using original name)
-        # This is the corrected/annotated data from the UI, not the original
+        # 1. Save ANNOTATED JSON file
         json_output_path = os.path.join(MOBILE_DATASET_FOLDER, json_filename)
         with open(json_output_path, 'w', encoding='utf-8') as f:
             json.dump(annotated_data, f, indent=2, ensure_ascii=False)
         
-        # 2. Copy WAV file to MOBILE_DATASET (using original name)
+        # 2. Copy WAV file
         wav_filename = f"{base_name}.wav"
         if original_wav_path and os.path.exists(original_wav_path):
             wav_output_path = os.path.join(MOBILE_DATASET_FOLDER, wav_filename)
             shutil.copy2(original_wav_path, wav_output_path)
         
-        # 3. Generate and save TextGrid file from ANNOTATED data (using original name)
+        # 3. Generate and save TextGrid file
         frames = annotated_data.get('frames', [])
         duration = annotated_data.get('duration_ms', 0) / 1000.0
         if duration == 0 and frames:
@@ -253,12 +384,10 @@ def api_register():
     password = data.get('password', '').strip()
     company_password = data.get('company_password', '').strip()
     
-    # Company password validation (hardcoded - change as needed)
-    COMPANY_MASTER_PASSWORD = "admin123"  # Change this to your company password
+    COMPANY_MASTER_PASSWORD = "admin123"
     
     users = load_users()
     
-    # Validation
     if not username or not phone or not password or not company_password:
         return jsonify({"error": "All fields are required"}), 400
     
@@ -274,16 +403,15 @@ def api_register():
     if company_password != COMPANY_MASTER_PASSWORD:
         return jsonify({"error": "Invalid company password"}), 400
     
-    # Store user
     users[username] = {
         "username": username,
         "phone": phone,
-        "password": password,  # In production, hash this!
+        "password": password,
         "created_at": datetime.now().isoformat()
     }
     save_users(users)
     
-    # Create user-specific submission folder
+    # Create user-specific folders
     user_folder = os.path.join(USER_SUBMISSIONS_FOLDER, username)
     os.makedirs(user_folder, exist_ok=True)
     
@@ -326,26 +454,59 @@ def api_current_user():
         })
     return jsonify({"logged_in": False})
 
-# Get next file to annotate
+# Get next file to annotate - UPDATED with assignment tracking
 @app.route("/get-next-file")
 @login_required
 def get_next_file():
-    available_files = get_available_files()
+    username = session.get('username')
     
-    if not available_files:
+    # Check if user already has an assigned file
+    file_assignments = load_file_assignments()
+    assigned_file = None
+    
+    for filename, assignment in file_assignments.items():
+        if assignment.get("assigned_to") == username and assignment.get("status") == "assigned":
+            # Check if assignment is not expired (30 minutes timeout)
+            assigned_time = datetime.fromisoformat(assignment["assigned_at"])
+            if datetime.now().timestamp() - assigned_time.timestamp() < 1800:
+                # Check if file is not already completed
+                if filename not in completed_files:
+                    assigned_file = filename
+                    break
+            else:
+                # Assignment expired, remove it
+                release_file_assignment(filename)
+    
+    if assigned_file:
+        # Return the already assigned file
+        json_data = load_json_data(assigned_file)
+        if json_data:
+            wav_file = assigned_file.replace('.json', '.wav')
+            json_data['wav_file'] = wav_file
+            json_data['json_file'] = assigned_file
+            
+            wav_path = os.path.join(AUDIO_FOLDER, wav_file)
+            duration_ms = get_audio_length(wav_path)
+            json_data['duration_ms'] = duration_ms
+            
+            return jsonify(json_data)
+    
+    # Assign a new file
+    next_file = assign_file_to_user(username)
+    
+    if not next_file:
         return jsonify({"completed": True, "message": "All files have been annotated!"})
     
-    next_file = available_files[0]
-    json_data = load_json_data(next_file['json_file'])
+    json_data = load_json_data(next_file)
     
     if not json_data:
         return jsonify({"error": "Could not load file"})
     
-    json_data['wav_file'] = next_file['wav_file']
-    json_data['json_file'] = next_file['json_file']
+    wav_file = next_file.replace('.json', '.wav')
+    json_data['wav_file'] = wav_file
+    json_data['json_file'] = next_file
     
-    # Calculate duration in ms for TextGrid generation
-    wav_path = os.path.join(AUDIO_FOLDER, next_file['wav_file'])
+    wav_path = os.path.join(AUDIO_FOLDER, wav_file)
     duration_ms = get_audio_length(wav_path)
     json_data['duration_ms'] = duration_ms
     
@@ -370,7 +531,7 @@ def update_frame():
     
     return jsonify({"success": False, "error": "Update failed"})
 
-# Submit annotation - UPDATED: Saves ANNOTATED/CORRECTED data from UI
+# Submit annotation - UPDATED with user stats tracking
 @app.route("/submit", methods=["POST"])
 @login_required
 def submit():
@@ -378,20 +539,20 @@ def submit():
     json_file = data.get('json_file')
     username = session.get('username')
     
-    # Get original WAV file path (only for copying the audio)
     wav_file = data.get('wav_file', json_file.replace('.json', '.wav'))
     original_wav_path = os.path.join(AUDIO_FOLDER, wav_file)
     
-    # IMPORTANT: data already contains the corrected/annotated frames from the UI
-    # This is the annotated data that the user just submitted
-    # Add submission metadata with user info
+    # Get audio duration for stats
+    duration_ms = data.get('duration_ms', 0)
+    duration_seconds = duration_ms / 1000.0
+    
     data["status"] = "submitted"
     data["submitted_at"] = datetime.now().isoformat()
     data["submitted_by"] = username
     data["submitted_by_phone"] = session.get('phone', '')
     data["annotator"] = username
     
-    # ===== 1. Save annotated data to user-specific subfolder (using original filename) =====
+    # Save to user-specific subfolder
     user_submit_folder = os.path.join(USER_SUBMISSIONS_FOLDER, username)
     os.makedirs(user_submit_folder, exist_ok=True)
     
@@ -399,46 +560,91 @@ def submit():
     with open(user_submit_path, "w", encoding='utf-8') as f:
         json.dump(data, f, indent=2, ensure_ascii=False)
     
-    # ===== 2. Also save to the old SUBMIT_FOLDER for backward compatibility =====
+    # Save to old SUBMIT_FOLDER for backward compatibility
     old_submit_path = os.path.join(SUBMIT_FOLDER, f"{username}_{json_file}")
     with open(old_submit_path, "w", encoding='utf-8') as f:
         json.dump(data, f, indent=2, ensure_ascii=False)
     
-    # ===== 3. Save to MOBILE_DATASET with annotated JSON + WAV + TextGrid =====
-    # This uses the annotated/corrected data from the UI
+    # Save to MOBILE_DATASET
     save_to_mobile_dataset(data, username, original_wav_path, json_file)
     
-    # Mark as completed
+    # Update user statistics
+    update_user_stats(username, json_file, duration_seconds)
+    
+    # Mark as completed globally
     completed_files.add(json_file)
     save_completed_files(completed_files)
     
-    available_files = get_available_files()
-    has_more = len(available_files) > 0
+    # Release file assignment
+    release_file_assignment(json_file)
+    
+    # Check if there are more files
+    all_json_files = glob.glob(os.path.join(AUDIO_FOLDER, "*.json"))
+    total = len(all_json_files)
+    remaining = total - len(completed_files)
+    has_more = remaining > 0
+    
+    # Get updated user stats
+    user_stats = get_user_stats(username)
     
     return jsonify({
         "message": "Submitted successfully", 
         "file": json_file,
         "user_folder": f"user_submissions/{username}",
         "has_more": has_more,
-        "remaining": len(available_files)
+        "remaining": remaining,
+        "user_stats": user_stats
     })
 
-# Get progress
+# Skip file - release assignment
+@app.route("/skip-file", methods=["POST"])
+@login_required
+def skip_file():
+    data = request.json
+    json_file = data.get('json_file')
+    username = session.get('username')
+    
+    if json_file:
+        release_file_assignment(json_file)
+    
+    return jsonify({"message": "File skipped", "has_more": True})
+
+# Get progress - UPDATED with user stats
 @app.route("/progress")
 @login_required
 def progress():
+    username = session.get('username')
     all_json_files = glob.glob(os.path.join(AUDIO_FOLDER, "*.json"))
     total = len(all_json_files)
     completed = len(completed_files)
     remaining = total - completed
+    
+    user_stats = get_user_stats(username)
     
     return jsonify({
         "total": total,
         "completed": completed,
         "remaining": remaining,
         "completed_list": list(completed_files),
-        "username": session.get('username')
+        "username": username,
+        "user_stats": user_stats
     })
+
+# NEW: Get user statistics
+@app.route("/api/user-stats")
+@login_required
+def get_user_stats_endpoint():
+    username = session.get('username')
+    stats = get_user_stats(username)
+    return jsonify(stats)
+
+# NEW: Get all user statistics (for admin)
+@app.route("/api/all-user-stats")
+@login_required
+def get_all_user_stats():
+    # You can add admin check here if needed
+    stats = load_user_stats()
+    return jsonify(stats)
 
 # Serve audio files
 @app.route("/audio/<path:filename>")
@@ -446,7 +652,7 @@ def progress():
 def serve_audio(filename):
     return send_from_directory(AUDIO_FOLDER, filename)
 
-# NEW: Endpoint to list user submissions
+# Endpoint to list user submissions
 @app.route("/api/my-submissions")
 @login_required
 def get_my_submissions():
@@ -469,11 +675,10 @@ def get_my_submissions():
     submissions.sort(key=lambda x: x['modified'], reverse=True)
     return jsonify({"submissions": submissions, "username": username})
 
-# NEW: Endpoint to list MOBILE_DATASET files
+# Endpoint to list MOBILE_DATASET files
 @app.route("/api/mobile-dataset")
 @login_required
 def get_mobile_dataset():
-    """List all files in MOBILE_DATASET folder"""
     files = []
     if os.path.exists(MOBILE_DATASET_FOLDER):
         for file in os.listdir(MOBILE_DATASET_FOLDER):
@@ -489,11 +694,10 @@ def get_mobile_dataset():
     files.sort(key=lambda x: x['modified'], reverse=True)
     return jsonify({"files": files, "total": len(files)})
 
-# NEW: Download from MOBILE_DATASET
+# Download from MOBILE_DATASET
 @app.route("/mobile-dataset/<filename>")
 @login_required
 def download_mobile_dataset(filename):
-    """Download a file from MOBILE_DATASET folder"""
     return send_from_directory(MOBILE_DATASET_FOLDER, filename, as_attachment=True)
 
 if __name__ == "__main__":
