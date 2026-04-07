@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+<title>Login - Annotation Tool</title>
+
+<style>
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+body {
+    background: #F5F5F0;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.container {
+    width: 360px;
+    max-width: 100%;
+    background: white;
+    padding: 40px 32px;
+    border-radius: 28px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+}
+
+h2 {
+    font-size: 24px;
+    font-weight: 590;
+    letter-spacing: -0.3px;
+    margin-bottom: 28px;
+    color: #1C1C1A;
+}
+
+.input-group {
+    margin-bottom: 20px;
+}
+
+.input-wrapper {
+    position: relative;
+}
+
+input {
+    width: 100%;
+    padding: 14px 12px;
+    border: 1.5px solid #E5E5DE;
+    border-radius: 16px;
+    font-size: 15px;
+    transition: all 0.2s ease;
+}
+
+.password-input {
+    padding-right: 85px;
+}
+
+input:focus {
+    outline: none;
+    border-color: #2C6E49;
+}
+
+.show-btn {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: #8E8E88;
+    font-size: 13px;
+    cursor: pointer;
+    padding: 6px 10px;
+    border-radius: 30px;
+}
+
+.show-btn:hover {
+    color: #2C6E49;
+}
+
+button {
+    width: 100%;
+    padding: 14px;
+    background: #2C6E49;
+    color: white;
+    border: none;
+    border-radius: 44px;
+    font-size: 16px;
+    font-weight: 590;
+    cursor: pointer;
+    margin-top: 16px;
+    transition: all 0.2s ease;
+}
+
+button:hover {
+    background: #215A3A;
+    transform: scale(0.98);
+}
+
+p {
+    margin-top: 20px;
+    font-size: 13px;
+    color: #6E6E68;
+    text-align: center;
+}
+
+a {
+    color: #2C6E49;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+.error-message {
+    background: #FDE9E7;
+    color: #B13E3A;
+    padding: 12px;
+    border-radius: 16px;
+    font-size: 13px;
+    margin-bottom: 20px;
+    text-align: center;
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Sign In</h2>
+    
+    <div id="errorMsg" class="error-message" style="display: none;"></div>
+
+    <div class="input-group">
+        <input id="username" placeholder="Username" autocomplete="off">
+    </div>
+
+    <div class="input-group">
+        <div class="input-wrapper">
+            <input id="password" type="password" placeholder="Password" class="password-input">
+            <button type="button" class="show-btn" onclick="togglePassword()">Show</button>
+        </div>
+    </div>
+
+    <button onclick="login()">Sign In</button>
+
+    <p>
+        Don't have an account? <a href="/mobile-annotator/register">Create one</a>
+    </p>
+</div>
+
+<script>
+const BASE_PATH = "/mobile-annotator";
+
+function togglePassword() {
+    let field = document.getElementById("password");
+    let btn = event.target;
+    if (field.type === "password") {
+        field.type = "text";
+        btn.textContent = "Hide";
+    } else {
+        field.type = "password";
+        btn.textContent = "Show";
+    }
+}
+
+async function login() {
+    let username = document.getElementById("username").value.trim();
+    let password = document.getElementById("password").value.trim();
+    let errorDiv = document.getElementById("errorMsg");
+    
+    errorDiv.style.display = "none";
+    
+    if (!username || !password) {
+        errorDiv.style.display = "block";
+        errorDiv.innerText = "Please enter username and password";
+        return;
+    }
+    
+    let response = await fetch(`${BASE_PATH}/api/login`, {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({username, password})
+    });
+    
+    let data = await response.json();
+    
+    if (response.ok && data.message) {
+        window.location.href = `${BASE_PATH}/`;
+    } else {
+        errorDiv.style.display = "block";
+        errorDiv.innerText = data.error || "Login failed";
+    }
+}
+
+document.getElementById("username").addEventListener("keypress", function(e) {
+    if (e.key === "Enter") login();
+});
+document.getElementById("password").addEventListener("keypress", function(e) {
+    if (e.key === "Enter") login();
+});
+</script>
+</body>
+</html>

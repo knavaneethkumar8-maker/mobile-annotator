@@ -1,0 +1,6 @@
+data/
+annotation_submitted/
+*.log
+*.zip
+*.npz
+__pycache__/

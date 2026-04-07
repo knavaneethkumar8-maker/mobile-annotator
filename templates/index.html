@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+<title>Annotation Tool</title>
+
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  background: #F5F5F0;
+  padding: 16px;
+  color: #1C1C1A;
+  line-height: 1.4;
+}
+
+.container {
+  max-width: 680px;
+  margin: 0 auto;
+  background: #FFFFFF;
+  border-radius: 28px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02), 0 2px 6px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+  padding: 20px 18px 28px;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 18px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.header-left h2 {
+  font-size: 1.65rem;
+  font-weight: 590;
+  letter-spacing: -0.02em;
+  color: #1C1C1A;
+  margin: 0;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #F0F0EB;
+  padding: 6px 14px;
+  border-radius: 40px;
+}
+
+.user-name {
+  font-weight: 550;
+  font-size: 0.85rem;
+  color: #2C6E49;
+}
+
+.logout-btn {
+  background: none;
+  border: none;
+  color: #8E8E88;
+  font-size: 0.75rem;
+  cursor: pointer;
+  padding: 4px 8px;
+  font-weight: 500;
+  margin: 0;
+  width: auto;
+}
+
+.logout-btn:hover {
+  color: #B13E3A;
+}
+
+.remaining-badge {
+  background: #E8E8E3;
+  padding: 6px 14px;
+  border-radius: 40px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: #2C2C2A;
+}
+
+.progress-section {
+  margin-bottom: 12px;
+}
+
+.progress-bar {
+  background: #EBEBE4;
+  height: 6px;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  background: #2C6E49;
+  height: 100%;
+  width: 0%;
+  transition: width 0.25s ease-out;
+  border-radius: 12px;
+}
+
+.stats {
+  display: flex;
+  gap: 24px;
+  margin: 12px 0 8px;
+  font-size: 0.85rem;
+  color: #5E5E5A;
+  font-weight: 470;
+}
+
+.stats span {
+  background: #F5F5F0;
+  padding: 4px 12px;
+  border-radius: 32px;
+}
+
+.audio-wrapper {
+  margin: 16px 0 18px;
+}
+
+audio {
+  width: 100%;
+  border-radius: 44px;
+  background: #F9F9F6;
+  outline: none;
+}
+
+.current-file-card {
+  background: #F8F8F4;
+  border-radius: 24px;
+  padding: 14px 18px;
+  margin: 12px 0 16px;
+  font-size: 0.9rem;
+  border: 1px solid #E9E9E2;
+  color: #2E2E2A;
+}
+
+.current-file-card strong {
+  font-weight: 590;
+  color: #1A4D3A;
+}
+
+.frames-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  max-height: 540px;
+  overflow-y: auto;
+  padding: 4px 2px 8px 2px;
+  margin-top: 8px;
+}
+
+.frame-card {
+  background: #FEFEFC;
+  border: 1px solid #E5E5DE;
+  border-radius: 20px;
+  padding: 12px 14px;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+}
+
+.frame-card.active {
+  background: #EBF2EA;
+  border-color: #2C6E49;
+  box-shadow: 0 2px 8px rgba(44,110,73,0.08);
+}
+
+.frame-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 10px;
+  font-size: 0.7rem;
+  font-weight: 480;
+  letter-spacing: 0.3px;
+  color: #6E6E68;
+}
+
+.frame-time {
+  background: #EEEEE8;
+  padding: 2px 10px;
+  border-radius: 30px;
+  font-size: 0.7rem;
+  font-family: monospace;
+}
+
+.frame-label {
+  font-weight: 500;
+  text-transform: uppercase;
+  font-size: 0.7rem;
+}
+
+.edit-text {
+  border: 1px solid #DCDCD4;
+  border-radius: 18px;
+  padding: 12px 14px;
+  background: #FFFFFF;
+  font-size: 1rem;
+  font-family: inherit;
+  width: 100%;
+  outline: none;
+  transition: 0.18s ease;
+  font-weight: 460;
+  color: #1C1C1A;
+  resize: vertical;
+  cursor: text;
+  box-sizing: border-box;
+}
+
+.edit-text:focus {
+  border-color: #2C6E49;
+  box-shadow: 0 0 0 2px rgba(44,110,73,0.2);
+}
+
+.button-group {
+  display: flex;
+  gap: 14px;
+  margin: 28px 0 16px;
+}
+
+button {
+  flex: 1;
+  padding: 14px 8px;
+  border: none;
+  border-radius: 44px;
+  font-size: 1rem;
+  font-weight: 520;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: #F2F2EC;
+  color: #2C2C2A;
+}
+
+.btn-submit {
+  background: #2C6E49;
+  color: white;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+
+.btn-submit:active {
+  background: #215A3A;
+  transform: scale(0.97);
+}
+
+.btn-skip {
+  background: #E8E8E3;
+  color: #3A3A36;
+}
+
+.btn-skip:active {
+  background: #DCDCD4;
+  transform: scale(0.97);
+}
+
+.message-area {
+  margin-top: 12px;
+}
+
+.message {
+  padding: 12px 16px;
+  border-radius: 28px;
+  text-align: center;
+  font-size: 0.85rem;
+  font-weight: 470;
+}
+
+.message.success {
+  background: #E0F0E6;
+  color: #1E5631;
+}
+
+.message.error {
+  background: #FDE9E7;
+  color: #B13E3A;
+}
+
+.message.info {
+  background: #E9EDF2;
+  color: #2B4F6C;
+}
+
+.loading {
+  text-align: center;
+  padding: 48px 20px;
+  font-size: 1rem;
+  color: #6E6E68;
+  font-weight: 460;
+}
+
+.completion-box {
+  text-align: center;
+  padding: 36px 16px;
+}
+
+.completion-box h2 {
+  font-size: 1.9rem;
+  font-weight: 560;
+  letter-spacing: -0.3px;
+  color: #2C6E49;
+  margin-bottom: 12px;
+}
+
+.completion-box p {
+  font-size: 1rem;
+  margin: 18px 0;
+  color: #3C3C38;
+}
+
+.completion-box button {
+  background: #2C6E49;
+  color: white;
+  max-width: 220px;
+  margin: 16px auto 0;
+}
+
+.frames-grid::-webkit-scrollbar {
+  width: 4px;
+}
+
+.frames-grid::-webkit-scrollbar-track {
+  background: #EFEFE9;
+  border-radius: 8px;
+}
+
+.frames-grid::-webkit-scrollbar-thumb {
+  background: #BDBDB3;
+  border-radius: 8px;
+}
+
+@media (max-width: 560px) {
+  body {
+    padding: 12px;
+  }
+  .container {
+    padding: 18px 14px 24px;
+    border-radius: 24px;
+  }
+  .button-group {
+    gap: 12px;
+  }
+  button {
+    padding: 12px 8px;
+    font-size: 0.95rem;
+  }
+  .edit-text {
+    font-size: 0.95rem;
+    padding: 10px 12px;
+  }
+  .current-file-card {
+    font-size: 0.85rem;
+    padding: 12px 14px;
+  }
+  .stats span {
+    font-size: 0.75rem;
+  }
+}
+
+.empty-hint {
+  font-size: 0.7rem;
+  color: #8E8E88;
+  text-align: right;
+  margin-top: 6px;
+  padding-right: 4px;
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="header">
+    <div class="header-left">
+      <h2>Annotation Tool</h2>
+    </div>
+    <div style="display: flex; align-items: center; gap: 12px;">
+      <div class="user-info">
+        <span class="user-name" id="usernameDisplay">Loading...</span>
+        <button class="logout-btn" onclick="logout()">Sign out</button>
+      </div>
+      <div class="remaining-badge" id="remainingBadge">—</div>
+    </div>
+  </div>
+
+  <div class="progress-section">
+    <div class="progress-bar">
+      <div class="progress-fill" id="progressFill"></div>
+    </div>
+    <div class="stats">
+      <span>Total <span id="totalCount">0</span></span>
+      <span>Completed <span id="completedCount">0</span></span>
+      <span>Remaining <span id="remainingCount">0</span></span>
+    </div>
+  </div>
+
+  <div id="content">
+    <div class="loading">Loading next sample...</div>
+  </div>
+</div>
+
+<script>
+const BASE_PATH = "/mobile-annotator";
+let currentData = null;
+let currentAudio = null;
+let currentPlayTimeout = null;
+let currentUsername = '';
+
+// Check authentication and load user
+async function checkAuth() {
+  try {
+    const response = await fetch(`${BASE_PATH}/api/current-user`);
+    const data = await response.json();
+    
+    if (!data.logged_in) {
+      window.location.href = `${BASE_PATH}/login`;
+      return false;
+    }
+    
+    currentUsername = data.username;
+    document.getElementById('usernameDisplay').innerText = data.username;
+    return true;
+  } catch (err) {
+    console.error('Auth check failed:', err);
+    window.location.href = `${BASE_PATH}/login`;
+    return false;
+  }
+}
+
+// Logout
+async function logout() {
+  await fetch(`${BASE_PATH}/api/logout`, { method: 'POST' });
+  window.location.href = `${BASE_PATH}/login`;
+}
+
+// Load progress
+async function loadProgress() {
+  try {
+    const response = await fetch(`${BASE_PATH}/progress`);
+    if (response.status === 401) {
+      window.location.href = `${BASE_PATH}/login`;
+      return;
+    }
+    const data = await response.json();
+    document.getElementById('totalCount').innerText = data.total;
+    document.getElementById('completedCount').innerText = data.completed;
+    document.getElementById('remainingCount').innerText = data.remaining;
+    document.getElementById('remainingBadge').innerHTML = `${data.remaining} remaining`;
+    const percent = data.total > 0 ? (data.completed / data.total * 100).toFixed(1) : 0;
+    document.getElementById('progressFill').style.width = percent + '%';
+  } catch (err) {
+    console.warn('Progress error:', err);
+  }
+}
+
+// Load next file
+async function loadNextFile() {
+  const contentDiv = document.getElementById('content');
+  contentDiv.innerHTML = '<div class="loading">Loading next sample...</div>';
+  
+  try {
+    const response = await fetch(`${BASE_PATH}/get-next-file`);
+    if (response.status === 401) {
+      window.location.href = `${BASE_PATH}/login`;
+      return;
+    }
+    const data = await response.json();
+    
+    if (data.completed) {
+      showCompletionScreen();
+      return;
+    }
+    if (data.error) {
+      showErrorScreen(data.error);
+      return;
+    }
+    renderAnnotationInterface(data);
+    loadProgress();
+  } catch (err) {
+    console.error('Load error:', err);
+    showErrorScreen('Connection issue: ' + err);
+  }
+}
+
+function showCompletionScreen() {
+  const completedCountElem = document.getElementById('completedCount').innerText;
+  document.getElementById('content').innerHTML = `
+    <div class="completion-box">
+      <h2>All done</h2>
+      <p>You have successfully annotated all files.</p>
+      <p>Total files completed: <strong>${completedCountElem}</strong></p>
+      <button class="btn-submit" onclick="location.reload()">Reload page</button>
+    </div>
+  `;
+}
+
+function showErrorScreen(message) {
+  document.getElementById('content').innerHTML = `
+    <div class="message error" style="margin-top:20px;">Error: ${message}</div>
+    <div class="button-group" style="margin-top:20px;">
+      <button class="btn-submit" onclick="loadNextFile()">Try again</button>
+    </div>
+  `;
+}
+
+function renderAnnotationInterface(data) {
+  currentData = data;
+  
+  const contentDiv = document.getElementById('content');
+  contentDiv.innerHTML = `
+    <div class="audio-wrapper">
+      <audio id="audioPlayer" controls preload="auto">
+        <source src="${BASE_PATH}/audio/${data.wav_file}" type="audio/wav">
+      </audio>
+    </div>
+    <div class="current-file-card">
+      <div><strong>File:</strong> ${data.json_file}</div>
+      <div><strong>Word:</strong> ${data.word || '—'}</div>
+      <div><strong>Sentence:</strong> ${data.sentence || ''}</div>
+      <div style="margin-top: 8px; font-size: 0.8rem; color: #6E6E68;"><strong>Annotator:</strong> ${currentUsername}</div>
+    </div>
+    <div class="frames-grid" id="framesGrid"></div>
+    <div class="button-group">
+      <button class="btn-submit" id="submitBtn">Submit annotation</button>
+      <button class="btn-skip" id="skipBtn">Skip (keep later)</button>
+    </div>
+    <div id="messageArea" class="message-area"></div>
+  `;
+  
+  currentAudio = document.getElementById('audioPlayer');
+  if (currentAudio) {
+    currentAudio.onerror = () => showMessage('Audio could not be loaded', 'error');
+  }
+  
+  const framesGrid = document.getElementById('framesGrid');
+  framesGrid.innerHTML = '';
+  
+  currentData.frames.forEach((frame, idx) => {
+    const frameCard = document.createElement('div');
+    frameCard.className = 'frame-card';
+    frameCard.setAttribute('data-frame-index', idx);
+    frameCard.setAttribute('data-start-ms', frame.start_ms);
+    frameCard.setAttribute('data-end-ms', frame.end_ms);
+    
+    const headerDiv = document.createElement('div');
+    headerDiv.className = 'frame-header';
+    headerDiv.innerHTML = `
+      <span class="frame-label">Segment ${idx+1}</span>
+      <span class="frame-time">${frame.start_ms}–${frame.end_ms} ms</span>
+    `;
+    
+    const editDiv = document.createElement('div');
+    editDiv.setAttribute('contenteditable', 'true');
+    editDiv.className = 'edit-text';
+    const currentText = frame.text || '';
+    editDiv.innerText = currentText;
+    editDiv.setAttribute('data-frame-idx', idx);
+    
+    editDiv.addEventListener('click', (e) => e.stopPropagation());
+    editDiv.addEventListener('blur', (e) => {
+      let newText = e.target.innerText;
+      if (newText === null || newText === undefined) newText = '';
+      updateFrameText(idx, newText);
+    });
+    
+    frameCard.appendChild(headerDiv);
+    frameCard.appendChild(editDiv);
+    
+    frameCard.addEventListener('click', (e) => {
+      if (e.target === editDiv || editDiv.contains(e.target)) return;
+      playSegment(idx, frameCard);
+    });
+    
+    framesGrid.appendChild(frameCard);
+  });
+  
+  const hint = document.createElement('div');
+  hint.className = 'empty-hint';
+  hint.innerText = 'Segments can be left empty';
+  framesGrid.appendChild(hint);
+  
+  document.getElementById('submitBtn').addEventListener('click', () => submitAnnotation());
+  document.getElementById('skipBtn').addEventListener('click', () => skipFile());
+}
+
+async function updateFrameText(index, newText) {
+  if (!currentData) return;
+  
+  const finalText = (newText === undefined || newText === null) ? '' : newText;
+  
+  try {
+    const response = await fetch(`${BASE_PATH}/update-frame`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        json_file: currentData.json_file,
+        frame_index: index,
+        text: finalText
+      })
+    });
+    
+    if (response.status === 401) {
+      window.location.href = `${BASE_PATH}/login`;
+      return;
+    }
+    
+    const data = await response.json();
+    if (data.success) {
+      if (currentData.frames[index]) {
+        currentData.frames[index].text = finalText;
+      }
+      currentData.full_sequence = data.full_sequence;
+      showMessage('Frame updated', 'success');
+    } else {
+      showMessage('Update failed', 'error');
+    }
+  } catch (err) {
+    showMessage('Error updating frame', 'error');
+  }
+}
+
+function playSegment(frameIndex, cardElement) {
+  if (currentPlayTimeout) {
+    clearTimeout(currentPlayTimeout);
+    currentPlayTimeout = null;
+  }
+  if (!currentAudio) {
+    showMessage('Audio player not ready', 'error');
+    return;
+  }
+  
+  const frame = currentData.frames[frameIndex];
+  if (!frame) return;
+  
+  const startSec = frame.start_ms / 1000;
+  const endSec = frame.end_ms / 1000;
+  const durationSec = endSec - startSec;
+  
+  document.querySelectorAll('.frame-card').forEach(card => card.classList.remove('active'));
+  if (cardElement) cardElement.classList.add('active');
+  
+  currentAudio.pause();
+  currentAudio.currentTime = startSec;
+  
+  const playPromise = currentAudio.play();
+  if (playPromise !== undefined) {
+    playPromise.then(() => {
+      currentPlayTimeout = setTimeout(() => {
+        if (currentAudio && !currentAudio.paused) {
+          currentAudio.pause();
+        }
+        currentPlayTimeout = null;
+      }, durationSec * 1000);
+    }).catch(err => {
+      console.warn('Playback error:', err);
+      showMessage('Cannot play segment', 'error');
+      if (cardElement) cardElement.classList.remove('active');
+    });
+  }
+  
+  currentAudio.onended = () => {
+    if (currentPlayTimeout) {
+      clearTimeout(currentPlayTimeout);
+      currentPlayTimeout = null;
+    }
+  };
+}
+
+async function submitAnnotation() {
+  if (!currentData) {
+    showMessage('No data to submit', 'error');
+    return;
+  }
+  
+  for (let i = 0; i < currentData.frames.length; i++) {
+    if (currentData.frames[i].text === undefined || currentData.frames[i].text === null) {
+      currentData.frames[i].text = '';
+    }
+  }
+  
+  const submitPayload = {
+    json_file: currentData.json_file,
+    wav_file: currentData.wav_file,
+    word: currentData.word,
+    sentence: currentData.sentence,
+    sentence_devanagari: currentData.sentence_devanagari,
+    full_sequence: currentData.full_sequence,
+    frames: currentData.frames,
+    window_ms: currentData.window_ms,
+    language: currentData.language
+  };
+  
+  showMessage('Submitting annotation...', 'info');
+  
+  try {
+    const response = await fetch(`${BASE_PATH}/submit`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(submitPayload)
+    });
+    
+    if (response.status === 401) {
+      window.location.href = `${BASE_PATH}/login`;
+      return;
+    }
+    
+    const data = await response.json();
+    
+    if (data.has_more) {
+      showMessage(`Submitted. ${data.remaining} files remaining.`, 'success');
+      setTimeout(() => loadNextFile(), 1200);
+    } else {
+      showMessage('All files completed! Well done.', 'success');
+      setTimeout(() => loadNextFile(), 1500);
+    }
+    loadProgress();
+  } catch (err) {
+    console.error('Submit error:', err);
+    showMessage('Error during submission', 'error');
+  }
+}
+
+function skipFile() {
+  if (!currentData) return;
+  if (currentAudio) {
+    currentAudio.pause();
+  }
+  if (currentPlayTimeout) {
+    clearTimeout(currentPlayTimeout);
+    currentPlayTimeout = null;
+  }
+  showMessage('Skipping to next file...', 'info');
+  setTimeout(() => loadNextFile(), 300);
+}
+
+function showMessage(text, type) {
+  const msgDiv = document.getElementById('messageArea');
+  if (!msgDiv) return;
+  msgDiv.innerHTML = `<div class="message ${type}">${text}</div>`;
+  setTimeout(() => {
+    if (msgDiv.firstChild && msgDiv.firstChild.innerText === text) {
+      msgDiv.innerHTML = '';
+    }
+  }, 2800);
+}
+
+// Initialize
+async function init() {
+  const authed = await checkAuth();
+  if (authed) {
+    loadProgress();
+    loadNextFile();
+    setInterval(loadProgress, 10000);
+  }
+}
+
+init();
+</script>
+</body>
+</html>
