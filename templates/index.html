@@ -109,7 +109,7 @@ body {
 
 .stats {
   display: flex;
-  gap: 16px;
+  gap: 12px;
   margin: 12px 0 8px;
   font-size: 0.8rem;
   color: #5E5E5A;
@@ -123,137 +123,79 @@ body {
   border-radius: 32px;
   flex: 1;
   text-align: center;
-  min-width: 100px;
+  min-width: 90px;
 }
 
-/* Daily stats styles */
-.daily-stats-section {
-  margin: 16px 0 8px;
-  background: #F8F8F4;
-  border-radius: 20px;
-  padding: 12px 16px;
-}
-
-.daily-stats-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 12px;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.daily-stats-title {
-  font-weight: 590;
-  font-size: 0.85rem;
-  color: #2C6E49;
-}
-
-.daily-stats-date {
-  font-size: 0.7rem;
-  color: #8E8E88;
-}
-
-.daily-stats-container {
-  max-height: 250px;
-  overflow-y: auto;
-}
-
-.daily-stat-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 10px 0;
-  border-bottom: 1px solid #E9E9E2;
-}
-
-.daily-stat-item:last-child {
-  border-bottom: none;
-}
-
-.daily-stat-date {
-  font-weight: 500;
-  font-size: 0.8rem;
-  color: #2C2C2A;
-}
-
-.daily-stat-subdate {
-  font-size: 0.65rem;
-  color: #8E8E88;
-  margin-top: 2px;
-}
-
-.daily-stat-stats {
+/* Stats cards for today and total */
+.stats-cards {
   display: flex;
   gap: 12px;
-  font-size: 0.75rem;
-  color: #6E6E68;
+  margin: 12px 0 8px;
 }
 
-.daily-stat-stats span {
-  background: #FFFFFF;
-  padding: 4px 10px;
+.stat-card {
+  flex: 1;
+  background: #F8F8F4;
   border-radius: 20px;
-  font-size: 0.7rem;
-}
-
-.daily-stat-badge {
-  background: #2C6E49;
-  color: white;
-  padding: 2px 8px;
-  border-radius: 20px;
-  font-size: 0.6rem;
-  font-weight: 500;
-  margin-left: 8px;
-}
-
-.total-stats-card {
-  background: #EBF2EA;
-  border-radius: 16px;
   padding: 12px;
-  margin-bottom: 12px;
+  text-align: center;
+  border: 1px solid #E9E9E2;
 }
 
-.total-stats-card .label {
+.stat-card-label {
   font-size: 0.7rem;
-  color: #5E5E5A;
+  color: #8E8E88;
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  margin-bottom: 6px;
 }
 
-.total-stats-card .value {
-  font-size: 1.2rem;
+.stat-card-value {
+  font-size: 1.3rem;
   font-weight: 600;
   color: #2C6E49;
 }
 
-.total-stats-row {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 8px;
-  gap: 16px;
-}
-
-.total-stats-item {
-  flex: 1;
-  text-align: center;
-}
-
-.daily-divider {
-  margin: 8px 0 4px;
-  font-size: 0.7rem;
+.stat-card-sub {
+  font-size: 0.65rem;
   color: #8E8E88;
-  display: flex;
-  align-items: center;
-  gap: 8px;
+  margin-top: 4px;
 }
 
-.daily-divider::before,
-.daily-divider::after {
-  content: "";
-  flex: 1;
-  height: 1px;
-  background: #E9E9E2;
+/* Akshar Set Styles */
+.akshar-set-section {
+  margin: 12px 0 16px;
+  background: #F8F8F4;
+  border-radius: 20px;
+  padding: 12px 16px;
+  border: 1px solid #E9E9E2;
+}
+
+.akshar-title {
+  font-weight: 590;
+  font-size: 0.75rem;
+  color: #2C6E49;
+  margin-bottom: 10px;
+  letter-spacing: 0.3px;
+}
+
+.akshar-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.akshar-item {
+  background: #FFFFFF;
+  border: 1px solid #E5E5DE;
+  border-radius: 12px;
+  padding: 6px 10px;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #1C1C1A;
+  min-width: 44px;
+  text-align: center;
+  font-family: monospace;
 }
 
 .audio-wrapper {
@@ -339,7 +281,7 @@ audio {
   padding: 12px 14px;
   background: #FFFFFF;
   font-size: 1rem;
-  font-family: inherit;
+  font-family: monospace;
   width: 100%;
   outline: none;
   transition: 0.18s ease;
@@ -471,20 +413,6 @@ button {
   border-radius: 8px;
 }
 
-.daily-stats-container::-webkit-scrollbar {
-  width: 3px;
-}
-
-.daily-stats-container::-webkit-scrollbar-track {
-  background: #EFEFE9;
-  border-radius: 8px;
-}
-
-.daily-stats-container::-webkit-scrollbar-thumb {
-  background: #BDBDB3;
-  border-radius: 8px;
-}
-
 @media (max-width: 560px) {
   body {
     padding: 12px;
@@ -501,7 +429,7 @@ button {
     font-size: 0.95rem;
   }
   .edit-text {
-    font-size: 0.95rem;
+    font-size: 0.9rem;
     padding: 10px 12px;
   }
   .current-file-card {
@@ -511,14 +439,15 @@ button {
   .stats span {
     font-size: 0.7rem;
     padding: 4px 8px;
-    min-width: 80px;
+    min-width: 70px;
   }
-  .daily-stat-stats {
-    gap: 6px;
+  .akshar-item {
+    padding: 4px 8px;
+    font-size: 0.85rem;
+    min-width: 36px;
   }
-  .daily-stat-stats span {
-    padding: 2px 6px;
-    font-size: 0.65rem;
+  .stat-card-value {
+    font-size: 1rem;
   }
 }
 
@@ -551,22 +480,26 @@ button {
     <div class="progress-bar">
       <div class="progress-fill" id="progressFill"></div>
     </div>
-    <div class="stats">
-      <span>Total Files: <span id="totalCount">0</span></span>
-      <span>My Files: <span id="myFilesCount">0</span></span>
-      <span>My Duration: <span id="myDuration">0s</span></span>
+  </div>
+
+  <!-- Stats Cards: Today and Total -->
+  <div class="stats-cards">
+    <div class="stat-card">
+      <div class="stat-card-label">Today</div>
+      <div class="stat-card-value" id="todayFiles">0</div>
+      <div class="stat-card-sub" id="todayDuration">0s</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-card-label">Total</div>
+      <div class="stat-card-value" id="totalFiles">0</div>
+      <div class="stat-card-sub" id="totalDuration">0s</div>
     </div>
   </div>
 
-  <!-- Daily Stats Section -->
-  <div class="daily-stats-section">
-    <div class="daily-stats-header">
-      <span class="daily-stats-title">Daily Progress</span>
-      <span class="daily-stats-date" id="dailyStatsDate">Today</span>
-    </div>
-    <div id="dailyStatsContainer" class="daily-stats-container">
-      <div style="text-align: center; color: #8E8E88; padding: 16px;">Loading daily stats...</div>
-    </div>
+  <!-- Akshar Set Section -->
+  <div class="akshar-set-section">
+    <div class="akshar-title">Allowed Akshar Set</div>
+    <div class="akshar-grid" id="aksharGrid"></div>
   </div>
 
   <div id="content">
@@ -576,10 +509,34 @@ button {
 
 <script>
 const BASE_PATH = "/mobile-annotator";
+const AKSHAR_SET = [
+  "अ", "आ", "इ", "उ", "ए", "ओ",
+  "क", "ख", "ग", "घ", "च", "छ", "ज", "झ",
+  "ट", "ठ", "ड", "ढ", "त", "थ", "द", "ध",
+  "प", "फ", "ब", "भ",
+  "न", "म",
+  "य", "र", "ल", "व",
+  "स", "ह", "०"
+];
+
 let currentData = null;
 let currentAudio = null;
 let currentPlayTimeout = null;
 let currentUsername = '';
+
+// Render Akshar Set
+function renderAksharSet() {
+  const container = document.getElementById('aksharGrid');
+  if (!container) return;
+  
+  container.innerHTML = '';
+  AKSHAR_SET.forEach(akshar => {
+    const span = document.createElement('span');
+    span.className = 'akshar-item';
+    span.textContent = akshar;
+    container.appendChild(span);
+  });
+}
 
 // Check authentication and load user
 async function checkAuth() {
@@ -618,94 +575,38 @@ async function loadProgress() {
     }
     const data = await response.json();
     
-    // Update total files
-    document.getElementById('totalCount').innerText = data.total;
-    
-    // Update user stats (my files and my duration)
-    if (data.user_stats) {
-      document.getElementById('myFilesCount').innerText = data.user_stats.total_files_completed || 0;
-      document.getElementById('myDuration').innerText = data.user_stats.total_duration_formatted || '0s';
-    }
-    
-    // Update progress bar (global progress)
+    // Update progress bar
     const percent = data.total > 0 ? (data.completed / data.total * 100).toFixed(1) : 0;
     document.getElementById('progressFill').style.width = percent + '%';
     document.getElementById('remainingBadge').innerHTML = `${data.remaining} remaining`;
     
-    // Render daily stats
-    renderDailyStats(data.user_daily_stats);
+    // Update stats cards
+    if (data.user_stats) {
+      // Total stats
+      document.getElementById('totalFiles').innerText = data.user_stats.total_files_completed || 0;
+      document.getElementById('totalDuration').innerText = data.user_stats.total_duration_formatted || '0s';
+    }
+    
+    // Update today's stats from daily_stats
+    if (data.user_daily_stats && data.user_daily_stats.daily) {
+      const today = new Date().toISOString().split('T')[0];
+      const todayStats = data.user_daily_stats.daily[today];
+      
+      if (todayStats) {
+        document.getElementById('todayFiles').innerText = todayStats.files_completed || 0;
+        document.getElementById('todayDuration').innerText = todayStats.duration_formatted || '0s';
+      } else {
+        document.getElementById('todayFiles').innerText = '0';
+        document.getElementById('todayDuration').innerText = '0s';
+      }
+    } else {
+      document.getElementById('todayFiles').innerText = '0';
+      document.getElementById('todayDuration').innerText = '0s';
+    }
     
   } catch (err) {
     console.warn('Progress error:', err);
   }
-}
-
-// Render daily statistics
-function renderDailyStats(dailyStats) {
-  const container = document.getElementById('dailyStatsContainer');
-  if (!container) return;
-  
-  if (!dailyStats || !dailyStats.daily || Object.keys(dailyStats.daily).length === 0) {
-    container.innerHTML = '<div style="text-align: center; color: #8E8E88; padding: 16px;">No submissions yet</div>';
-    return;
-  }
-  
-  // Get today's date
-  const today = new Date().toISOString().split('T')[0];
-  document.getElementById('dailyStatsDate').innerText = `Last 7 days`;
-  
-  // Sort dates in descending order (most recent first) and show last 7 days
-  const sortedDates = Object.keys(dailyStats.daily).sort().reverse().slice(0, 7);
-  
-  let html = '';
-  
-  // Add total stats card
-  html += `
-    <div class="total-stats-card">
-      <div class="label">📈 All Time Stats</div>
-      <div class="total-stats-row">
-        <div class="total-stats-item">
-          <div class="label">Files</div>
-          <div class="value">${dailyStats.total?.files_completed || 0}</div>
-        </div>
-        <div class="total-stats-item">
-          <div class="label">Duration</div>
-          <div class="value">${dailyStats.total?.duration_formatted || '0s'}</div>
-        </div>
-      </div>
-    </div>
-  `;
-  
-  // Add daily breakdown header
-  if (sortedDates.length > 0) {
-    html += '<div class="daily-divider">Daily Breakdown</div>';
-  }
-  
-  for (const date of sortedDates) {
-    const dayStats = dailyStats.daily[date];
-    const isToday = date === today;
-    const dateObj = new Date(date);
-    const formattedDate = dateObj.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
-    const dayName = dateObj.toLocaleDateString('en-US', { weekday: 'short' });
-    
-    html += `
-      <div class="daily-stat-item">
-        <div>
-          <div class="daily-stat-date" style="display: flex; align-items: center; flex-wrap: wrap; gap: 6px;">
-            ${formattedDate}
-            ${isToday ? '<span class="daily-stat-badge">Today</span>' : ''}
-          </div>
-          <div class="daily-stat-subdate">${date}</div>
-        </div>
-        <div class="daily-stat-stats">
-          <span>📁 ${dayStats.files_completed}</span>
-          <span>⏱️ ${dayStats.duration_formatted}</span>
-        </div>
-      </div>
-    `;
-  }
-  
-  container.innerHTML = html;
 }
 
 // Load next file
@@ -985,7 +886,6 @@ function skipFile() {
     currentPlayTimeout = null;
   }
   
-  // Send skip request to release assignment
   fetch(`${BASE_PATH}/skip-file`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -1009,6 +909,7 @@ function showMessage(text, type) {
 
 // Initialize
 async function init() {
+  renderAksharSet();
   const authed = await checkAuth();
   if (authed) {
     loadProgress();
