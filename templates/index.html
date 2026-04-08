@@ -109,17 +109,151 @@ body {
 
 .stats {
   display: flex;
-  gap: 24px;
+  gap: 16px;
   margin: 12px 0 8px;
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   color: #5E5E5A;
   font-weight: 470;
+  flex-wrap: wrap;
 }
 
 .stats span {
   background: #F5F5F0;
-  padding: 4px 12px;
+  padding: 6px 12px;
   border-radius: 32px;
+  flex: 1;
+  text-align: center;
+  min-width: 100px;
+}
+
+/* Daily stats styles */
+.daily-stats-section {
+  margin: 16px 0 8px;
+  background: #F8F8F4;
+  border-radius: 20px;
+  padding: 12px 16px;
+}
+
+.daily-stats-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.daily-stats-title {
+  font-weight: 590;
+  font-size: 0.85rem;
+  color: #2C6E49;
+}
+
+.daily-stats-date {
+  font-size: 0.7rem;
+  color: #8E8E88;
+}
+
+.daily-stats-container {
+  max-height: 250px;
+  overflow-y: auto;
+}
+
+.daily-stat-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid #E9E9E2;
+}
+
+.daily-stat-item:last-child {
+  border-bottom: none;
+}
+
+.daily-stat-date {
+  font-weight: 500;
+  font-size: 0.8rem;
+  color: #2C2C2A;
+}
+
+.daily-stat-subdate {
+  font-size: 0.65rem;
+  color: #8E8E88;
+  margin-top: 2px;
+}
+
+.daily-stat-stats {
+  display: flex;
+  gap: 12px;
+  font-size: 0.75rem;
+  color: #6E6E68;
+}
+
+.daily-stat-stats span {
+  background: #FFFFFF;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.7rem;
+}
+
+.daily-stat-badge {
+  background: #2C6E49;
+  color: white;
+  padding: 2px 8px;
+  border-radius: 20px;
+  font-size: 0.6rem;
+  font-weight: 500;
+  margin-left: 8px;
+}
+
+.total-stats-card {
+  background: #EBF2EA;
+  border-radius: 16px;
+  padding: 12px;
+  margin-bottom: 12px;
+}
+
+.total-stats-card .label {
+  font-size: 0.7rem;
+  color: #5E5E5A;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.total-stats-card .value {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #2C6E49;
+}
+
+.total-stats-row {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 8px;
+  gap: 16px;
+}
+
+.total-stats-item {
+  flex: 1;
+  text-align: center;
+}
+
+.daily-divider {
+  margin: 8px 0 4px;
+  font-size: 0.7rem;
+  color: #8E8E88;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.daily-divider::before,
+.daily-divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: #E9E9E2;
 }
 
 .audio-wrapper {
@@ -337,6 +471,20 @@ button {
   border-radius: 8px;
 }
 
+.daily-stats-container::-webkit-scrollbar {
+  width: 3px;
+}
+
+.daily-stats-container::-webkit-scrollbar-track {
+  background: #EFEFE9;
+  border-radius: 8px;
+}
+
+.daily-stats-container::-webkit-scrollbar-thumb {
+  background: #BDBDB3;
+  border-radius: 8px;
+}
+
 @media (max-width: 560px) {
   body {
     padding: 12px;
@@ -361,7 +509,16 @@ button {
     padding: 12px 14px;
   }
   .stats span {
-    font-size: 0.75rem;
+    font-size: 0.7rem;
+    padding: 4px 8px;
+    min-width: 80px;
+  }
+  .daily-stat-stats {
+    gap: 6px;
+  }
+  .daily-stat-stats span {
+    padding: 2px 6px;
+    font-size: 0.65rem;
   }
 }
 
@@ -395,9 +552,20 @@ button {
       <div class="progress-fill" id="progressFill"></div>
     </div>
     <div class="stats">
-      <span>Total <span id="totalCount">0</span></span>
-      <span>Completed <span id="completedCount">0</span></span>
-      <span>Remaining <span id="remainingCount">0</span></span>
+      <span>📁 Total Files: <span id="totalCount">0</span></span>
+      <span>✅ My Files: <span id="myFilesCount">0</span></span>
+      <span>⏱️ My Duration: <span id="myDuration">0s</span></span>
+    </div>
+  </div>
+
+  <!-- Daily Stats Section -->
+  <div class="daily-stats-section">
+    <div class="daily-stats-header">
+      <span class="daily-stats-title">📊 Daily Progress</span>
+      <span class="daily-stats-date" id="dailyStatsDate">Today</span>
+    </div>
+    <div id="dailyStatsContainer" class="daily-stats-container">
+      <div style="text-align: center; color: #8E8E88; padding: 16px;">Loading daily stats...</div>
     </div>
   </div>
 
@@ -440,7 +608,7 @@ async function logout() {
   window.location.href = `${BASE_PATH}/login`;
 }
 
-// Load progress
+// Load progress with user stats
 async function loadProgress() {
   try {
     const response = await fetch(`${BASE_PATH}/progress`);
@@ -449,15 +617,95 @@ async function loadProgress() {
       return;
     }
     const data = await response.json();
+    
+    // Update total files
     document.getElementById('totalCount').innerText = data.total;
-    document.getElementById('completedCount').innerText = data.completed;
-    document.getElementById('remainingCount').innerText = data.remaining;
-    document.getElementById('remainingBadge').innerHTML = `${data.remaining} remaining`;
+    
+    // Update user stats (my files and my duration)
+    if (data.user_stats) {
+      document.getElementById('myFilesCount').innerText = data.user_stats.total_files_completed || 0;
+      document.getElementById('myDuration').innerText = data.user_stats.total_duration_formatted || '0s';
+    }
+    
+    // Update progress bar (global progress)
     const percent = data.total > 0 ? (data.completed / data.total * 100).toFixed(1) : 0;
     document.getElementById('progressFill').style.width = percent + '%';
+    document.getElementById('remainingBadge').innerHTML = `${data.remaining} remaining`;
+    
+    // Render daily stats
+    renderDailyStats(data.user_daily_stats);
+    
   } catch (err) {
     console.warn('Progress error:', err);
   }
+}
+
+// Render daily statistics
+function renderDailyStats(dailyStats) {
+  const container = document.getElementById('dailyStatsContainer');
+  if (!container) return;
+  
+  if (!dailyStats || !dailyStats.daily || Object.keys(dailyStats.daily).length === 0) {
+    container.innerHTML = '<div style="text-align: center; color: #8E8E88; padding: 16px;">No submissions yet</div>';
+    return;
+  }
+  
+  // Get today's date
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('dailyStatsDate').innerText = `Last 7 days`;
+  
+  // Sort dates in descending order (most recent first) and show last 7 days
+  const sortedDates = Object.keys(dailyStats.daily).sort().reverse().slice(0, 7);
+  
+  let html = '';
+  
+  // Add total stats card
+  html += `
+    <div class="total-stats-card">
+      <div class="label">📈 All Time Stats</div>
+      <div class="total-stats-row">
+        <div class="total-stats-item">
+          <div class="label">Files</div>
+          <div class="value">${dailyStats.total?.files_completed || 0}</div>
+        </div>
+        <div class="total-stats-item">
+          <div class="label">Duration</div>
+          <div class="value">${dailyStats.total?.duration_formatted || '0s'}</div>
+        </div>
+      </div>
+    </div>
+  `;
+  
+  // Add daily breakdown header
+  if (sortedDates.length > 0) {
+    html += '<div class="daily-divider">Daily Breakdown</div>';
+  }
+  
+  for (const date of sortedDates) {
+    const dayStats = dailyStats.daily[date];
+    const isToday = date === today;
+    const dateObj = new Date(date);
+    const formattedDate = dateObj.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+    const dayName = dateObj.toLocaleDateString('en-US', { weekday: 'short' });
+    
+    html += `
+      <div class="daily-stat-item">
+        <div>
+          <div class="daily-stat-date" style="display: flex; align-items: center; flex-wrap: wrap; gap: 6px;">
+            ${formattedDate}
+            ${isToday ? '<span class="daily-stat-badge">Today</span>' : ''}
+          </div>
+          <div class="daily-stat-subdate">${date}</div>
+        </div>
+        <div class="daily-stat-stats">
+          <span>📁 ${dayStats.files_completed}</span>
+          <span>⏱️ ${dayStats.duration_formatted}</span>
+        </div>
+      </div>
+    `;
+  }
+  
+  container.innerHTML = html;
 }
 
 // Load next file
@@ -490,12 +738,10 @@ async function loadNextFile() {
 }
 
 function showCompletionScreen() {
-  const completedCountElem = document.getElementById('completedCount').innerText;
   document.getElementById('content').innerHTML = `
     <div class="completion-box">
       <h2>All done</h2>
       <p>You have successfully annotated all files.</p>
-      <p>Total files completed: <strong>${completedCountElem}</strong></p>
       <button class="btn-submit" onclick="location.reload()">Reload page</button>
     </div>
   `;
@@ -535,7 +781,7 @@ function saveAllPendingEdits() {
   return updated;
 }
 
-// FIXED: Function to play segment - now can be called from anywhere
+// Function to play segment
 function playSegmentByIndex(frameIndex) {
   if (!currentData || !currentAudio) {
     showMessage('Audio not ready', 'error');
@@ -545,7 +791,6 @@ function playSegmentByIndex(frameIndex) {
   const frame = currentData.frames[frameIndex];
   if (!frame) return;
   
-  // Stop any currently playing audio
   if (currentPlayTimeout) {
     clearTimeout(currentPlayTimeout);
     currentPlayTimeout = null;
@@ -555,7 +800,6 @@ function playSegmentByIndex(frameIndex) {
   const endSec = frame.end_ms / 1000;
   const durationSec = endSec - startSec;
   
-  // Update active card styling
   document.querySelectorAll('.frame-card').forEach(card => card.classList.remove('active'));
   const activeCard = document.querySelector(`.frame-card[data-frame-index="${frameIndex}"]`);
   if (activeCard) activeCard.classList.add('active');
@@ -640,7 +884,6 @@ function renderAnnotationInterface(data) {
     editDiv.innerText = currentText;
     editDiv.setAttribute('data-frame-idx', idx);
     
-    // Update on input (real-time)
     editDiv.addEventListener('input', (e) => {
       const newText = e.target.innerText || '';
       if (currentData && currentData.frames[idx]) {
@@ -650,7 +893,6 @@ function renderAnnotationInterface(data) {
       }
     });
     
-    // FIXED: When clicking on the input box, play the segment
     editDiv.addEventListener('click', (e) => {
       e.stopPropagation();
       playSegmentByIndex(idx);
@@ -659,7 +901,6 @@ function renderAnnotationInterface(data) {
     frameCard.appendChild(headerDiv);
     frameCard.appendChild(editDiv);
     
-    // When clicking on the card (but not on input), play the segment
     frameCard.addEventListener('click', (e) => {
       if (e.target === editDiv || editDiv.contains(e.target)) return;
       playSegmentByIndex(idx);
@@ -677,57 +918,14 @@ function renderAnnotationInterface(data) {
   document.getElementById('skipBtn').addEventListener('click', () => skipFile());
 }
 
-async function updateFrameText(index, newText) {
-  if (!currentData) return;
-  
-  const finalText = (newText === undefined || newText === null) ? '' : newText;
-  
-  try {
-    const response = await fetch(`${BASE_PATH}/update-frame`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        json_file: currentData.json_file,
-        frame_index: index,
-        text: finalText
-      })
-    });
-    
-    if (response.status === 401) {
-      window.location.href = `${BASE_PATH}/login`;
-      return;
-    }
-    
-    const data = await response.json();
-    if (data.success) {
-      if (currentData.frames[index]) {
-        currentData.frames[index].text = finalText;
-      }
-      currentData.full_sequence = data.full_sequence;
-      showMessage('Frame updated', 'success');
-    } else {
-      showMessage('Update failed', 'error');
-    }
-  } catch (err) {
-    showMessage('Error updating frame', 'error');
-  }
-}
-
-function playSegment(frameIndex, cardElement) {
-  // Legacy function - kept for compatibility, but now using playSegmentByIndex
-  playSegmentByIndex(frameIndex);
-}
-
 async function submitAnnotation() {
   if (!currentData) {
     showMessage('No data to submit', 'error');
     return;
   }
   
-  // Save all pending edits from the UI before submission
   saveAllPendingEdits();
   
-  // Ensure all frames have text property (null/undefined -> empty string)
   for (let i = 0; i < currentData.frames.length; i++) {
     if (currentData.frames[i].text === undefined || currentData.frames[i].text === null) {
       currentData.frames[i].text = '';
@@ -743,7 +941,8 @@ async function submitAnnotation() {
     full_sequence: currentData.full_sequence,
     frames: currentData.frames,
     window_ms: currentData.window_ms,
-    language: currentData.language
+    language: currentData.language,
+    duration_ms: currentData.duration_ms || 0
   };
   
   showMessage('Submitting annotation...', 'info');
@@ -763,7 +962,7 @@ async function submitAnnotation() {
     const data = await response.json();
     
     if (data.has_more) {
-      showMessage(`Submitted. ${data.remaining} files remaining.`, 'success');
+      showMessage(`Submitted! ${data.remaining} files remaining.`, 'success');
       setTimeout(() => loadNextFile(), 1200);
     } else {
       showMessage('All files completed! Well done.', 'success');
@@ -785,6 +984,14 @@ function skipFile() {
     clearTimeout(currentPlayTimeout);
     currentPlayTimeout = null;
   }
+  
+  // Send skip request to release assignment
+  fetch(`${BASE_PATH}/skip-file`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ json_file: currentData.json_file })
+  }).catch(err => console.warn('Skip error:', err));
+  
   showMessage('Skipping to next file...', 'info');
   setTimeout(() => loadNextFile(), 300);
 }

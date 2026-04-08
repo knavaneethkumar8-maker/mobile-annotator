@@ -609,7 +609,143 @@ def skip_file():
     
     return jsonify({"message": "File skipped", "has_more": True})
 
-# Get progress - UPDATED with user stats
+
+# Add these new functions after the existing load_user_stats() and save_user_stats()
+
+def load_daily_stats():
+    """Load daily statistics from JSON file"""
+    DAILY_STATS_FILE = "daily_stats.json"
+    if os.path.exists(DAILY_STATS_FILE):
+        with open(DAILY_STATS_FILE, 'r') as f:
+            return json.load(f)
+    return {}
+
+def save_daily_stats(stats):
+    """Save daily statistics to JSON file"""
+    DAILY_STATS_FILE = "daily_stats.json"
+    with open(DAILY_STATS_FILE, 'w') as f:
+        json.dump(stats, f, indent=2)
+
+def update_daily_stats(username, json_file, duration_seconds):
+    """Update daily statistics for a user"""
+    today = datetime.now().strftime("%Y-%m-%d")
+    daily_stats = load_daily_stats()
+    
+    # Initialize user's daily stats if not exists
+    if username not in daily_stats:
+        daily_stats[username] = {
+            "total": {
+                "files_completed": 0,
+                "duration_seconds": 0,
+                "duration_formatted": "0s"
+            },
+            "daily": {}
+        }
+    
+    # Update daily stats
+    if today not in daily_stats[username]["daily"]:
+        daily_stats[username]["daily"][today] = {
+            "files_completed": 0,
+            "duration_seconds": 0,
+            "duration_formatted": "0s",
+            "files": []
+        }
+    
+    # Add file to daily stats if not already counted
+    if json_file not in daily_stats[username]["daily"][today]["files"]:
+        daily_stats[username]["daily"][today]["files_completed"] += 1
+        daily_stats[username]["daily"][today]["duration_seconds"] += duration_seconds
+        daily_stats[username]["daily"][today]["files"].append(json_file)
+        
+        # Format daily duration
+        secs = daily_stats[username]["daily"][today]["duration_seconds"]
+        if secs < 60:
+            daily_stats[username]["daily"][today]["duration_formatted"] = f"{secs:.1f}s"
+        elif secs < 3600:
+            mins = int(secs // 60)
+            secs_rem = int(secs % 60)
+            daily_stats[username]["daily"][today]["duration_formatted"] = f"{mins}m {secs_rem}s"
+        else:
+            hours = int(secs // 3600)
+            mins = int((secs % 3600) // 60)
+            daily_stats[username]["daily"][today]["duration_formatted"] = f"{hours}h {mins}m"
+    
+    # Update total stats
+    daily_stats[username]["total"]["files_completed"] += 1
+    daily_stats[username]["total"]["duration_seconds"] += duration_seconds
+    
+    total_secs = daily_stats[username]["total"]["duration_seconds"]
+    if total_secs < 60:
+        daily_stats[username]["total"]["duration_formatted"] = f"{total_secs:.1f}s"
+    elif total_secs < 3600:
+        mins = int(total_secs // 60)
+        secs_rem = int(total_secs % 60)
+        daily_stats[username]["total"]["duration_formatted"] = f"{mins}m {secs_rem}s"
+    else:
+        hours = int(total_secs // 3600)
+        mins = int((total_secs % 3600) // 60)
+        daily_stats[username]["total"]["duration_formatted"] = f"{hours}h {mins}m"
+    
+    save_daily_stats(daily_stats)
+    return daily_stats[username]
+
+def get_user_daily_stats(username):
+    """Get daily statistics for a specific user"""
+    daily_stats = load_daily_stats()
+    if username in daily_stats:
+        return daily_stats[username]
+    return {
+        "total": {
+            "files_completed": 0,
+            "duration_seconds": 0,
+            "duration_formatted": "0s"
+        },
+        "daily": {}
+    }
+
+# Update the update_user_stats function to also update daily stats
+def update_user_stats(username, json_file, duration_seconds):
+    """Update user statistics when a file is completed"""
+    stats = load_user_stats()
+    
+    if username not in stats:
+        stats[username] = {
+            "completed_files": [],
+            "total_files_completed": 0,
+            "total_duration_seconds": 0,
+            "total_duration_formatted": "0s",
+            "last_active": None
+        }
+    
+    # Add file to completed list if not already there
+    if json_file not in stats[username]["completed_files"]:
+        stats[username]["completed_files"].append(json_file)
+        stats[username]["total_files_completed"] += 1
+        stats[username]["total_duration_seconds"] += duration_seconds
+        
+        # Format duration
+        total_secs = stats[username]["total_duration_seconds"]
+        if total_secs < 60:
+            stats[username]["total_duration_formatted"] = f"{total_secs:.1f}s"
+        elif total_secs < 3600:
+            mins = int(total_secs // 60)
+            secs = int(total_secs % 60)
+            stats[username]["total_duration_formatted"] = f"{mins}m {secs}s"
+        else:
+            hours = int(total_secs // 3600)
+            mins = int((total_secs % 3600) // 60)
+            stats[username]["total_duration_formatted"] = f"{hours}h {mins}m"
+        
+        stats[username]["last_active"] = datetime.now().isoformat()
+    
+    save_user_stats(stats)
+    
+    # Also update daily stats
+    update_daily_stats(username, json_file, duration_seconds)
+    
+    return stats[username]
+
+# Update the progress endpoint to include daily stats
 @app.route("/progress")
 @login_required
 def progress():
@@ -620,6 +756,7 @@ def progress():
     remaining = total - completed
     
     user_stats = get_user_stats(username)
+    user_daily_stats = get_user_daily_stats(username)
     
     return jsonify({
         "total": total,
@@ -627,8 +764,13 @@ def progress():
         "remaining": remaining,
         "completed_list": list(completed_files),
         "username": username,
-        "user_stats": user_stats
+        "user_stats": user_stats,
+        "user_daily_stats": user_daily_stats  # Added daily stats
     })
+
+
+
+
 
 # NEW: Get user statistics
 @app.route("/api/user-stats")
