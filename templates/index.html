@@ -202,6 +202,62 @@ body {
   margin: 16px 0 18px;
 }
 
+.volume-control {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 12px;
+  padding: 8px 12px;
+  background: #F8F8F4;
+  border-radius: 40px;
+  border: 1px solid #E9E9E2;
+}
+
+.volume-icon {
+  font-size: 1.2rem;
+  line-height: 1;
+  color: #6E6E68;
+}
+
+.volume-slider {
+  flex: 1;
+  height: 4px;
+  -webkit-appearance: none;
+  appearance: none;
+  background: #DCDCD4;
+  border-radius: 4px;
+  outline: none;
+}
+
+.volume-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #2C6E49;
+  cursor: pointer;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.volume-slider::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #2C6E49;
+  cursor: pointer;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  border: none;
+}
+
+.volume-value {
+  min-width: 48px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: #2C6E49;
+  text-align: right;
+}
+
 audio {
   width: 100%;
   border-radius: 44px;
@@ -449,6 +505,14 @@ button {
   .stat-card-value {
     font-size: 1rem;
   }
+  .volume-control {
+    gap: 8px;
+    padding: 6px 10px;
+  }
+  .volume-value {
+    min-width: 42px;
+    font-size: 0.75rem;
+  }
 }
 
 .empty-hint {
@@ -523,6 +587,10 @@ let currentData = null;
 let currentAudio = null;
 let currentPlayTimeout = null;
 let currentUsername = '';
+let audioContext = null;
+let gainNode = null;
+let sourceNode = null;
+let currentVolume = 1.0;
 
 // Render Akshar Set
 function renderAksharSet() {
@@ -609,10 +677,53 @@ async function loadProgress() {
   }
 }
 
+// Initialize Web Audio API for volume boost
+function initAudioContext() {
+  if (!audioContext && currentAudio) {
+    try {
+      audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      const source = audioContext.createMediaElementSource(currentAudio);
+      gainNode = audioContext.createGain();
+      source.connect(gainNode);
+      gainNode.connect(audioContext.destination);
+      
+      // Set initial volume
+      gainNode.gain.value = currentVolume;
+      sourceNode = source;
+    } catch (e) {
+      console.warn('Web Audio API initialization failed:', e);
+    }
+  }
+}
+
+// Update volume
+function updateVolume(value) {
+  currentVolume = value;
+  const percent = Math.round(value * 100);
+  document.getElementById('volumeValue').innerText = percent + '%';
+  
+  if (gainNode) {
+    gainNode.gain.value = value;
+  }
+  
+  // Fallback for browsers without Web Audio API
+  if (currentAudio && !gainNode) {
+    currentAudio.volume = Math.min(value, 1.0);
+  }
+}
+
 // Load next file
 async function loadNextFile() {
   const contentDiv = document.getElementById('content');
   contentDiv.innerHTML = '<div class="loading">Loading next sample...</div>';
+  
+  // Reset audio context when loading new file
+  if (audioContext) {
+    audioContext.close();
+    audioContext = null;
+    gainNode = null;
+    sourceNode = null;
+  }
   
   try {
     const response = await fetch(`${BASE_PATH}/get-next-file`);
@@ -705,6 +816,11 @@ function playSegmentByIndex(frameIndex) {
   const activeCard = document.querySelector(`.frame-card[data-frame-index="${frameIndex}"]`);
   if (activeCard) activeCard.classList.add('active');
   
+  // Resume audio context if suspended
+  if (audioContext && audioContext.state === 'suspended') {
+    audioContext.resume();
+  }
+  
   currentAudio.pause();
   currentAudio.currentTime = startSec;
   
@@ -741,6 +857,11 @@ function renderAnnotationInterface(data) {
       <audio id="audioPlayer" controls preload="auto">
         <source src="${BASE_PATH}/audio/${data.wav_file}" type="audio/wav">
       </audio>
+      <div class="volume-control">
+        <span class="volume-icon">🔊</span>
+        <input type="range" id="volumeSlider" class="volume-slider" min="0" max="3" step="0.01" value="1.0">
+        <span class="volume-value" id="volumeValue">100%</span>
+      </div>
     </div>
     <div class="current-file-card">
       <div><strong>File:</strong> ${data.json_file}</div>
@@ -759,6 +880,22 @@ function renderAnnotationInterface(data) {
   currentAudio = document.getElementById('audioPlayer');
   if (currentAudio) {
     currentAudio.onerror = () => showMessage('Audio could not be loaded', 'error');
+    
+    // Initialize volume control
+    const volumeSlider = document.getElementById('volumeSlider');
+    volumeSlider.addEventListener('input', (e) => {
+      updateVolume(parseFloat(e.target.value));
+    });
+    
+    // Initialize Web Audio API when user interacts with audio
+    currentAudio.addEventListener('play', () => {
+      if (!audioContext) {
+        initAudioContext();
+        if (audioContext && audioContext.state === 'suspended') {
+          audioContext.resume();
+        }
+      }
+    }, { once: true });
   }
   
   const framesGrid = document.getElementById('framesGrid');
@@ -884,6 +1021,14 @@ function skipFile() {
   if (currentPlayTimeout) {
     clearTimeout(currentPlayTimeout);
     currentPlayTimeout = null;
+  }
+  
+  // Clean up audio context
+  if (audioContext) {
+    audioContext.close();
+    audioContext = null;
+    gainNode = null;
+    sourceNode = null;
   }
   
   fetch(`${BASE_PATH}/skip-file`, {
