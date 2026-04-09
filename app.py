@@ -7,19 +7,29 @@ from datetime import datetime
 import json
 import glob
 from functools import wraps
+from config import BASE_PATH, DEBUG, HOST, PORT
 
 app = Flask(__name__)
 app.secret_key = 'your-secret-key-change-this-in-production'  # Change this to a secure key
 
-@app.before_request
-def fix_script_name():
-    from flask import request
-    request.environ['SCRIPT_NAME'] = BASE_PATH
+# Only apply BASE_PATH if it's not empty
+if BASE_PATH:
+    @app.before_request
+    def fix_script_name():
+        from flask import request
+        request.environ['SCRIPT_NAME'] = BASE_PATH
+    
+    app.config['APPLICATION_ROOT'] = BASE_PATH
 
-# IMPORTANT: Add BASE_PATH for nginx reverse proxy
-BASE_PATH = "/mobile-annotator"
+# Helper function for URL generation
+def url_for_path(path):
+    """Generate URL with proper base path"""
+    if path.startswith('/'):
+        path = path[1:]
+    return f"{BASE_PATH}/{path}" if BASE_PATH else f"/{path}"
 
-app.config['APPLICATION_ROOT'] = '/mobile-annotator'
+# Make url_for_path available to templates
+app.jinja_env.globals['url_for_path'] = url_for_path
 
 # Folders
 AUDIO_FOLDER = "data"
@@ -38,7 +48,8 @@ os.makedirs(USER_SUBMISSIONS_FOLDER, exist_ok=True)
 
 from werkzeug.middleware.proxy_fix import ProxyFix
 
-app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
+if BASE_PATH:  # Only use ProxyFix when behind proxy (server mode)
+    app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
 
 
 # Load users
@@ -65,7 +76,7 @@ def save_completed_files(completed_set):
 
 completed_files = load_completed_files()
 
-# ============= NEW: File Assignment Tracking =============
+# ============= File Assignment Tracking =============
 def load_file_assignments():
     """Load file assignments from JSON file"""
     if os.path.exists(FILE_ASSIGNMENTS_FILE):
@@ -206,7 +217,7 @@ def login_required(f):
         if 'username' not in session:
             return jsonify({
                 "error": "Please login first", 
-                "redirect": f"{BASE_PATH}/login"
+                "redirect": url_for_path("login")
             }), 401
         return f(*args, **kwargs)
     return decorated_function
@@ -364,16 +375,16 @@ def save_to_mobile_dataset(annotated_data, username, original_wav_path, json_fil
 @app.route("/")
 def index():
     if 'username' in session:
-        return render_template("index.html", username=session['username'])
-    return redirect(f"{BASE_PATH}/login")
+        return render_template("index.html", username=session['username'], base_path=BASE_PATH)
+    return redirect(url_for_path("login"))
 
 @app.route("/login")
 def login_page():
-    return render_template("login.html")
+    return render_template("login.html", base_path=BASE_PATH)
 
 @app.route("/register")
 def register_page():
-    return render_template("register.html")
+    return render_template("register.html", base_path=BASE_PATH)
 
 # API: Register
 @app.route("/api/register", methods=["POST"])
@@ -704,46 +715,7 @@ def get_user_daily_stats(username):
     }
 
 # Update the update_user_stats function to also update daily stats
-def update_user_stats(username, json_file, duration_seconds):
-    """Update user statistics when a file is completed"""
-    stats = load_user_stats()
-    
-    if username not in stats:
-        stats[username] = {
-            "completed_files": [],
-            "total_files_completed": 0,
-            "total_duration_seconds": 0,
-            "total_duration_formatted": "0s",
-            "last_active": None
-        }
-    
-    # Add file to completed list if not already there
-    if json_file not in stats[username]["completed_files"]:
-        stats[username]["completed_files"].append(json_file)
-        stats[username]["total_files_completed"] += 1
-        stats[username]["total_duration_seconds"] += duration_seconds
-        
-        # Format duration
-        total_secs = stats[username]["total_duration_seconds"]
-        if total_secs < 60:
-            stats[username]["total_duration_formatted"] = f"{total_secs:.1f}s"
-        elif total_secs < 3600:
-            mins = int(total_secs // 60)
-            secs = int(total_secs % 60)
-            stats[username]["total_duration_formatted"] = f"{mins}m {secs}s"
-        else:
-            hours = int(total_secs // 3600)
-            mins = int((total_secs % 3600) // 60)
-            stats[username]["total_duration_formatted"] = f"{hours}h {mins}m"
-        
-        stats[username]["last_active"] = datetime.now().isoformat()
-    
-    save_user_stats(stats)
-    
-    # Also update daily stats
-    update_daily_stats(username, json_file, duration_seconds)
-    
-    return stats[username]
+# Note: This is already defined above, so we'll update it there
 
 # Update the progress endpoint to include daily stats
 @app.route("/progress")
@@ -767,10 +739,6 @@ def progress():
         "user_stats": user_stats,
         "user_daily_stats": user_daily_stats  # Added daily stats
     })
-
-
-
-
 
 # NEW: Get user statistics
 @app.route("/api/user-stats")
@@ -843,4 +811,13 @@ def download_mobile_dataset(filename):
     return send_from_directory(MOBILE_DATASET_FOLDER, filename, as_attachment=True)
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=8889, debug=False)
+    print("=" * 50)
+    print("Annotation Tool Server")
+    print("=" * 50)
+    print(f"Mode: {'PRODUCTION' if BASE_PATH else 'DEVELOPMENT'}")
+    print(f"Base URL: {BASE_PATH if BASE_PATH else '/'}")
+    print(f"Debug: {DEBUG}")
+    print(f"Server: http://{HOST}:{PORT}{BASE_PATH}/")
+    print("=" * 50)
+    
+    app.run(host=HOST, port=PORT, debug=DEBUG)

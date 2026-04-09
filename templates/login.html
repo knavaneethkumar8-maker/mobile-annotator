@@ -151,12 +151,13 @@ a:hover {
     <button onclick="login()">Sign In</button>
 
     <p>
-        Don't have an account? <a href="/mobile-annotator/register">Create one</a>
+        Don't have an account? <a href="{{ base_path }}/register">Create one</a>
     </p>
 </div>
 
 <script>
-const BASE_PATH = "/mobile-annotator";
+//const BASE_PATH = "/mobile-annotator";
+const BASE_PATH = "{{ base_path }}";
 
 function togglePassword() {
     let field = document.getElementById("password");

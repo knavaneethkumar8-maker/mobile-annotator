@@ -5,3 +5,7 @@ annotation_submitted/
 *.npz
 __pycache__/
 hreembheej1008/
+user_submissions/
+MOBILE_DATASET/
+*.json
+

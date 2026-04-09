@@ -186,12 +186,13 @@ button:disabled {
     <button id="registerBtn" onclick="register()" disabled>Register</button>
 
     <p>
-        Already have an account? <a href="/mobile-annotator/login">Sign in</a>
+        Already have an account? <a href="{{ base_path }}/login">Sign in</a>
     </p>
 </div>
 
 <script>
-const BASE_PATH = "/mobile-annotator";
+//const BASE_PATH = "/mobile-annotator";
+const BASE_PATH = "{{ base_path }}";
 
 function togglePassword(fieldId, btn) {
     let field = document.getElementById(fieldId);
