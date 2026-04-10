@@ -107,25 +107,6 @@ body {
   border-radius: 12px;
 }
 
-.stats {
-  display: flex;
-  gap: 12px;
-  margin: 12px 0 8px;
-  font-size: 0.8rem;
-  color: #5E5E5A;
-  font-weight: 470;
-  flex-wrap: wrap;
-}
-
-.stats span {
-  background: #F5F5F0;
-  padding: 6px 12px;
-  border-radius: 32px;
-  flex: 1;
-  text-align: center;
-  min-width: 90px;
-}
-
 /* Stats cards for today and total */
 .stats-cards {
   display: flex;
@@ -160,42 +141,6 @@ body {
   font-size: 0.65rem;
   color: #8E8E88;
   margin-top: 4px;
-}
-
-/* Akshar Set Styles */
-.akshar-set-section {
-  margin: 12px 0 16px;
-  background: #F8F8F4;
-  border-radius: 20px;
-  padding: 12px 16px;
-  border: 1px solid #E9E9E2;
-}
-
-.akshar-title {
-  font-weight: 590;
-  font-size: 0.75rem;
-  color: #2C6E49;
-  margin-bottom: 10px;
-  letter-spacing: 0.3px;
-}
-
-.akshar-grid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-}
-
-.akshar-item {
-  background: #FFFFFF;
-  border: 1px solid #E5E5DE;
-  border-radius: 12px;
-  padding: 6px 10px;
-  font-size: 1rem;
-  font-weight: 500;
-  color: #1C1C1A;
-  min-width: 44px;
-  text-align: center;
-  font-family: monospace;
 }
 
 .audio-wrapper {
@@ -288,6 +233,7 @@ audio {
   overflow-y: auto;
   padding: 4px 2px 8px 2px;
   margin-top: 8px;
+  margin-bottom: 16px;
 }
 
 .frame-card {
@@ -353,10 +299,46 @@ audio {
   box-shadow: 0 0 0 2px rgba(44,110,73,0.2);
 }
 
+/* Akshar Set Styles - moved to bottom */
+.akshar-set-section {
+  margin: 8px 0 20px;
+  background: #F8F8F4;
+  border-radius: 20px;
+  padding: 12px 16px;
+  border: 1px solid #E9E9E2;
+}
+
+.akshar-title {
+  font-weight: 590;
+  font-size: 0.75rem;
+  color: #2C6E49;
+  margin-bottom: 10px;
+  letter-spacing: 0.3px;
+}
+
+.akshar-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.akshar-item {
+  background: #FFFFFF;
+  border: 1px solid #E5E5DE;
+  border-radius: 12px;
+  padding: 6px 10px;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #1C1C1A;
+  min-width: 44px;
+  text-align: center;
+  font-family: monospace;
+}
+
 .button-group {
   display: flex;
   gap: 14px;
-  margin: 28px 0 16px;
+  margin: 0 0 16px;
 }
 
 button {
@@ -492,11 +474,6 @@ button {
     font-size: 0.85rem;
     padding: 12px 14px;
   }
-  .stats span {
-    font-size: 0.7rem;
-    padding: 4px 8px;
-    min-width: 70px;
-  }
   .akshar-item {
     padding: 4px 8px;
     font-size: 0.85rem;
@@ -560,12 +537,6 @@ button {
     </div>
   </div>
 
-  <!-- Akshar Set Section -->
-  <div class="akshar-set-section">
-    <div class="akshar-title">Allowed Akshar Set</div>
-    <div class="akshar-grid" id="aksharGrid"></div>
-  </div>
-
   <div id="content">
     <div class="loading">Loading next sample...</div>
   </div>
@@ -595,8 +566,8 @@ let currentVolume = 1.0;
 const MAX_VOLUME = 6.0;  // 600% max volume
 
 // Render Akshar Set
-function renderAksharSet() {
-  const container = document.getElementById('aksharGrid');
+function renderAksharSet(containerId) {
+  const container = document.getElementById(containerId);
   if (!container) return;
   
   container.innerHTML = '';
@@ -712,15 +683,6 @@ function updateVolume(value) {
   if (currentAudio && !gainNode) {
     currentAudio.volume = Math.min(value, 1.0);
   }
-}
-
-// Format volume display with boost indicator
-function getVolumeDisplay(value) {
-  const percent = Math.round(value * 100);
-  if (value > 1.0) {
-    return percent + '% ';
-  }
-  return percent + '%';
 }
 
 // Load next file
@@ -881,12 +843,20 @@ function renderAnnotationInterface(data) {
       <div style="margin-top: 8px; font-size: 0.8rem; color: #6E6E68;"><strong>Annotator:</strong> ${currentUsername}</div>
     </div>
     <div class="frames-grid" id="framesGrid"></div>
+    <!-- Akshar Set Section moved here - above button group -->
+    <div class="akshar-set-section">
+      <div class="akshar-title">Allowed Akshar Set</div>
+      <div class="akshar-grid" id="aksharGridBottom"></div>
+    </div>
     <div class="button-group">
       <button class="btn-submit" id="submitBtn">Submit annotation</button>
       <button class="btn-skip" id="skipBtn">Skip (keep later)</button>
     </div>
     <div id="messageArea" class="message-area"></div>
   `;
+  
+  // Render Akshar Set in the bottom container
+  renderAksharSet('aksharGridBottom');
   
   currentAudio = document.getElementById('audioPlayer');
   if (currentAudio) {
@@ -902,7 +872,7 @@ function renderAnnotationInterface(data) {
       const percent = Math.round(val * 100);
       const volumeSpan = document.getElementById('volumeValue');
       if (val > 1.0) {
-        volumeSpan.innerText = percent + '% ';
+        volumeSpan.innerText = percent + '%';
       } else {
         volumeSpan.innerText = percent + '%';
       }
@@ -1075,7 +1045,6 @@ function showMessage(text, type) {
 
 // Initialize
 async function init() {
-  renderAksharSet();
   const authed = await checkAuth();
   if (authed) {
     loadProgress();
