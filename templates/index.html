@@ -251,7 +251,7 @@ body {
 }
 
 .volume-value {
-  min-width: 48px;
+  min-width: 52px;
   font-size: 0.8rem;
   font-weight: 500;
   color: #2C6E49;
@@ -510,7 +510,7 @@ button {
     padding: 6px 10px;
   }
   .volume-value {
-    min-width: 42px;
+    min-width: 48px;
     font-size: 0.75rem;
   }
 }
@@ -592,6 +592,7 @@ let audioContext = null;
 let gainNode = null;
 let sourceNode = null;
 let currentVolume = 1.0;
+const MAX_VOLUME = 6.0;  // 600% max volume
 
 // Render Akshar Set
 function renderAksharSet() {
@@ -697,7 +698,7 @@ function initAudioContext() {
   }
 }
 
-// Update volume
+// Update volume (supports up to 600%)
 function updateVolume(value) {
   currentVolume = value;
   const percent = Math.round(value * 100);
@@ -707,10 +708,19 @@ function updateVolume(value) {
     gainNode.gain.value = value;
   }
   
-  // Fallback for browsers without Web Audio API
+  // Fallback for browsers without Web Audio API (clamped to 1.0)
   if (currentAudio && !gainNode) {
     currentAudio.volume = Math.min(value, 1.0);
   }
+}
+
+// Format volume display with boost indicator
+function getVolumeDisplay(value) {
+  const percent = Math.round(value * 100);
+  if (value > 1.0) {
+    return percent + '% ';
+  }
+  return percent + '%';
 }
 
 // Load next file
@@ -860,7 +870,7 @@ function renderAnnotationInterface(data) {
       </audio>
       <div class="volume-control">
         <span class="volume-icon">🔊</span>
-        <input type="range" id="volumeSlider" class="volume-slider" min="0" max="3" step="0.01" value="1.0">
+        <input type="range" id="volumeSlider" class="volume-slider" min="0" max="${MAX_VOLUME}" step="0.05" value="1.0">
         <span class="volume-value" id="volumeValue">100%</span>
       </div>
     </div>
@@ -885,7 +895,17 @@ function renderAnnotationInterface(data) {
     // Initialize volume control
     const volumeSlider = document.getElementById('volumeSlider');
     volumeSlider.addEventListener('input', (e) => {
-      updateVolume(parseFloat(e.target.value));
+      const val = parseFloat(e.target.value);
+      updateVolume(val);
+      
+      // Update display with boost indicator if > 100%
+      const percent = Math.round(val * 100);
+      const volumeSpan = document.getElementById('volumeValue');
+      if (val > 1.0) {
+        volumeSpan.innerText = percent + '% ';
+      } else {
+        volumeSpan.innerText = percent + '%';
+      }
     });
     
     // Initialize Web Audio API when user interacts with audio
