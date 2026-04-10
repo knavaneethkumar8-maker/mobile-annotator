@@ -334,26 +334,32 @@ audio {
   background: #FFFFFF;
   border: 1px solid #E5E5DE;
   border-radius: 12px;
-  padding: 6px 10px;
-  font-size: 1rem;
+  padding: 8px 12px;
+  font-size: 1.1rem;
   font-weight: 500;
   color: #1C1C1A;
-  min-width: 44px;
+  min-width: 48px;
   text-align: center;
   font-family: monospace;
   cursor: grab;
   user-select: none;
   transition: all 0.15s ease;
-  touch-action: manipulation;
+  touch-action: none;
 }
 
 .akshar-item:active {
   cursor: grabbing;
+  transform: scale(0.95);
 }
 
 .akshar-item.dragging {
   opacity: 0.5;
   cursor: grabbing;
+}
+
+.akshar-item.drag-source {
+  opacity: 0.4;
+  transform: scale(0.95);
 }
 
 .button-group {
@@ -496,9 +502,9 @@ button {
     padding: 12px 14px;
   }
   .akshar-item {
-    padding: 4px 8px;
-    font-size: 0.85rem;
-    min-width: 36px;
+    padding: 6px 10px;
+    font-size: 1rem;
+    min-width: 42px;
   }
   .stat-card-value {
     font-size: 1rem;
@@ -584,10 +590,22 @@ let audioContext = null;
 let gainNode = null;
 let sourceNode = null;
 let currentVolume = 1.0;
-const MAX_VOLUME = 6.0;  // 600% max volume
-let draggedAkshar = null;
+const MAX_VOLUME = 6.0;
 
-// Render Akshar Set with drag-and-drop support
+// Drag and drop state for mobile
+let dragState = {
+  active: false,
+  akshar: null,
+  sourceElement: null,
+  startX: 0,
+  startY: 0,
+  currentX: 0,
+  currentY: 0,
+  feedbackElement: null,
+  targetFrameIndex: null
+};
+
+// Render Akshar Set with drag-and-drop support for both desktop and mobile
 function renderAksharSet(containerId) {
   const container = document.getElementById(containerId);
   if (!container) return;
@@ -600,78 +618,181 @@ function renderAksharSet(containerId) {
     span.setAttribute('draggable', 'true');
     span.setAttribute('data-akshar', akshar);
     
-    // Drag start event
-    span.addEventListener('dragstart', (e) => {
-      draggedAkshar = akshar;
-      e.dataTransfer.setData('text/plain', akshar);
-      e.dataTransfer.effectAllowed = 'copy';
-      span.classList.add('dragging');
-    });
+    // Desktop drag events
+    span.addEventListener('dragstart', handleDragStart);
+    span.addEventListener('dragend', handleDragEnd);
     
-    // Drag end event
-    span.addEventListener('dragend', (e) => {
-      draggedAkshar = null;
-      span.classList.remove('dragging');
-      // Remove drag-over class from all frames
-      document.querySelectorAll('.frame-card').forEach(card => {
-        card.classList.remove('drag-over');
-      });
-    });
-    
-    // For touch devices - long press to drag simulation
-    let touchStartTimeout;
-    span.addEventListener('touchstart', (e) => {
-      touchStartTimeout = setTimeout(() => {
-        // Simulate drag for touch devices
-        draggedAkshar = akshar;
-        span.style.opacity = '0.5';
-        
-        // Create a visual feedback for touch drag
-        const feedback = document.createElement('div');
-        feedback.textContent = akshar;
-        feedback.style.position = 'fixed';
-        feedback.style.left = e.touches[0].clientX + 'px';
-        feedback.style.top = e.touches[0].clientY + 'px';
-        feedback.style.backgroundColor = '#2C6E49';
-        feedback.style.color = 'white';
-        feedback.style.padding = '8px 12px';
-        feedback.style.borderRadius = '20px';
-        feedback.style.fontSize = '1.2rem';
-        feedback.style.fontFamily = 'monospace';
-        feedback.style.zIndex = '9999';
-        feedback.style.pointerEvents = 'none';
-        feedback.id = 'dragFeedback';
-        document.body.appendChild(feedback);
-        
-        // Show message
-        showMessage('Drop on any segment input', 'info');
-      }, 500);
-    });
-    
-    span.addEventListener('touchmove', (e) => {
-      e.preventDefault();
-      const feedback = document.getElementById('dragFeedback');
-      if (feedback && e.touches[0]) {
-        feedback.style.left = e.touches[0].clientX + 'px';
-        feedback.style.top = e.touches[0].clientY + 'px';
-      }
-    });
-    
-    span.addEventListener('touchend', (e) => {
-      clearTimeout(touchStartTimeout);
-      const feedback = document.getElementById('dragFeedback');
-      if (feedback) feedback.remove();
-      span.style.opacity = '1';
-      draggedAkshar = null;
-    });
+    // Mobile touch events
+    span.addEventListener('touchstart', handleTouchStart);
+    span.addEventListener('touchmove', handleTouchMove);
+    span.addEventListener('touchend', handleTouchEnd);
     
     container.appendChild(span);
   });
 }
 
-// Setup drop zone for an edit text field
-function setupDropZone(editDiv, frameIndex) {
-  // Prevent default drag over
+// Desktop drag handlers
+function handleDragStart(e) {
+  const akshar = e.target.getAttribute('data-akshar');
+  e.dataTransfer.setData('text/plain', akshar);
+  e.dataTransfer.effectAllowed = 'copy';
+  e.target.classList.add('dragging');
+  dragState.akshar = akshar;
+}
+
+function handleDragEnd(e) {
+  e.target.classList.remove('dragging');
+  dragState.akshar = null;
+  document.querySelectorAll('.frame-card').forEach(card => {
+    card.classList.remove('drag-over');
+  });
+}
+
+// Mobile touch handlers
+function handleTouchStart(e) {
+  e.preventDefault();
+  const touch = e.touches[0];
+  const element = e.target;
+  const akshar = element.getAttribute('data-akshar');
+  
+  if (!akshar) return;
+  
+  // Initialize drag state
+  dragState.active = true;
+  dragState.akshar = akshar;
+  dragState.sourceElement = element;
+  dragState.startX = touch.clientX;
+  dragState.startY = touch.clientY;
+  dragState.currentX = touch.clientX;
+  dragState.currentY = touch.clientY;
+  
+  // Add dragging class to source
+  element.classList.add('drag-source');
+  
+  // Create visual feedback element
+  const feedback = document.createElement('div');
+  feedback.textContent = akshar;
+  feedback.style.position = 'fixed';
+  feedback.style.left = (touch.clientX - 20) + 'px';
+  feedback.style.top = (touch.clientY - 20) + 'px';
+  feedback.style.backgroundColor = '#2C6E49';
+  feedback.style.color = 'white';
+  feedback.style.padding = '12px 16px';
+  feedback.style.borderRadius = '24px';
+  feedback.style.fontSize = '1.3rem';
+  feedback.style.fontFamily = 'monospace';
+  feedback.style.fontWeight = 'bold';
+  feedback.style.zIndex = '9999';
+  feedback.style.pointerEvents = 'none';
+  feedback.style.boxShadow = '0 4px 12px rgba(0,0,0,0.2)';
+  feedback.style.transform = 'scale(1.1)';
+  feedback.style.transition = 'transform 0.05s ease';
+  feedback.id = 'dragFeedback';
+  document.body.appendChild(feedback);
+  
+  // Show instruction message
+  showMessage('Drag to any segment field', 'info');
+}
+
+function handleTouchMove(e) {
+  if (!dragState.active) return;
+  e.preventDefault();
+  
+  const touch = e.touches[0];
+  dragState.currentX = touch.clientX;
+  dragState.currentY = touch.clientY;
+  
+  // Update feedback position
+  const feedback = document.getElementById('dragFeedback');
+  if (feedback) {
+    feedback.style.left = (touch.clientX - 25) + 'px';
+    feedback.style.top = (touch.clientY - 25) + 'px';
+  }
+  
+  // Find element under touch point
+  const elementAtTouch = document.elementFromPoint(touch.clientX, touch.clientY);
+  const targetEditDiv = elementAtTouch?.closest('.edit-text');
+  const targetFrameCard = elementAtTouch?.closest('.frame-card');
+  
+  // Remove drag-over class from all frames
+  document.querySelectorAll('.frame-card').forEach(card => {
+    if (targetFrameCard !== card) {
+      card.classList.remove('drag-over');
+    }
+  });
+  
+  // Add drag-over class to current target
+  if (targetFrameCard) {
+    targetFrameCard.classList.add('drag-over');
+    dragState.targetFrameIndex = parseInt(targetFrameCard.getAttribute('data-frame-index'));
+  } else {
+    dragState.targetFrameIndex = null;
+  }
+}
+
+function handleTouchEnd(e) {
+  if (!dragState.active) return;
+  e.preventDefault();
+  
+  // Remove visual feedback
+  const feedback = document.getElementById('dragFeedback');
+  if (feedback) feedback.remove();
+  
+  // Remove drag-source class
+  if (dragState.sourceElement) {
+    dragState.sourceElement.classList.remove('drag-source');
+  }
+  
+  // Remove drag-over class from all frames
+  document.querySelectorAll('.frame-card').forEach(card => {
+    card.classList.remove('drag-over');
+  });
+  
+  // If we have a target frame index and akshar, perform the drop
+  if (dragState.targetFrameIndex !== null && dragState.akshar && currentData) {
+    const frameIndex = dragState.targetFrameIndex;
+    const targetEditDiv = document.querySelector(`.frame-card[data-frame-index="${frameIndex}"] .edit-text`);
+    
+    if (targetEditDiv && currentData.frames[frameIndex]) {
+      // Append the akshar to the existing text
+      const currentText = currentData.frames[frameIndex].text || '';
+      const newText = currentText + dragState.akshar;
+      
+      // Update UI
+      targetEditDiv.innerText = newText;
+      
+      // Update data model
+      currentData.frames[frameIndex].text = newText;
+      
+      // Update full sequence
+      const fullSequence = currentData.frames.map(f => f.text || '').filter(t => t !== '').join(' ');
+      currentData.full_sequence = fullSequence;
+      
+      // Show success message
+      showMessage(`Added "${dragState.akshar}" to segment ${frameIndex + 1}`, 'success');
+      
+      // Move cursor to end for desktop
+      if (targetEditDiv.focus) {
+        targetEditDiv.focus();
+        const range = document.createRange();
+        const sel = window.getSelection();
+        range.selectNodeContents(targetEditDiv);
+        range.collapse(false);
+        sel.removeAllRanges();
+        sel.addRange(range);
+      }
+    }
+  }
+  
+  // Reset drag state
+  dragState.active = false;
+  dragState.akshar = null;
+  dragState.sourceElement = null;
+  dragState.targetFrameIndex = null;
+}
+
+// Setup drop zone for desktop
+function setupDesktopDropZone(editDiv, frameIndex) {
   editDiv.addEventListener('dragover', (e) => {
     e.preventDefault();
     e.dataTransfer.dropEffect = 'copy';
@@ -684,35 +805,23 @@ function setupDropZone(editDiv, frameIndex) {
     if (frameCard) frameCard.classList.remove('drag-over');
   });
   
-  // Handle drop event
   editDiv.addEventListener('drop', (e) => {
     e.preventDefault();
     const frameCard = editDiv.closest('.frame-card');
     if (frameCard) frameCard.classList.remove('drag-over');
     
-    let akshar = draggedAkshar;
-    if (!akshar) {
-      // Try to get from dataTransfer
-      akshar = e.dataTransfer.getData('text/plain');
-    }
+    let akshar = e.dataTransfer.getData('text/plain');
     
     if (akshar && currentData && currentData.frames[frameIndex]) {
-      // Get current text
       const currentText = currentData.frames[frameIndex].text || '';
-      // Append the new akshar to form words
       const newText = currentText + akshar;
       
-      // Update the editDiv content
       editDiv.innerText = newText;
-      
-      // Update data model
       currentData.frames[frameIndex].text = newText;
       
-      // Update full sequence
       const fullSequence = currentData.frames.map(f => f.text || '').filter(t => t !== '').join(' ');
       currentData.full_sequence = fullSequence;
       
-      // Show feedback
       showMessage(`Added "${akshar}" to segment ${frameIndex + 1}`, 'success');
       
       // Move cursor to end
@@ -722,34 +831,6 @@ function setupDropZone(editDiv, frameIndex) {
       range.collapse(false);
       sel.removeAllRanges();
       sel.addRange(range);
-    }
-    
-    draggedAkshar = null;
-  });
-  
-  // For touch devices - handle drop via touch end
-  editDiv.addEventListener('touchend', (e) => {
-    const feedback = document.getElementById('dragFeedback');
-    if (feedback && draggedAkshar) {
-      e.preventDefault();
-      feedback.remove();
-      
-      const akshar = draggedAkshar;
-      if (akshar && currentData && currentData.frames[frameIndex]) {
-        const currentText = currentData.frames[frameIndex].text || '';
-        const newText = currentText + akshar;
-        editDiv.innerText = newText;
-        currentData.frames[frameIndex].text = newText;
-        
-        const fullSequence = currentData.frames.map(f => f.text || '').filter(t => t !== '').join(' ');
-        currentData.full_sequence = fullSequence;
-        
-        showMessage(`Added "${akshar}" to segment ${frameIndex + 1}`, 'success');
-      }
-      draggedAkshar = null;
-      document.querySelectorAll('.frame-card').forEach(card => {
-        card.classList.remove('drag-over');
-      });
     }
   });
 }
@@ -791,19 +872,15 @@ async function loadProgress() {
     }
     const data = await response.json();
     
-    // Update progress bar
     const percent = data.total > 0 ? (data.completed / data.total * 100).toFixed(1) : 0;
     document.getElementById('progressFill').style.width = percent + '%';
     document.getElementById('remainingBadge').innerHTML = `${data.remaining} remaining`;
     
-    // Update stats cards
     if (data.user_stats) {
-      // Total stats
       document.getElementById('totalFiles').innerText = data.user_stats.total_files_completed || 0;
       document.getElementById('totalDuration').innerText = data.user_stats.total_duration_formatted || '0s';
     }
     
-    // Update today's stats from daily_stats
     if (data.user_daily_stats && data.user_daily_stats.daily) {
       const today = new Date().toISOString().split('T')[0];
       const todayStats = data.user_daily_stats.daily[today];
@@ -834,8 +911,6 @@ function initAudioContext() {
       gainNode = audioContext.createGain();
       source.connect(gainNode);
       gainNode.connect(audioContext.destination);
-      
-      // Set initial volume
       gainNode.gain.value = currentVolume;
       sourceNode = source;
     } catch (e) {
@@ -844,7 +919,7 @@ function initAudioContext() {
   }
 }
 
-// Update volume (supports up to 600%)
+// Update volume
 function updateVolume(value) {
   currentVolume = value;
   const percent = Math.round(value * 100);
@@ -854,7 +929,6 @@ function updateVolume(value) {
     gainNode.gain.value = value;
   }
   
-  // Fallback for browsers without Web Audio API (clamped to 1.0)
   if (currentAudio && !gainNode) {
     currentAudio.volume = Math.min(value, 1.0);
   }
@@ -865,7 +939,6 @@ async function loadNextFile() {
   const contentDiv = document.getElementById('content');
   contentDiv.innerHTML = '<div class="loading">Loading next sample...</div>';
   
-  // Reset audio context when loading new file
   if (audioContext) {
     audioContext.close();
     audioContext = null;
@@ -916,7 +989,6 @@ function showErrorScreen(message) {
   `;
 }
 
-// Function to save all pending frame edits before submission
 function saveAllPendingEdits() {
   const editDivs = document.querySelectorAll('.edit-text');
   let updated = false;
@@ -941,7 +1013,6 @@ function saveAllPendingEdits() {
   return updated;
 }
 
-// Function to play segment
 function playSegmentByIndex(frameIndex) {
   if (!currentData || !currentAudio) {
     showMessage('Audio not ready', 'error');
@@ -964,7 +1035,6 @@ function playSegmentByIndex(frameIndex) {
   const activeCard = document.querySelector(`.frame-card[data-frame-index="${frameIndex}"]`);
   if (activeCard) activeCard.classList.add('active');
   
-  // Resume audio context if suspended
   if (audioContext && audioContext.state === 'suspended') {
     audioContext.resume();
   }
@@ -1018,7 +1088,6 @@ function renderAnnotationInterface(data) {
       <div style="margin-top: 8px; font-size: 0.8rem; color: #6E6E68;"><strong>Annotator:</strong> ${currentUsername}</div>
     </div>
     <div class="frames-grid" id="framesGrid"></div>
-    <!-- Akshar Set Section moved here - above button group -->
     <div class="akshar-set-section">
       <div class="akshar-title">Allowed Akshar Set (Drag & Drop)</div>
       <div class="akshar-grid" id="aksharGridBottom"></div>
@@ -1030,26 +1099,20 @@ function renderAnnotationInterface(data) {
     <div id="messageArea" class="message-area"></div>
   `;
   
-  // Render Akshar Set with drag-drop support
   renderAksharSet('aksharGridBottom');
   
   currentAudio = document.getElementById('audioPlayer');
   if (currentAudio) {
     currentAudio.onerror = () => showMessage('Audio could not be loaded', 'error');
     
-    // Initialize volume control
     const volumeSlider = document.getElementById('volumeSlider');
     volumeSlider.addEventListener('input', (e) => {
       const val = parseFloat(e.target.value);
       updateVolume(val);
-      
-      // Update display with boost indicator if > 100%
       const percent = Math.round(val * 100);
-      const volumeSpan = document.getElementById('volumeValue');
-      volumeSpan.innerText = percent + '%';
+      document.getElementById('volumeValue').innerText = percent + '%';
     });
     
-    // Initialize Web Audio API when user interacts with audio
     currentAudio.addEventListener('play', () => {
       if (!audioContext) {
         initAudioContext();
@@ -1084,8 +1147,8 @@ function renderAnnotationInterface(data) {
     editDiv.innerText = currentText;
     editDiv.setAttribute('data-frame-idx', idx);
     
-    // Setup drag and drop for this edit field
-    setupDropZone(editDiv, idx);
+    // Setup desktop drop zone
+    setupDesktopDropZone(editDiv, idx);
     
     editDiv.addEventListener('input', (e) => {
       const newText = e.target.innerText || '';
@@ -1114,7 +1177,7 @@ function renderAnnotationInterface(data) {
   
   const hint = document.createElement('div');
   hint.className = 'empty-hint';
-  hint.innerText = 'Segments can be left empty. Drag akshar from above and drop here.';
+  hint.innerText = '💡 Tip: Tap and hold any akshar, then drag to a segment field';
   framesGrid.appendChild(hint);
   
   document.getElementById('submitBtn').addEventListener('click', () => submitAnnotation());
@@ -1188,7 +1251,6 @@ function skipFile() {
     currentPlayTimeout = null;
   }
   
-  // Clean up audio context
   if (audioContext) {
     audioContext.close();
     audioContext = null;
