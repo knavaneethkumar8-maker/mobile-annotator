@@ -591,6 +591,7 @@ let gainNode = null;
 let sourceNode = null;
 let currentVolume = 1.0;
 const MAX_VOLUME = 6.0;
+let audioUnlocked = false;
 
 // Drag and drop state for mobile
 let dragState = {
@@ -604,6 +605,47 @@ let dragState = {
   feedbackElement: null,
   targetFrameIndex: null
 };
+
+// iOS Audio Unlock - MUST be called from user gesture
+function unlockAudio() {
+  if (audioUnlocked) return;
+  
+  if (audioContext && audioContext.state === 'suspended') {
+    audioContext.resume().then(() => {
+      audioUnlocked = true;
+      console.log('AudioContext resumed successfully');
+    }).catch(err => {
+      console.warn('Failed to resume AudioContext:', err);
+    });
+  }
+  
+  // Also try to play and immediately pause a silent sound
+  if (currentAudio) {
+    const unlockPromise = currentAudio.play();
+    if (unlockPromise !== undefined) {
+      unlockPromise.then(() => {
+        currentAudio.pause();
+        currentAudio.currentTime = 0;
+        audioUnlocked = true;
+        console.log('Audio element unlocked');
+      }).catch(err => {
+        console.log('Audio unlock attempt failed:', err);
+      });
+    }
+  }
+}
+
+// Setup global tap to unlock audio (iOS requirement)
+function setupAudioUnlock() {
+  const unlockHandler = () => {
+    unlockAudio();
+    document.removeEventListener('touchstart', unlockHandler);
+    document.removeEventListener('click', unlockHandler);
+  };
+  
+  document.addEventListener('touchstart', unlockHandler);
+  document.addEventListener('click', unlockHandler);
+}
 
 // Render Akshar Set with drag-and-drop support for both desktop and mobile
 function renderAksharSet(containerId) {
@@ -657,7 +699,6 @@ function handleTouchStart(e) {
   
   if (!akshar) return;
   
-  // Initialize drag state
   dragState.active = true;
   dragState.akshar = akshar;
   dragState.sourceElement = element;
@@ -666,10 +707,8 @@ function handleTouchStart(e) {
   dragState.currentX = touch.clientX;
   dragState.currentY = touch.clientY;
   
-  // Add dragging class to source
   element.classList.add('drag-source');
   
-  // Create visual feedback element
   const feedback = document.createElement('div');
   feedback.textContent = akshar;
   feedback.style.position = 'fixed';
@@ -686,11 +725,9 @@ function handleTouchStart(e) {
   feedback.style.pointerEvents = 'none';
   feedback.style.boxShadow = '0 4px 12px rgba(0,0,0,0.2)';
   feedback.style.transform = 'scale(1.1)';
-  feedback.style.transition = 'transform 0.05s ease';
   feedback.id = 'dragFeedback';
   document.body.appendChild(feedback);
   
-  // Show instruction message
   showMessage('Drag to any segment field', 'info');
 }
 
@@ -702,26 +739,21 @@ function handleTouchMove(e) {
   dragState.currentX = touch.clientX;
   dragState.currentY = touch.clientY;
   
-  // Update feedback position
   const feedback = document.getElementById('dragFeedback');
   if (feedback) {
     feedback.style.left = (touch.clientX - 25) + 'px';
     feedback.style.top = (touch.clientY - 25) + 'px';
   }
   
-  // Find element under touch point
   const elementAtTouch = document.elementFromPoint(touch.clientX, touch.clientY);
-  const targetEditDiv = elementAtTouch?.closest('.edit-text');
   const targetFrameCard = elementAtTouch?.closest('.frame-card');
   
-  // Remove drag-over class from all frames
   document.querySelectorAll('.frame-card').forEach(card => {
     if (targetFrameCard !== card) {
       card.classList.remove('drag-over');
     }
   });
   
-  // Add drag-over class to current target
   if (targetFrameCard) {
     targetFrameCard.classList.add('drag-over');
     dragState.targetFrameIndex = parseInt(targetFrameCard.getAttribute('data-frame-index'));
@@ -734,44 +766,33 @@ function handleTouchEnd(e) {
   if (!dragState.active) return;
   e.preventDefault();
   
-  // Remove visual feedback
   const feedback = document.getElementById('dragFeedback');
   if (feedback) feedback.remove();
   
-  // Remove drag-source class
   if (dragState.sourceElement) {
     dragState.sourceElement.classList.remove('drag-source');
   }
   
-  // Remove drag-over class from all frames
   document.querySelectorAll('.frame-card').forEach(card => {
     card.classList.remove('drag-over');
   });
   
-  // If we have a target frame index and akshar, perform the drop
   if (dragState.targetFrameIndex !== null && dragState.akshar && currentData) {
     const frameIndex = dragState.targetFrameIndex;
     const targetEditDiv = document.querySelector(`.frame-card[data-frame-index="${frameIndex}"] .edit-text`);
     
     if (targetEditDiv && currentData.frames[frameIndex]) {
-      // Append the akshar to the existing text
       const currentText = currentData.frames[frameIndex].text || '';
       const newText = currentText + dragState.akshar;
       
-      // Update UI
       targetEditDiv.innerText = newText;
-      
-      // Update data model
       currentData.frames[frameIndex].text = newText;
       
-      // Update full sequence
       const fullSequence = currentData.frames.map(f => f.text || '').filter(t => t !== '').join(' ');
       currentData.full_sequence = fullSequence;
       
-      // Show success message
       showMessage(`Added "${dragState.akshar}" to segment ${frameIndex + 1}`, 'success');
       
-      // Move cursor to end for desktop
       if (targetEditDiv.focus) {
         targetEditDiv.focus();
         const range = document.createRange();
@@ -784,7 +805,6 @@ function handleTouchEnd(e) {
     }
   }
   
-  // Reset drag state
   dragState.active = false;
   dragState.akshar = null;
   dragState.sourceElement = null;
@@ -824,7 +844,6 @@ function setupDesktopDropZone(editDiv, frameIndex) {
       
       showMessage(`Added "${akshar}" to segment ${frameIndex + 1}`, 'success');
       
-      // Move cursor to end
       const range = document.createRange();
       const sel = window.getSelection();
       range.selectNodeContents(editDiv);
@@ -913,13 +932,24 @@ function initAudioContext() {
       gainNode.connect(audioContext.destination);
       gainNode.gain.value = currentVolume;
       sourceNode = source;
+      
+      // For iOS: resume on user interaction
+      if (audioContext.state === 'suspended') {
+        const resumeHandler = () => {
+          audioContext.resume();
+          document.removeEventListener('touchstart', resumeHandler);
+          document.removeEventListener('click', resumeHandler);
+        };
+        document.addEventListener('touchstart', resumeHandler);
+        document.addEventListener('click', resumeHandler);
+      }
     } catch (e) {
       console.warn('Web Audio API initialization failed:', e);
     }
   }
 }
 
-// Update volume
+// Update volume (supports up to 600%)
 function updateVolume(value) {
   currentVolume = value;
   const percent = Math.round(value * 100);
@@ -929,9 +959,69 @@ function updateVolume(value) {
     gainNode.gain.value = value;
   }
   
+  // Fallback for browsers without Web Audio API
   if (currentAudio && !gainNode) {
     currentAudio.volume = Math.min(value, 1.0);
   }
+}
+
+// iOS-compatible segment playback
+function playSegmentAudio(startMs, endMs) {
+  if (!currentAudio) {
+    showMessage('Audio not ready', 'error');
+    return;
+  }
+  
+  const startSec = startMs / 1000;
+  const endSec = endMs / 1000;
+  const durationSec = endSec - startSec;
+  
+  if (currentPlayTimeout) {
+    clearTimeout(currentPlayTimeout);
+    currentPlayTimeout = null;
+  }
+  
+  // Ensure audio context is active for iOS
+  if (audioContext && audioContext.state === 'suspended') {
+    audioContext.resume().then(() => {
+      playAudioSegment(startSec, durationSec);
+    }).catch(err => {
+      console.warn('AudioContext resume failed:', err);
+      playAudioSegment(startSec, durationSec);
+    });
+  } else {
+    playAudioSegment(startSec, durationSec);
+  }
+}
+
+function playAudioSegment(startSec, durationSec) {
+  if (!currentAudio) return;
+  
+  currentAudio.pause();
+  currentAudio.currentTime = startSec;
+  
+  const playPromise = currentAudio.play();
+  
+  if (playPromise !== undefined) {
+    playPromise.then(() => {
+      currentPlayTimeout = setTimeout(() => {
+        if (currentAudio && !currentAudio.paused) {
+          currentAudio.pause();
+        }
+        currentPlayTimeout = null;
+      }, durationSec * 1000);
+    }).catch(err => {
+      console.warn('Playback error:', err);
+      showMessage('Tap the play button first to enable audio', 'info');
+    });
+  }
+  
+  currentAudio.onended = () => {
+    if (currentPlayTimeout) {
+      clearTimeout(currentPlayTimeout);
+      currentPlayTimeout = null;
+    }
+  };
 }
 
 // Load next file
@@ -939,12 +1029,14 @@ async function loadNextFile() {
   const contentDiv = document.getElementById('content');
   contentDiv.innerHTML = '<div class="loading">Loading next sample...</div>';
   
+  // Reset audio context when loading new file
   if (audioContext) {
-    audioContext.close();
+    await audioContext.close();
     audioContext = null;
     gainNode = null;
     sourceNode = null;
   }
+  audioUnlocked = false;
   
   try {
     const response = await fetch(`${BASE_PATH}/get-next-file`);
@@ -1022,48 +1114,15 @@ function playSegmentByIndex(frameIndex) {
   const frame = currentData.frames[frameIndex];
   if (!frame) return;
   
-  if (currentPlayTimeout) {
-    clearTimeout(currentPlayTimeout);
-    currentPlayTimeout = null;
-  }
-  
-  const startSec = frame.start_ms / 1000;
-  const endSec = frame.end_ms / 1000;
-  const durationSec = endSec - startSec;
-  
   document.querySelectorAll('.frame-card').forEach(card => card.classList.remove('active'));
   const activeCard = document.querySelector(`.frame-card[data-frame-index="${frameIndex}"]`);
   if (activeCard) activeCard.classList.add('active');
   
-  if (audioContext && audioContext.state === 'suspended') {
-    audioContext.resume();
-  }
+  // First unlock audio if needed (iOS)
+  unlockAudio();
   
-  currentAudio.pause();
-  currentAudio.currentTime = startSec;
-  
-  const playPromise = currentAudio.play();
-  if (playPromise !== undefined) {
-    playPromise.then(() => {
-      currentPlayTimeout = setTimeout(() => {
-        if (currentAudio && !currentAudio.paused) {
-          currentAudio.pause();
-        }
-        currentPlayTimeout = null;
-      }, durationSec * 1000);
-    }).catch(err => {
-      console.warn('Playback error:', err);
-      showMessage('Cannot play segment', 'error');
-      if (activeCard) activeCard.classList.remove('active');
-    });
-  }
-  
-  currentAudio.onended = () => {
-    if (currentPlayTimeout) {
-      clearTimeout(currentPlayTimeout);
-      currentPlayTimeout = null;
-    }
-  };
+  // Then play the segment
+  playSegmentAudio(frame.start_ms, frame.end_ms);
 }
 
 function renderAnnotationInterface(data) {
@@ -1072,7 +1131,7 @@ function renderAnnotationInterface(data) {
   const contentDiv = document.getElementById('content');
   contentDiv.innerHTML = `
     <div class="audio-wrapper">
-      <audio id="audioPlayer" controls preload="auto">
+      <audio id="audioPlayer" controls preload="auto" playsinline>
         <source src="${BASE_PATH}/audio/${data.wav_file}" type="audio/wav">
       </audio>
       <div class="volume-control">
@@ -1105,6 +1164,9 @@ function renderAnnotationInterface(data) {
   if (currentAudio) {
     currentAudio.onerror = () => showMessage('Audio could not be loaded', 'error');
     
+    // Add playsinline attribute for iOS
+    currentAudio.setAttribute('playsinline', '');
+    
     const volumeSlider = document.getElementById('volumeSlider');
     volumeSlider.addEventListener('input', (e) => {
       const val = parseFloat(e.target.value);
@@ -1113,13 +1175,19 @@ function renderAnnotationInterface(data) {
       document.getElementById('volumeValue').innerText = percent + '%';
     });
     
+    // Initialize Web Audio when audio starts playing
     currentAudio.addEventListener('play', () => {
       if (!audioContext) {
         initAudioContext();
-        if (audioContext && audioContext.state === 'suspended') {
-          audioContext.resume();
-        }
       }
+      if (audioContext && audioContext.state === 'suspended') {
+        audioContext.resume();
+      }
+    });
+    
+    // For iOS: also try to unlock on first touch on the audio element
+    currentAudio.addEventListener('touchstart', () => {
+      unlockAudio();
     }, { once: true });
   }
   
@@ -1147,7 +1215,6 @@ function renderAnnotationInterface(data) {
     editDiv.innerText = currentText;
     editDiv.setAttribute('data-frame-idx', idx);
     
-    // Setup desktop drop zone
     setupDesktopDropZone(editDiv, idx);
     
     editDiv.addEventListener('input', (e) => {
@@ -1177,7 +1244,7 @@ function renderAnnotationInterface(data) {
   
   const hint = document.createElement('div');
   hint.className = 'empty-hint';
-  hint.innerText = '💡 Tip: Tap and hold any akshar, then drag to a segment field';
+  hint.innerText = '💡 Tip: Tap any segment to play audio. Tap and hold akshar to drag.';
   framesGrid.appendChild(hint);
   
   document.getElementById('submitBtn').addEventListener('click', () => submitAnnotation());
@@ -1281,6 +1348,7 @@ function showMessage(text, type) {
 
 // Initialize
 async function init() {
+  setupAudioUnlock();
   const authed = await checkAuth();
   if (authed) {
     loadProgress();
