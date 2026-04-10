@@ -252,6 +252,13 @@ audio {
   box-shadow: 0 2px 8px rgba(44,110,73,0.08);
 }
 
+.frame-card.drag-over {
+  background: #E8F0FE;
+  border-color: #2C6E49;
+  border-width: 2px;
+  transform: scale(1.01);
+}
+
 .frame-header {
   display: flex;
   justify-content: space-between;
@@ -292,6 +299,7 @@ audio {
   resize: vertical;
   cursor: text;
   box-sizing: border-box;
+  min-height: 50px;
 }
 
 .edit-text:focus {
@@ -299,7 +307,7 @@ audio {
   box-shadow: 0 0 0 2px rgba(44,110,73,0.2);
 }
 
-/* Akshar Set Styles - moved to bottom */
+/* Akshar Set Styles - draggable items */
 .akshar-set-section {
   margin: 8px 0 20px;
   background: #F8F8F4;
@@ -333,6 +341,19 @@ audio {
   min-width: 44px;
   text-align: center;
   font-family: monospace;
+  cursor: grab;
+  user-select: none;
+  transition: all 0.15s ease;
+  touch-action: manipulation;
+}
+
+.akshar-item:active {
+  cursor: grabbing;
+}
+
+.akshar-item.dragging {
+  opacity: 0.5;
+  cursor: grabbing;
 }
 
 .button-group {
@@ -564,8 +585,9 @@ let gainNode = null;
 let sourceNode = null;
 let currentVolume = 1.0;
 const MAX_VOLUME = 6.0;  // 600% max volume
+let draggedAkshar = null;
 
-// Render Akshar Set
+// Render Akshar Set with drag-and-drop support
 function renderAksharSet(containerId) {
   const container = document.getElementById(containerId);
   if (!container) return;
@@ -575,7 +597,160 @@ function renderAksharSet(containerId) {
     const span = document.createElement('span');
     span.className = 'akshar-item';
     span.textContent = akshar;
+    span.setAttribute('draggable', 'true');
+    span.setAttribute('data-akshar', akshar);
+    
+    // Drag start event
+    span.addEventListener('dragstart', (e) => {
+      draggedAkshar = akshar;
+      e.dataTransfer.setData('text/plain', akshar);
+      e.dataTransfer.effectAllowed = 'copy';
+      span.classList.add('dragging');
+    });
+    
+    // Drag end event
+    span.addEventListener('dragend', (e) => {
+      draggedAkshar = null;
+      span.classList.remove('dragging');
+      // Remove drag-over class from all frames
+      document.querySelectorAll('.frame-card').forEach(card => {
+        card.classList.remove('drag-over');
+      });
+    });
+    
+    // For touch devices - long press to drag simulation
+    let touchStartTimeout;
+    span.addEventListener('touchstart', (e) => {
+      touchStartTimeout = setTimeout(() => {
+        // Simulate drag for touch devices
+        draggedAkshar = akshar;
+        span.style.opacity = '0.5';
+        
+        // Create a visual feedback for touch drag
+        const feedback = document.createElement('div');
+        feedback.textContent = akshar;
+        feedback.style.position = 'fixed';
+        feedback.style.left = e.touches[0].clientX + 'px';
+        feedback.style.top = e.touches[0].clientY + 'px';
+        feedback.style.backgroundColor = '#2C6E49';
+        feedback.style.color = 'white';
+        feedback.style.padding = '8px 12px';
+        feedback.style.borderRadius = '20px';
+        feedback.style.fontSize = '1.2rem';
+        feedback.style.fontFamily = 'monospace';
+        feedback.style.zIndex = '9999';
+        feedback.style.pointerEvents = 'none';
+        feedback.id = 'dragFeedback';
+        document.body.appendChild(feedback);
+        
+        // Show message
+        showMessage('Drop on any segment input', 'info');
+      }, 500);
+    });
+    
+    span.addEventListener('touchmove', (e) => {
+      e.preventDefault();
+      const feedback = document.getElementById('dragFeedback');
+      if (feedback && e.touches[0]) {
+        feedback.style.left = e.touches[0].clientX + 'px';
+        feedback.style.top = e.touches[0].clientY + 'px';
+      }
+    });
+    
+    span.addEventListener('touchend', (e) => {
+      clearTimeout(touchStartTimeout);
+      const feedback = document.getElementById('dragFeedback');
+      if (feedback) feedback.remove();
+      span.style.opacity = '1';
+      draggedAkshar = null;
+    });
+    
     container.appendChild(span);
+  });
+}
+
+// Setup drop zone for an edit text field
+function setupDropZone(editDiv, frameIndex) {
+  // Prevent default drag over
+  editDiv.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'copy';
+    const frameCard = editDiv.closest('.frame-card');
+    if (frameCard) frameCard.classList.add('drag-over');
+  });
+  
+  editDiv.addEventListener('dragleave', (e) => {
+    const frameCard = editDiv.closest('.frame-card');
+    if (frameCard) frameCard.classList.remove('drag-over');
+  });
+  
+  // Handle drop event
+  editDiv.addEventListener('drop', (e) => {
+    e.preventDefault();
+    const frameCard = editDiv.closest('.frame-card');
+    if (frameCard) frameCard.classList.remove('drag-over');
+    
+    let akshar = draggedAkshar;
+    if (!akshar) {
+      // Try to get from dataTransfer
+      akshar = e.dataTransfer.getData('text/plain');
+    }
+    
+    if (akshar && currentData && currentData.frames[frameIndex]) {
+      // Get current text
+      const currentText = currentData.frames[frameIndex].text || '';
+      // Append the new akshar to form words
+      const newText = currentText + akshar;
+      
+      // Update the editDiv content
+      editDiv.innerText = newText;
+      
+      // Update data model
+      currentData.frames[frameIndex].text = newText;
+      
+      // Update full sequence
+      const fullSequence = currentData.frames.map(f => f.text || '').filter(t => t !== '').join(' ');
+      currentData.full_sequence = fullSequence;
+      
+      // Show feedback
+      showMessage(`Added "${akshar}" to segment ${frameIndex + 1}`, 'success');
+      
+      // Move cursor to end
+      const range = document.createRange();
+      const sel = window.getSelection();
+      range.selectNodeContents(editDiv);
+      range.collapse(false);
+      sel.removeAllRanges();
+      sel.addRange(range);
+    }
+    
+    draggedAkshar = null;
+  });
+  
+  // For touch devices - handle drop via touch end
+  editDiv.addEventListener('touchend', (e) => {
+    const feedback = document.getElementById('dragFeedback');
+    if (feedback && draggedAkshar) {
+      e.preventDefault();
+      feedback.remove();
+      
+      const akshar = draggedAkshar;
+      if (akshar && currentData && currentData.frames[frameIndex]) {
+        const currentText = currentData.frames[frameIndex].text || '';
+        const newText = currentText + akshar;
+        editDiv.innerText = newText;
+        currentData.frames[frameIndex].text = newText;
+        
+        const fullSequence = currentData.frames.map(f => f.text || '').filter(t => t !== '').join(' ');
+        currentData.full_sequence = fullSequence;
+        
+        showMessage(`Added "${akshar}" to segment ${frameIndex + 1}`, 'success');
+      }
+      draggedAkshar = null;
+      document.querySelectorAll('.frame-card').forEach(card => {
+        card.classList.remove('drag-over');
+      });
+    }
   });
 }
 
@@ -845,7 +1020,7 @@ function renderAnnotationInterface(data) {
     <div class="frames-grid" id="framesGrid"></div>
     <!-- Akshar Set Section moved here - above button group -->
     <div class="akshar-set-section">
-      <div class="akshar-title">Allowed Akshar Set</div>
+      <div class="akshar-title">Allowed Akshar Set (Drag & Drop)</div>
       <div class="akshar-grid" id="aksharGridBottom"></div>
     </div>
     <div class="button-group">
@@ -855,7 +1030,7 @@ function renderAnnotationInterface(data) {
     <div id="messageArea" class="message-area"></div>
   `;
   
-  // Render Akshar Set in the bottom container
+  // Render Akshar Set with drag-drop support
   renderAksharSet('aksharGridBottom');
   
   currentAudio = document.getElementById('audioPlayer');
@@ -871,11 +1046,7 @@ function renderAnnotationInterface(data) {
       // Update display with boost indicator if > 100%
       const percent = Math.round(val * 100);
       const volumeSpan = document.getElementById('volumeValue');
-      if (val > 1.0) {
-        volumeSpan.innerText = percent + '%';
-      } else {
-        volumeSpan.innerText = percent + '%';
-      }
+      volumeSpan.innerText = percent + '%';
     });
     
     // Initialize Web Audio API when user interacts with audio
@@ -913,6 +1084,9 @@ function renderAnnotationInterface(data) {
     editDiv.innerText = currentText;
     editDiv.setAttribute('data-frame-idx', idx);
     
+    // Setup drag and drop for this edit field
+    setupDropZone(editDiv, idx);
+    
     editDiv.addEventListener('input', (e) => {
       const newText = e.target.innerText || '';
       if (currentData && currentData.frames[idx]) {
@@ -940,7 +1114,7 @@ function renderAnnotationInterface(data) {
   
   const hint = document.createElement('div');
   hint.className = 'empty-hint';
-  hint.innerText = 'Segments can be left empty';
+  hint.innerText = 'Segments can be left empty. Drag akshar from above and drop here.';
   framesGrid.appendChild(hint);
   
   document.getElementById('submitBtn').addEventListener('click', () => submitAnnotation());
