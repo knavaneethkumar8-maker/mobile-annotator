@@ -1,0 +1,1363 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+<title>Annotation Tool</title>
+
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  background: #F5F5F0;
+  padding: 16px 0px;
+  color: #1C1C1A;
+  line-height: 1.4;
+}
+
+.container {
+  max-width: 680px;
+  margin: 0 auto;
+  background: #FFFFFF;
+  border-radius: 28px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02), 0 2px 6px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+  padding: 20px 18px 28px;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 18px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.header-left h2 {
+  font-size: 1.65rem;
+  font-weight: 590;
+  letter-spacing: -0.02em;
+  color: #1C1C1A;
+  margin: 0;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #F0F0EB;
+  padding: 6px 14px;
+  border-radius: 40px;
+}
+
+.user-name {
+  font-weight: 550;
+  font-size: 0.85rem;
+  color: #2C6E49;
+}
+
+.logout-btn {
+  background: none;
+  border: none;
+  color: #8E8E88;
+  font-size: 0.75rem;
+  cursor: pointer;
+  padding: 4px 8px;
+  font-weight: 500;
+  margin: 0;
+  width: auto;
+}
+
+.logout-btn:hover {
+  color: #B13E3A;
+}
+
+.remaining-badge {
+  background: #E8E8E3;
+  padding: 6px 14px;
+  border-radius: 40px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: #2C2C2A;
+}
+
+.progress-section {
+  margin-bottom: 12px;
+}
+
+.progress-bar {
+  background: #EBEBE4;
+  height: 6px;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  background: #2C6E49;
+  height: 100%;
+  width: 0%;
+  transition: width 0.25s ease-out;
+  border-radius: 12px;
+}
+
+/* Stats cards for today and total */
+.stats-cards {
+  display: flex;
+  gap: 12px;
+  margin: 12px 0 8px;
+}
+
+.stat-card {
+  flex: 1;
+  background: #F8F8F4;
+  border-radius: 20px;
+  padding: 12px;
+  text-align: center;
+  border: 1px solid #E9E9E2;
+}
+
+.stat-card-label {
+  font-size: 0.7rem;
+  color: #8E8E88;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 6px;
+}
+
+.stat-card-value {
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: #2C6E49;
+}
+
+.stat-card-sub {
+  font-size: 0.65rem;
+  color: #8E8E88;
+  margin-top: 4px;
+}
+
+.audio-wrapper {
+  margin: 16px 0 18px;
+}
+
+.volume-control {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 12px;
+  padding: 8px 12px;
+  background: #F8F8F4;
+  border-radius: 40px;
+  border: 1px solid #E9E9E2;
+}
+
+.volume-icon {
+  font-size: 1.2rem;
+  line-height: 1;
+  color: #6E6E68;
+}
+
+.volume-slider {
+  flex: 1;
+  height: 4px;
+  -webkit-appearance: none;
+  appearance: none;
+  background: #DCDCD4;
+  border-radius: 4px;
+  outline: none;
+}
+
+.volume-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #2C6E49;
+  cursor: pointer;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.volume-slider::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #2C6E49;
+  cursor: pointer;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  border: none;
+}
+
+.volume-value {
+  min-width: 52px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: #2C6E49;
+  text-align: right;
+}
+
+audio {
+  width: 100%;
+  border-radius: 44px;
+  background: #F9F9F6;
+  outline: none;
+}
+
+.current-file-card {
+  background: #F8F8F4;
+  border-radius: 24px;
+  padding: 14px 18px;
+  margin: 12px 0 16px;
+  font-size: 0.9rem;
+  border: 1px solid #E9E9E2;
+  color: #2E2E2A;
+}
+
+.current-file-card strong {
+  font-weight: 590;
+  color: #1A4D3A;
+}
+
+.frames-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  max-height: 540px;
+  overflow-y: auto;
+  padding: 4px 2px 8px 2px;
+  margin-top: 8px;
+  margin-bottom: 16px;
+}
+
+.frame-card {
+  background: #FEFEFC;
+  border: 1px solid #E5E5DE;
+  border-radius: 20px;
+  padding: 12px 14px;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+}
+
+.frame-card.active {
+  background: #EBF2EA;
+  border-color: #2C6E49;
+  box-shadow: 0 2px 8px rgba(44,110,73,0.08);
+}
+
+.frame-card.drag-over {
+  background: #E8F0FE;
+  border-color: #2C6E49;
+  border-width: 2px;
+  transform: scale(1.01);
+}
+
+.frame-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 10px;
+  font-size: 0.7rem;
+  font-weight: 480;
+  letter-spacing: 0.3px;
+  color: #6E6E68;
+}
+
+.frame-time {
+  background: #EEEEE8;
+  padding: 2px 10px;
+  border-radius: 30px;
+  font-size: 0.7rem;
+  font-family: monospace;
+}
+
+.frame-label {
+  font-weight: 500;
+  text-transform: uppercase;
+  font-size: 0.7rem;
+}
+
+.edit-text {
+  border: 1px solid #DCDCD4;
+  border-radius: 18px;
+  padding: 12px 14px;
+  background: #FFFFFF;
+  font-size: 1rem;
+  font-family: monospace;
+  width: 100%;
+  outline: none;
+  transition: 0.18s ease;
+  font-weight: 460;
+  color: #1C1C1A;
+  resize: vertical;
+  cursor: text;
+  box-sizing: border-box;
+  min-height: 50px;
+}
+
+.edit-text:focus {
+  border-color: #2C6E49;
+  box-shadow: 0 0 0 2px rgba(44,110,73,0.2);
+}
+
+/* Akshar Set Styles - draggable items */
+.akshar-set-section {
+  margin: 8px 0 20px;
+  background: #F8F8F4;
+  border-radius: 20px;
+  padding: 12px 16px;
+  border: 1px solid #E9E9E2;
+}
+
+.akshar-title {
+  font-weight: 590;
+  font-size: 0.75rem;
+  color: #2C6E49;
+  margin-bottom: 10px;
+  letter-spacing: 0.3px;
+}
+
+.akshar-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.akshar-item {
+  background: #FFFFFF;
+  border: 1px solid #E5E5DE;
+  border-radius: 12px;
+  padding: 8px 12px;
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: #1C1C1A;
+  min-width: 48px;
+  text-align: center;
+  font-family: monospace;
+  cursor: grab;
+  user-select: none;
+  transition: all 0.15s ease;
+  touch-action: none;
+}
+
+.akshar-item:active {
+  cursor: grabbing;
+  transform: scale(0.95);
+}
+
+.akshar-item.dragging {
+  opacity: 0.5;
+  cursor: grabbing;
+}
+
+.akshar-item.drag-source {
+  opacity: 0.4;
+  transform: scale(0.95);
+}
+
+.button-group {
+  display: flex;
+  gap: 14px;
+  margin: 0 0 16px;
+}
+
+button {
+  flex: 1;
+  padding: 14px 8px;
+  border: none;
+  border-radius: 44px;
+  font-size: 1rem;
+  font-weight: 520;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: #F2F2EC;
+  color: #2C2C2A;
+}
+
+.btn-submit {
+  background: #2C6E49;
+  color: white;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+
+.btn-submit:active {
+  background: #215A3A;
+  transform: scale(0.97);
+}
+
+.btn-skip {
+  background: #E8E8E3;
+  color: #3A3A36;
+}
+
+.btn-skip:active {
+  background: #DCDCD4;
+  transform: scale(0.97);
+}
+
+.message-area {
+  margin-top: 12px;
+}
+
+.message {
+  padding: 12px 16px;
+  border-radius: 28px;
+  text-align: center;
+  font-size: 0.85rem;
+  font-weight: 470;
+}
+
+.message.success {
+  background: #E0F0E6;
+  color: #1E5631;
+}
+
+.message.error {
+  background: #FDE9E7;
+  color: #B13E3A;
+}
+
+.message.info {
+  background: #E9EDF2;
+  color: #2B4F6C;
+}
+
+.loading {
+  text-align: center;
+  padding: 48px 20px;
+  font-size: 1rem;
+  color: #6E6E68;
+  font-weight: 460;
+}
+
+.completion-box {
+  text-align: center;
+  padding: 36px 16px;
+}
+
+.completion-box h2 {
+  font-size: 1.9rem;
+  font-weight: 560;
+  letter-spacing: -0.3px;
+  color: #2C6E49;
+  margin-bottom: 12px;
+}
+
+.completion-box p {
+  font-size: 1rem;
+  margin: 18px 0;
+  color: #3C3C38;
+}
+
+.completion-box button {
+  background: #2C6E49;
+  color: white;
+  max-width: 220px;
+  margin: 16px auto 0;
+}
+
+.frames-grid::-webkit-scrollbar {
+  width: 4px;
+}
+
+.frames-grid::-webkit-scrollbar-track {
+  background: #EFEFE9;
+  border-radius: 8px;
+}
+
+.frames-grid::-webkit-scrollbar-thumb {
+  background: #BDBDB3;
+  border-radius: 8px;
+}
+
+@media (max-width: 560px) {
+  body {
+    padding: 12px 0px;
+  }
+  .container {
+    padding: 18px 14px 24px;
+    border-radius: 24px;
+  }
+  .button-group {
+    gap: 12px;
+  }
+  button {
+    padding: 12px 8px;
+    font-size: 0.95rem;
+  }
+  .edit-text {
+    font-size: 0.9rem;
+    padding: 10px 12px;
+  }
+  .current-file-card {
+    font-size: 0.85rem;
+    padding: 12px 14px;
+  }
+  .akshar-item {
+    padding: 6px 10px;
+    font-size: 1rem;
+    min-width: 42px;
+  }
+  .stat-card-value {
+    font-size: 1rem;
+  }
+  .volume-control {
+    gap: 8px;
+    padding: 6px 10px;
+  }
+  .volume-value {
+    min-width: 48px;
+    font-size: 0.75rem;
+  }
+}
+
+.empty-hint {
+  font-size: 0.7rem;
+  color: #8E8E88;
+  text-align: right;
+  margin-top: 6px;
+  padding-right: 4px;
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="header">
+    <div class="header-left">
+      <h2>Annotation Tool</h2>
+    </div>
+    <div style="display: flex; align-items: center; gap: 12px;">
+      <div class="user-info">
+        <span class="user-name" id="usernameDisplay">Loading...</span>
+        <button class="logout-btn" onclick="logout()">Sign out</button>
+      </div>
+      <div class="remaining-badge" id="remainingBadge">—</div>
+    </div>
+  </div>
+
+  <div class="progress-section">
+    <div class="progress-bar">
+      <div class="progress-fill" id="progressFill"></div>
+    </div>
+  </div>
+
+  <!-- Stats Cards: Today and Total -->
+  <div class="stats-cards">
+    <div class="stat-card">
+      <div class="stat-card-label">Today</div>
+      <div class="stat-card-value" id="todayFiles">0</div>
+      <div class="stat-card-sub" id="todayDuration">0s</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-card-label">Total</div>
+      <div class="stat-card-value" id="totalFiles">0</div>
+      <div class="stat-card-sub" id="totalDuration">0s</div>
+    </div>
+  </div>
+
+  <div id="content">
+    <div class="loading">Loading next sample...</div>
+  </div>
+</div>
+
+<script>
+//const BASE_PATH = "/mobile-annotator";
+const BASE_PATH = "{{ base_path }}";
+const AKSHAR_SET = [
+  "अ", "आ", "इ", "उ", "ए", "ओ",
+  "क", "ख", "ग", "घ", "च", "छ", "ज", "झ",
+  "ट", "ठ", "ड", "ढ", "त", "थ", "द", "ध",
+  "प", "फ", "ब", "भ",
+  "न", "म",
+  "य", "र", "ल", "व",
+  "स", "ह", "०"
+];
+
+let currentData = null;
+let currentAudio = null;
+let currentPlayTimeout = null;
+let currentUsername = '';
+let audioContext = null;
+let gainNode = null;
+let sourceNode = null;
+let currentVolume = 1.0;
+const MAX_VOLUME = 6.0;
+let audioUnlocked = false;
+
+// Drag and drop state for mobile
+let dragState = {
+  active: false,
+  akshar: null,
+  sourceElement: null,
+  startX: 0,
+  startY: 0,
+  currentX: 0,
+  currentY: 0,
+  feedbackElement: null,
+  targetFrameIndex: null
+};
+
+// iOS Audio Unlock - MUST be called from user gesture
+function unlockAudio() {
+  if (audioUnlocked) return;
+  
+  if (audioContext && audioContext.state === 'suspended') {
+    audioContext.resume().then(() => {
+      audioUnlocked = true;
+      console.log('AudioContext resumed successfully');
+    }).catch(err => {
+      console.warn('Failed to resume AudioContext:', err);
+    });
+  }
+  
+  // Also try to play and immediately pause a silent sound
+  if (currentAudio) {
+    const unlockPromise = currentAudio.play();
+    if (unlockPromise !== undefined) {
+      unlockPromise.then(() => {
+        currentAudio.pause();
+        currentAudio.currentTime = 0;
+        audioUnlocked = true;
+        console.log('Audio element unlocked');
+      }).catch(err => {
+        console.log('Audio unlock attempt failed:', err);
+      });
+    }
+  }
+}
+
+// Setup global tap to unlock audio (iOS requirement)
+function setupAudioUnlock() {
+  const unlockHandler = () => {
+    unlockAudio();
+    document.removeEventListener('touchstart', unlockHandler);
+    document.removeEventListener('click', unlockHandler);
+  };
+  
+  document.addEventListener('touchstart', unlockHandler);
+  document.addEventListener('click', unlockHandler);
+}
+
+// Render Akshar Set with drag-and-drop support for both desktop and mobile
+function renderAksharSet(containerId) {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+  
+  container.innerHTML = '';
+  AKSHAR_SET.forEach(akshar => {
+    const span = document.createElement('span');
+    span.className = 'akshar-item';
+    span.textContent = akshar;
+    span.setAttribute('draggable', 'true');
+    span.setAttribute('data-akshar', akshar);
+    
+    // Desktop drag events
+    span.addEventListener('dragstart', handleDragStart);
+    span.addEventListener('dragend', handleDragEnd);
+    
+    // Mobile touch events
+    span.addEventListener('touchstart', handleTouchStart);
+    span.addEventListener('touchmove', handleTouchMove);
+    span.addEventListener('touchend', handleTouchEnd);
+    
+    container.appendChild(span);
+  });
+}
+
+// Desktop drag handlers
+function handleDragStart(e) {
+  const akshar = e.target.getAttribute('data-akshar');
+  e.dataTransfer.setData('text/plain', akshar);
+  e.dataTransfer.effectAllowed = 'copy';
+  e.target.classList.add('dragging');
+  dragState.akshar = akshar;
+}
+
+function handleDragEnd(e) {
+  e.target.classList.remove('dragging');
+  dragState.akshar = null;
+  document.querySelectorAll('.frame-card').forEach(card => {
+    card.classList.remove('drag-over');
+  });
+}
+
+// Mobile touch handlers
+function handleTouchStart(e) {
+  e.preventDefault();
+  const touch = e.touches[0];
+  const element = e.target;
+  const akshar = element.getAttribute('data-akshar');
+  
+  if (!akshar) return;
+  
+  dragState.active = true;
+  dragState.akshar = akshar;
+  dragState.sourceElement = element;
+  dragState.startX = touch.clientX;
+  dragState.startY = touch.clientY;
+  dragState.currentX = touch.clientX;
+  dragState.currentY = touch.clientY;
+  
+  element.classList.add('drag-source');
+  
+  const feedback = document.createElement('div');
+  feedback.textContent = akshar;
+  feedback.style.position = 'fixed';
+  feedback.style.left = (touch.clientX - 20) + 'px';
+  feedback.style.top = (touch.clientY - 20) + 'px';
+  feedback.style.backgroundColor = '#2C6E49';
+  feedback.style.color = 'white';
+  feedback.style.padding = '12px 16px';
+  feedback.style.borderRadius = '24px';
+  feedback.style.fontSize = '1.3rem';
+  feedback.style.fontFamily = 'monospace';
+  feedback.style.fontWeight = 'bold';
+  feedback.style.zIndex = '9999';
+  feedback.style.pointerEvents = 'none';
+  feedback.style.boxShadow = '0 4px 12px rgba(0,0,0,0.2)';
+  feedback.style.transform = 'scale(1.1)';
+  feedback.id = 'dragFeedback';
+  document.body.appendChild(feedback);
+  
+  showMessage('Drag to any segment field', 'info');
+}
+
+function handleTouchMove(e) {
+  if (!dragState.active) return;
+  e.preventDefault();
+  
+  const touch = e.touches[0];
+  dragState.currentX = touch.clientX;
+  dragState.currentY = touch.clientY;
+  
+  const feedback = document.getElementById('dragFeedback');
+  if (feedback) {
+    feedback.style.left = (touch.clientX - 25) + 'px';
+    feedback.style.top = (touch.clientY - 25) + 'px';
+  }
+  
+  const elementAtTouch = document.elementFromPoint(touch.clientX, touch.clientY);
+  const targetFrameCard = elementAtTouch?.closest('.frame-card');
+  
+  document.querySelectorAll('.frame-card').forEach(card => {
+    if (targetFrameCard !== card) {
+      card.classList.remove('drag-over');
+    }
+  });
+  
+  if (targetFrameCard) {
+    targetFrameCard.classList.add('drag-over');
+    dragState.targetFrameIndex = parseInt(targetFrameCard.getAttribute('data-frame-index'));
+  } else {
+    dragState.targetFrameIndex = null;
+  }
+}
+
+function handleTouchEnd(e) {
+  if (!dragState.active) return;
+  e.preventDefault();
+  
+  const feedback = document.getElementById('dragFeedback');
+  if (feedback) feedback.remove();
+  
+  if (dragState.sourceElement) {
+    dragState.sourceElement.classList.remove('drag-source');
+  }
+  
+  document.querySelectorAll('.frame-card').forEach(card => {
+    card.classList.remove('drag-over');
+  });
+  
+  if (dragState.targetFrameIndex !== null && dragState.akshar && currentData) {
+    const frameIndex = dragState.targetFrameIndex;
+    const targetEditDiv = document.querySelector(`.frame-card[data-frame-index="${frameIndex}"] .edit-text`);
+    
+    if (targetEditDiv && currentData.frames[frameIndex]) {
+      const currentText = currentData.frames[frameIndex].text || '';
+      const newText = currentText + dragState.akshar;
+      
+      targetEditDiv.innerText = newText;
+      currentData.frames[frameIndex].text = newText;
+      
+      const fullSequence = currentData.frames.map(f => f.text || '').filter(t => t !== '').join(' ');
+      currentData.full_sequence = fullSequence;
+      
+      showMessage(`Added "${dragState.akshar}" to segment ${frameIndex + 1}`, 'success');
+      
+      if (targetEditDiv.focus) {
+        targetEditDiv.focus();
+        const range = document.createRange();
+        const sel = window.getSelection();
+        range.selectNodeContents(targetEditDiv);
+        range.collapse(false);
+        sel.removeAllRanges();
+        sel.addRange(range);
+      }
+    }
+  }
+  
+  dragState.active = false;
+  dragState.akshar = null;
+  dragState.sourceElement = null;
+  dragState.targetFrameIndex = null;
+}
+
+// Setup drop zone for desktop
+function setupDesktopDropZone(editDiv, frameIndex) {
+  editDiv.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'copy';
+    const frameCard = editDiv.closest('.frame-card');
+    if (frameCard) frameCard.classList.add('drag-over');
+  });
+  
+  editDiv.addEventListener('dragleave', (e) => {
+    const frameCard = editDiv.closest('.frame-card');
+    if (frameCard) frameCard.classList.remove('drag-over');
+  });
+  
+  editDiv.addEventListener('drop', (e) => {
+    e.preventDefault();
+    const frameCard = editDiv.closest('.frame-card');
+    if (frameCard) frameCard.classList.remove('drag-over');
+    
+    let akshar = e.dataTransfer.getData('text/plain');
+    
+    if (akshar && currentData && currentData.frames[frameIndex]) {
+      const currentText = currentData.frames[frameIndex].text || '';
+      const newText = currentText + akshar;
+      
+      editDiv.innerText = newText;
+      currentData.frames[frameIndex].text = newText;
+      
+      const fullSequence = currentData.frames.map(f => f.text || '').filter(t => t !== '').join(' ');
+      currentData.full_sequence = fullSequence;
+      
+      showMessage(`Added "${akshar}" to segment ${frameIndex + 1}`, 'success');
+      
+      const range = document.createRange();
+      const sel = window.getSelection();
+      range.selectNodeContents(editDiv);
+      range.collapse(false);
+      sel.removeAllRanges();
+      sel.addRange(range);
+    }
+  });
+}
+
+// Check authentication and load user
+async function checkAuth() {
+  try {
+    const response = await fetch(`${BASE_PATH}/api/current-user`);
+    const data = await response.json();
+    
+    if (!data.logged_in) {
+      window.location.href = `${BASE_PATH}/login`;
+      return false;
+    }
+    
+    currentUsername = data.username;
+    document.getElementById('usernameDisplay').innerText = data.username;
+    return true;
+  } catch (err) {
+    console.error('Auth check failed:', err);
+    window.location.href = `${BASE_PATH}/login`;
+    return false;
+  }
+}
+
+// Logout
+async function logout() {
+  await fetch(`${BASE_PATH}/api/logout`, { method: 'POST' });
+  window.location.href = `${BASE_PATH}/login`;
+}
+
+// Load progress with user stats
+async function loadProgress() {
+  try {
+    const response = await fetch(`${BASE_PATH}/progress`);
+    if (response.status === 401) {
+      window.location.href = `${BASE_PATH}/login`;
+      return;
+    }
+    const data = await response.json();
+    
+    const percent = data.total > 0 ? (data.completed / data.total * 100).toFixed(1) : 0;
+    document.getElementById('progressFill').style.width = percent + '%';
+    document.getElementById('remainingBadge').innerHTML = `${data.remaining} remaining`;
+    
+    if (data.user_stats) {
+      document.getElementById('totalFiles').innerText = data.user_stats.total_files_completed || 0;
+      document.getElementById('totalDuration').innerText = data.user_stats.total_duration_formatted || '0s';
+    }
+    
+    if (data.user_daily_stats && data.user_daily_stats.daily) {
+      const today = new Date().toISOString().split('T')[0];
+      const todayStats = data.user_daily_stats.daily[today];
+      
+      if (todayStats) {
+        document.getElementById('todayFiles').innerText = todayStats.files_completed || 0;
+        document.getElementById('todayDuration').innerText = todayStats.duration_formatted || '0s';
+      } else {
+        document.getElementById('todayFiles').innerText = '0';
+        document.getElementById('todayDuration').innerText = '0s';
+      }
+    } else {
+      document.getElementById('todayFiles').innerText = '0';
+      document.getElementById('todayDuration').innerText = '0s';
+    }
+    
+  } catch (err) {
+    console.warn('Progress error:', err);
+  }
+}
+
+// Initialize Web Audio API for volume boost
+function initAudioContext() {
+  if (!audioContext && currentAudio) {
+    try {
+      audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      const source = audioContext.createMediaElementSource(currentAudio);
+      gainNode = audioContext.createGain();
+      source.connect(gainNode);
+      gainNode.connect(audioContext.destination);
+      gainNode.gain.value = currentVolume;
+      sourceNode = source;
+      
+      // For iOS: resume on user interaction
+      if (audioContext.state === 'suspended') {
+        const resumeHandler = () => {
+          audioContext.resume();
+          document.removeEventListener('touchstart', resumeHandler);
+          document.removeEventListener('click', resumeHandler);
+        };
+        document.addEventListener('touchstart', resumeHandler);
+        document.addEventListener('click', resumeHandler);
+      }
+    } catch (e) {
+      console.warn('Web Audio API initialization failed:', e);
+    }
+  }
+}
+
+// Update volume (supports up to 600%)
+function updateVolume(value) {
+  currentVolume = value;
+  const percent = Math.round(value * 100);
+  document.getElementById('volumeValue').innerText = percent + '%';
+  
+  if (gainNode) {
+    gainNode.gain.value = value;
+  }
+  
+  // Fallback for browsers without Web Audio API
+  if (currentAudio && !gainNode) {
+    currentAudio.volume = Math.min(value, 1.0);
+  }
+}
+
+// iOS-compatible segment playback
+function playSegmentAudio(startMs, endMs) {
+  if (!currentAudio) {
+    showMessage('Audio not ready', 'error');
+    return;
+  }
+  
+  const startSec = startMs / 1000;
+  const endSec = endMs / 1000;
+  const durationSec = endSec - startSec;
+  
+  if (currentPlayTimeout) {
+    clearTimeout(currentPlayTimeout);
+    currentPlayTimeout = null;
+  }
+  
+  // Ensure audio context is active for iOS
+  if (audioContext && audioContext.state === 'suspended') {
+    audioContext.resume().then(() => {
+      playAudioSegment(startSec, durationSec);
+    }).catch(err => {
+      console.warn('AudioContext resume failed:', err);
+      playAudioSegment(startSec, durationSec);
+    });
+  } else {
+    playAudioSegment(startSec, durationSec);
+  }
+}
+
+function playAudioSegment(startSec, durationSec) {
+  if (!currentAudio) return;
+  
+  currentAudio.pause();
+  currentAudio.currentTime = startSec;
+  
+  const playPromise = currentAudio.play();
+  
+  if (playPromise !== undefined) {
+    playPromise.then(() => {
+      currentPlayTimeout = setTimeout(() => {
+        if (currentAudio && !currentAudio.paused) {
+          currentAudio.pause();
+        }
+        currentPlayTimeout = null;
+      }, durationSec * 1000);
+    }).catch(err => {
+      console.warn('Playback error:', err);
+      showMessage('Tap the play button first to enable audio', 'info');
+    });
+  }
+  
+  currentAudio.onended = () => {
+    if (currentPlayTimeout) {
+      clearTimeout(currentPlayTimeout);
+      currentPlayTimeout = null;
+    }
+  };
+}
+
+// Load next file
+async function loadNextFile() {
+  const contentDiv = document.getElementById('content');
+  contentDiv.innerHTML = '<div class="loading">Loading next sample...</div>';
+  
+  // Reset audio context when loading new file
+  if (audioContext) {
+    await audioContext.close();
+    audioContext = null;
+    gainNode = null;
+    sourceNode = null;
+  }
+  audioUnlocked = false;
+  
+  try {
+    const response = await fetch(`${BASE_PATH}/get-next-file`);
+    if (response.status === 401) {
+      window.location.href = `${BASE_PATH}/login`;
+      return;
+    }
+    const data = await response.json();
+    
+    if (data.completed) {
+      showCompletionScreen();
+      return;
+    }
+    if (data.error) {
+      showErrorScreen(data.error);
+      return;
+    }
+    renderAnnotationInterface(data);
+    loadProgress();
+  } catch (err) {
+    console.error('Load error:', err);
+    showErrorScreen('Connection issue: ' + err);
+  }
+}
+
+function showCompletionScreen() {
+  document.getElementById('content').innerHTML = `
+    <div class="completion-box">
+      <h2>All done</h2>
+      <p>You have successfully annotated all files.</p>
+      <button class="btn-submit" onclick="location.reload()">Reload page</button>
+    </div>
+  `;
+}
+
+function showErrorScreen(message) {
+  document.getElementById('content').innerHTML = `
+    <div class="message error" style="margin-top:20px;">Error: ${message}</div>
+    <div class="button-group" style="margin-top:20px;">
+      <button class="btn-submit" onclick="loadNextFile()">Try again</button>
+    </div>
+  `;
+}
+
+function saveAllPendingEdits() {
+  const editDivs = document.querySelectorAll('.edit-text');
+  let updated = false;
+  
+  editDivs.forEach((div, idx) => {
+    const frameIndex = parseInt(div.getAttribute('data-frame-idx'));
+    const newText = div.innerText || '';
+    
+    if (currentData && currentData.frames[frameIndex]) {
+      if (currentData.frames[frameIndex].text !== newText) {
+        currentData.frames[frameIndex].text = newText;
+        updated = true;
+      }
+    }
+  });
+  
+  if (updated && currentData) {
+    const fullSequence = currentData.frames.map(f => f.text || '').filter(t => t !== '').join(' ');
+    currentData.full_sequence = fullSequence;
+  }
+  
+  return updated;
+}
+
+function playSegmentByIndex(frameIndex) {
+  if (!currentData || !currentAudio) {
+    showMessage('Audio not ready', 'error');
+    return;
+  }
+  
+  const frame = currentData.frames[frameIndex];
+  if (!frame) return;
+  
+  document.querySelectorAll('.frame-card').forEach(card => card.classList.remove('active'));
+  const activeCard = document.querySelector(`.frame-card[data-frame-index="${frameIndex}"]`);
+  if (activeCard) activeCard.classList.add('active');
+  
+  // First unlock audio if needed (iOS)
+  unlockAudio();
+  
+  // Then play the segment
+  playSegmentAudio(frame.start_ms, frame.end_ms);
+}
+
+function renderAnnotationInterface(data) {
+  currentData = data;
+  
+  const contentDiv = document.getElementById('content');
+  contentDiv.innerHTML = `
+    <div class="audio-wrapper">
+      <audio id="audioPlayer" controls preload="auto" playsinline>
+        <source src="${BASE_PATH}/audio/${data.wav_file}" type="audio/wav">
+      </audio>
+      <div class="volume-control">
+        <span class="volume-icon">🔊</span>
+        <input type="range" id="volumeSlider" class="volume-slider" min="0" max="${MAX_VOLUME}" step="0.05" value="1.0">
+        <span class="volume-value" id="volumeValue">100%</span>
+      </div>
+    </div>
+    <div class="current-file-card">
+      <div><strong>File:</strong> ${data.json_file}</div>
+      <div><strong>Word:</strong> ${data.word || '—'}</div>
+      <div><strong>Sentence:</strong> ${data.sentence || ''}</div>
+      <div style="margin-top: 8px; font-size: 0.8rem; color: #6E6E68;"><strong>Annotator:</strong> ${currentUsername}</div>
+    </div>
+    <div class="frames-grid" id="framesGrid"></div>
+    <div class="akshar-set-section">
+      <div class="akshar-title">Allowed Akshar Set (Drag & Drop)</div>
+      <div class="akshar-grid" id="aksharGridBottom"></div>
+    </div>
+    <div class="button-group">
+      <button class="btn-submit" id="submitBtn">Submit annotation</button>
+      <button class="btn-skip" id="skipBtn">Skip (keep later)</button>
+    </div>
+    <div id="messageArea" class="message-area"></div>
+  `;
+  
+  renderAksharSet('aksharGridBottom');
+  
+  currentAudio = document.getElementById('audioPlayer');
+  if (currentAudio) {
+    currentAudio.onerror = () => showMessage('Audio could not be loaded', 'error');
+    
+    // Add playsinline attribute for iOS
+    currentAudio.setAttribute('playsinline', '');
+    
+    const volumeSlider = document.getElementById('volumeSlider');
+    volumeSlider.addEventListener('input', (e) => {
+      const val = parseFloat(e.target.value);
+      updateVolume(val);
+      const percent = Math.round(val * 100);
+      document.getElementById('volumeValue').innerText = percent + '%';
+    });
+    
+    // Initialize Web Audio when audio starts playing
+    currentAudio.addEventListener('play', () => {
+      if (!audioContext) {
+        initAudioContext();
+      }
+      if (audioContext && audioContext.state === 'suspended') {
+        audioContext.resume();
+      }
+    });
+    
+    // For iOS: also try to unlock on first touch on the audio element
+    currentAudio.addEventListener('touchstart', () => {
+      unlockAudio();
+    }, { once: true });
+  }
+  
+  const framesGrid = document.getElementById('framesGrid');
+  framesGrid.innerHTML = '';
+  
+  currentData.frames.forEach((frame, idx) => {
+    const frameCard = document.createElement('div');
+    frameCard.className = 'frame-card';
+    frameCard.setAttribute('data-frame-index', idx);
+    frameCard.setAttribute('data-start-ms', frame.start_ms);
+    frameCard.setAttribute('data-end-ms', frame.end_ms);
+    
+    const headerDiv = document.createElement('div');
+    headerDiv.className = 'frame-header';
+    headerDiv.innerHTML = `
+      <span class="frame-label">Segment ${idx+1}</span>
+      <span class="frame-time">${frame.start_ms}–${frame.end_ms} ms</span>
+    `;
+    
+    const editDiv = document.createElement('div');
+    editDiv.setAttribute('contenteditable', 'true');
+    editDiv.className = 'edit-text';
+    const currentText = frame.text || '';
+    editDiv.innerText = currentText;
+    editDiv.setAttribute('data-frame-idx', idx);
+    
+    setupDesktopDropZone(editDiv, idx);
+    
+    editDiv.addEventListener('input', (e) => {
+      const newText = e.target.innerText || '';
+      if (currentData && currentData.frames[idx]) {
+        currentData.frames[idx].text = newText;
+        const fullSequence = currentData.frames.map(f => f.text || '').filter(t => t !== '').join(' ');
+        currentData.full_sequence = fullSequence;
+      }
+    });
+    
+    editDiv.addEventListener('click', (e) => {
+      e.stopPropagation();
+      playSegmentByIndex(idx);
+    });
+    
+    frameCard.appendChild(headerDiv);
+    frameCard.appendChild(editDiv);
+    
+    frameCard.addEventListener('click', (e) => {
+      if (e.target === editDiv || editDiv.contains(e.target)) return;
+      playSegmentByIndex(idx);
+    });
+    
+    framesGrid.appendChild(frameCard);
+  });
+  
+  const hint = document.createElement('div');
+  hint.className = 'empty-hint';
+  hint.innerText = '💡 Tip: Tap any segment to play audio. Tap and hold akshar to drag.';
+  framesGrid.appendChild(hint);
+  
+  document.getElementById('submitBtn').addEventListener('click', () => submitAnnotation());
+  document.getElementById('skipBtn').addEventListener('click', () => skipFile());
+}
+
+async function submitAnnotation() {
+  if (!currentData) {
+    showMessage('No data to submit', 'error');
+    return;
+  }
+  
+  saveAllPendingEdits();
+  
+  for (let i = 0; i < currentData.frames.length; i++) {
+    if (currentData.frames[i].text === undefined || currentData.frames[i].text === null) {
+      currentData.frames[i].text = '';
+    }
+  }
+  
+  const submitPayload = {
+    json_file: currentData.json_file,
+    wav_file: currentData.wav_file,
+    word: currentData.word,
+    sentence: currentData.sentence,
+    sentence_devanagari: currentData.sentence_devanagari,
+    full_sequence: currentData.full_sequence,
+    frames: currentData.frames,
+    window_ms: currentData.window_ms,
+    language: currentData.language,
+    duration_ms: currentData.duration_ms || 0
+  };
+  
+  showMessage('Submitting annotation...', 'info');
+  
+  try {
+    const response = await fetch(`${BASE_PATH}/submit`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(submitPayload)
+    });
+    
+    if (response.status === 401) {
+      window.location.href = `${BASE_PATH}/login`;
+      return;
+    }
+    
+    const data = await response.json();
+    
+    if (data.has_more) {
+      showMessage(`Submitted! ${data.remaining} files remaining.`, 'success');
+      setTimeout(() => loadNextFile(), 1200);
+    } else {
+      showMessage('All files completed! Well done.', 'success');
+      setTimeout(() => loadNextFile(), 1500);
+    }
+    loadProgress();
+  } catch (err) {
+    console.error('Submit error:', err);
+    showMessage('Error during submission', 'error');
+  }
+}
+
+function skipFile() {
+  if (!currentData) return;
+  if (currentAudio) {
+    currentAudio.pause();
+  }
+  if (currentPlayTimeout) {
+    clearTimeout(currentPlayTimeout);
+    currentPlayTimeout = null;
+  }
+  
+  if (audioContext) {
+    audioContext.close();
+    audioContext = null;
+    gainNode = null;
+    sourceNode = null;
+  }
+  
+  fetch(`${BASE_PATH}/skip-file`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ json_file: currentData.json_file })
+  }).catch(err => console.warn('Skip error:', err));
+  
+  showMessage('Skipping to next file...', 'info');
+  setTimeout(() => loadNextFile(), 300);
+}
+
+function showMessage(text, type) {
+  const msgDiv = document.getElementById('messageArea');
+  if (!msgDiv) return;
+  msgDiv.innerHTML = `<div class="message ${type}">${text}</div>`;
+  setTimeout(() => {
+    if (msgDiv.firstChild && msgDiv.firstChild.innerText === text) {
+      msgDiv.innerHTML = '';
+    }
+  }, 2800);
+}
+
+// Initialize
+async function init() {
+  setupAudioUnlock();
+  const authed = await checkAuth();
+  if (authed) {
+    loadProgress();
+    loadNextFile();
+    setInterval(loadProgress, 10000);
+  }
+}
+
+init();
+</script>
+</body>
+</html>

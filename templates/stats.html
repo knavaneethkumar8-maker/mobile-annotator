@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+  <title>Annotator Stats Dashboard</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      background: #F5F5F0;
+      padding: 16px 12px 32px;
+      color: #1C1C1A;
+    }
+
+    .stats-container {
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .dashboard-header {
+      margin-bottom: 24px;
+    }
+
+    .dashboard-header h1 {
+      font-size: 1.85rem;
+      font-weight: 620;
+      letter-spacing: -0.02em;
+      background: linear-gradient(135deg, #1C4D3A, #2C6E49);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      margin-bottom: 6px;
+    }
+
+    .dashboard-sub {
+      font-size: 0.8rem;
+      color: #6E6E68;
+      border-left: 3px solid #2C6E49;
+      padding-left: 10px;
+      margin-top: 4px;
+    }
+
+    .kpi-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 28px;
+    }
+
+    .kpi-card {
+      flex: 1;
+      background: #FFFFFF;
+      border-radius: 28px;
+      padding: 16px 10px;
+      text-align: center;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+      border: 1px solid #E9E9E2;
+    }
+
+    .kpi-label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      font-weight: 500;
+      color: #8E8E88;
+      margin-bottom: 8px;
+    }
+
+    .kpi-value {
+      font-size: 1.9rem;
+      font-weight: 700;
+      color: #2C6E49;
+      line-height: 1.2;
+    }
+
+    .kpi-sub {
+      font-size: 0.7rem;
+      color: #8E8E88;
+      margin-top: 6px;
+    }
+
+    .annotator-section {
+      background: #FFFFFF;
+      border-radius: 32px;
+      border: 1px solid #EDEDE6;
+      overflow: hidden;
+    }
+
+    .section-title {
+      padding: 18px 18px 10px 18px;
+      font-weight: 590;
+      font-size: 1.1rem;
+      background: #FEFEFC;
+      border-bottom: 1px solid #EFEFE9;
+      color: #1A2E25;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .section-title span {
+      background: #2C6E4910;
+      padding: 4px 10px;
+      border-radius: 40px;
+      font-size: 0.7rem;
+      font-weight: 500;
+      color: #2C6E49;
+    }
+
+    .refresh-btn {
+      background: #E9E9E2;
+      border: none;
+      padding: 6px 14px;
+      border-radius: 40px;
+      font-size: 0.7rem;
+      font-weight: 500;
+      color: #2C6E49;
+      cursor: pointer;
+      margin-left: auto;
+    }
+
+    .annotator-list {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .annotator-row {
+      padding: 16px 18px;
+      border-bottom: 1px solid #F0F0EA;
+    }
+
+    .annotator-name {
+      font-weight: 620;
+      font-size: 1.05rem;
+      color: #1C2F26;
+    }
+
+    .status-badge {
+      background: #E6F4EA;
+      padding: 4px 12px;
+      border-radius: 40px;
+      font-size: 0.65rem;
+      font-weight: 600;
+      color: #1E6E3E;
+      text-transform: uppercase;
+    }
+
+    .stats-row {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 12px;
+      margin-top: 12px;
+    }
+
+    .stat-chip {
+      flex: 1;
+      background: #F8F8F4;
+      border-radius: 20px;
+      padding: 8px;
+      text-align: center;
+      min-width: 70px;
+    }
+
+    .stat-chip-label {
+      font-size: 0.6rem;
+      font-weight: 500;
+      color: #8E8E88;
+    }
+
+    .stat-chip-value {
+      font-size: 1rem;
+      font-weight: 650;
+      color: #2C6E49;
+      margin-top: 4px;
+    }
+
+    .stat-chip-sub {
+      font-size: 0.6rem;
+      color: #A3A39B;
+      margin-top: 2px;
+    }
+
+    .files-done {
+      background: #2C6E4910;
+      border-radius: 24px;
+      padding: 8px;
+      text-align: center;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 44px 20px;
+      color: #A3A39B;
+    }
+
+    .refresh-note {
+      margin-top: 20px;
+      text-align: center;
+      font-size: 0.7rem;
+      color: #A8A89E;
+    }
+
+    @media (max-width: 480px) {
+      body { padding: 12px 10px 24px; }
+      .kpi-value { font-size: 1.5rem; }
+      .annotator-row { padding: 14px; }
+    }
+  </style>
+</head>
+<body>
+<div class="stats-container">
+  <div class="dashboard-header">
+    <h1>📊 Annotation Dashboard</h1>
+    <div class="dashboard-sub">Real-time annotator performance</div>
+  </div>
+
+  <div class="kpi-grid">
+    <div class="kpi-card">
+      <div class="kpi-label">ACTIVE USERS</div>
+      <div class="kpi-value" id="activeUsersCount">—</div>
+      <div class="kpi-sub">with submissions</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">📅 TOTAL FILES</div>
+      <div class="kpi-value" id="totalFilesAll">0</div>
+      <div class="kpi-sub">completed across all</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">⏱️ TOTAL DURATION</div>
+      <div class="kpi-value" id="totalDurationAll">0</div>
+      <div class="kpi-sub">all annotators</div>
+    </div>
+  </div>
+
+  <div class="annotator-section">
+    <div class="section-title">
+      🧑‍💻 Annotators <span id="annotatorCountBadge">0</span>
+      <button class="refresh-btn" id="manualRefreshBtn">↻ Refresh</button>
+    </div>
+    <div id="annotatorListContainer" class="annotator-list">
+      <div class="empty-state">Loading stats...</div>
+    </div>
+  </div>
+  <div class="refresh-note">
+    🔄 Auto-refreshes every 30 seconds • Data from actual submissions
+  </div>
+</div>
+
+<script>
+const BASE_PATH = "{{ base_path }}";
+
+function formatDuration(seconds) {
+  if (!seconds || seconds === 0) return "0s";
+  if (seconds < 60) return `${Math.floor(seconds)}s`;
+  if (seconds < 3600) {
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${mins}m ${secs}s`;
+  }
+  const hours = Math.floor(seconds / 3600);
+  const mins = Math.floor((seconds % 3600) / 60);
+  return `${hours}h ${mins}m`;
+}
+
+async function calculateUserAkshar(username) {
+  try {
+    const response = await fetch(`${BASE_PATH}/api/my-submissions`);
+    if (!response.ok) return 0;
+    const data = await response.json();
+    const submissions = data.submissions || [];
+    let totalAkshar = 0;
+    for (const sub of submissions) {
+      try {
+        const fileResp = await fetch(`${BASE_PATH}/user_submissions/${username}/${sub.filename}`);
+        if (fileResp.ok) {
+          const fileData = await fileResp.json();
+          const frames = fileData.frames || [];
+          for (const frame of frames) {
+            const text = frame.text || '';
+            totalAkshar += text.length;
+          }
+        }
+      } catch (e) {
+        console.warn(`Could not read ${sub.filename}:`, e);
+      }
+    }
+    return totalAkshar;
+  } catch (err) {
+    console.warn(`Error calculating akshar for ${username}:`, err);
+    return 0;
+  }
+}
+
+async function loadDashboard() {
+  try {
+    const statsResponse = await fetch(`${BASE_PATH}/api/all-user-stats`);
+    if (!statsResponse.ok) throw new Error("Failed to fetch stats");
+    const userStats = await statsResponse.json();
+    
+    const usernames = Object.keys(userStats);
+    
+    if (usernames.length === 0) {
+      document.getElementById("annotatorListContainer").innerHTML = '<div class="empty-state">No annotators found yet</div>';
+      document.getElementById("activeUsersCount").innerText = "0";
+      document.getElementById("totalFilesAll").innerText = "0";
+      document.getElementById("totalDurationAll").innerText = "0s";
+      document.getElementById("annotatorCountBadge").innerText = "0";
+      return;
+    }
+    
+    let totalFilesAll = 0;
+    let totalDurationAll = 0;
+    let activeUsers = 0;
+    const annotatorData = [];
+    
+    for (const username of usernames) {
+      const stats = userStats[username];
+      const filesCompleted = stats?.total_files_completed || 0;
+      const durationSecs = stats?.total_duration_seconds || 0;
+      const durationFormatted = stats?.total_duration_formatted || formatDuration(durationSecs);
+      
+      totalFilesAll += filesCompleted;
+      totalDurationAll += durationSecs;
+      
+      if (filesCompleted > 0) activeUsers++;
+      
+      annotatorData.push({
+        username: username,
+        filesDone: filesCompleted,
+        lifetimeDuration: durationFormatted,
+        lifetimeDurationSecs: durationSecs,
+        lifetimeAkshar: 0,
+        status: filesCompleted > 0 ? "Active" : "Inactive"
+      });
+    }
+    
+    document.getElementById("activeUsersCount").innerText = activeUsers;
+    document.getElementById("totalFilesAll").innerText = totalFilesAll;
+    document.getElementById("totalDurationAll").innerText = formatDuration(totalDurationAll);
+    document.getElementById("annotatorCountBadge").innerText = usernames.length;
+    
+    annotatorData.sort((a, b) => b.filesDone - a.filesDone);
+    
+    const container = document.getElementById("annotatorListContainer");
+    container.innerHTML = "";
+    
+    for (const ann of annotatorData) {
+      const safeId = ann.username.replace(/[^a-zA-Z0-9]/g, '_');
+      const row = document.createElement("div");
+      row.className = "annotator-row";
+      row.innerHTML = `
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+          <span class="annotator-name">${escapeHtml(ann.username)}</span>
+          <span class="status-badge">${ann.status === "Active" ? "🟢 Active" : "⚪ Inactive"}</span>
+        </div>
+        <div class="stats-row">
+          <div class="stat-chip">
+            <div class="stat-chip-label">📖 Lifetime Akshar</div>
+            <div class="stat-chip-value" id="akshar-${safeId}">Loading...</div>
+          </div>
+          <div class="stat-chip">
+            <div class="stat-chip-label">⏱️ Duration</div>
+            <div class="stat-chip-value">${ann.lifetimeDuration}</div>
+          </div>
+          <div class="stat-chip files-done">
+            <div class="stat-chip-label">✅ Files Done</div>
+            <div class="stat-chip-value" style="font-size:1rem;">${ann.filesDone}</div>
+          </div>
+        </div>
+      `;
+      container.appendChild(row);
+      
+      (async (username, safeId) => {
+        const akshar = await calculateUserAkshar(username);
+        const aksharSpan = document.getElementById(`akshar-${safeId}`);
+        if (aksharSpan) {
+          aksharSpan.innerText = akshar.toLocaleString();
+        }
+      })(ann.username, safeId);
+    }
+    
+  } catch (err) {
+    console.error("Error loading dashboard:", err);
+    document.getElementById("annotatorListContainer").innerHTML = `<div class="empty-state">Error loading stats: ${err.message}</div>`;
+  }
+}
+
+function escapeHtml(str) {
+  if (!str) return '';
+  return str.replace(/[&<>]/g, function(m) {
+    if (m === '&') return '&amp;';
+    if (m === '<') return '&lt;';
+    if (m === '>') return '&gt;';
+    return m;
+  });
+}
+
+let refreshInterval;
+function startAutoRefresh() {
+  if (refreshInterval) clearInterval(refreshInterval);
+  refreshInterval = setInterval(() => {
+    loadDashboard();
+  }, 30000);
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  loadDashboard().then(() => startAutoRefresh());
+  const manualBtn = document.getElementById("manualRefreshBtn");
+  if (manualBtn) {
+    manualBtn.addEventListener("click", () => {
+      loadDashboard();
+    });
+  }
+});
+</script>
+</body>
+</html>

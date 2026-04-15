@@ -48,12 +48,6 @@ body {
   margin: 0;
 }
 
-.header-right {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
 .user-info {
   display: flex;
   align-items: center;
@@ -82,22 +76,6 @@ body {
 }
 
 .logout-btn:hover { color: #B13E3A; }
-
-.stats-btn {
-  background: #2C6E49;
-  border: none;
-  color: white;
-  font-size: 0.75rem;
-  cursor: pointer;
-  padding: 6px 14px;
-  font-weight: 500;
-  margin: 0;
-  width: auto;
-  border-radius: 40px;
-  text-decoration: none;
-}
-
-.stats-btn:hover { background: #215A3A; }
 
 .remaining-badge {
   background: #E8E8E3;
@@ -263,14 +241,12 @@ audio {
   box-shadow: 0 2px 8px rgba(44,110,73,0.08);
 }
 
-/* selected for multi-play */
 .frame-card.selected {
   background: #F0FAF3;
   border: 2px solid #2C6E49;
   box-shadow: 0 0 0 3px rgba(44,110,73,0.08);
 }
 
-/* currently playing in queue */
 .frame-card.playing {
   background: #D6EFE0;
   border: 2px solid #1A4D3A;
@@ -351,7 +327,6 @@ audio {
   box-shadow: 0 0 0 2px rgba(44,110,73,0.2);
 }
 
-/* Multi-select toolbar */
 .multi-bar {
   display: none;
   align-items: center;
@@ -535,6 +510,45 @@ button {
   margin-top: 6px;
   padding-right: 4px;
 }
+
+.test-button {
+  background: #2C6E49;
+  color: white;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 44px;
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 10px 0;
+  width: 100%;
+  cursor: pointer;
+}
+
+.test-button:active {
+  transform: scale(0.97);
+  background: #1A4D3A;
+}
+
+.debug-console {
+  position: fixed;
+  bottom: 10px;
+  left: 10px;
+  right: 10px;
+  background: rgba(0,0,0,0.8);
+  color: #0f0;
+  font-family: monospace;
+  font-size: 10px;
+  padding: 8px;
+  border-radius: 8px;
+  max-height: 120px;
+  overflow-y: auto;
+  z-index: 9999;
+  display: none;
+}
+
+.debug-console.visible {
+  display: block;
+}
 </style>
 </head>
 <body>
@@ -544,8 +558,7 @@ button {
     <div class="header-left">
       <h2>Annotation Tool</h2>
     </div>
-    <div class="header-right">
-      <button class="stats-btn" onclick="window.location.href='{{ url_for_path("stats") }}'">📊 Stats</button>
+    <div style="display: flex; align-items: center; gap: 12px;">
       <div class="user-info">
         <span class="user-name" id="usernameDisplay">Loading...</span>
         <button class="logout-btn" onclick="logout()">Sign out</button>
@@ -578,6 +591,8 @@ button {
   </div>
 </div>
 
+<div id="debugConsole" class="debug-console"></div>
+
 <script>
 const BASE_PATH = "{{ base_path }}";
 const AKSHAR_SET = [
@@ -594,43 +609,35 @@ let currentData = null;
 let currentAudio = null;
 let currentPlayTimeout = null;
 let currentUsername = '';
-let audioContext = null;
-let gainNode = null;
-let sourceNode = null;
 let currentVolume = 1.0;
 const MAX_VOLUME = 6.0;
-let audioUnlocked = false;
+let currentAudioUrl = '';
 
-// ── Multi-select state ──
 let selectedSegments = new Set();
 let multiPlayQueue = [];
 let multiPlayIndex = 0;
 let multiPlayTimeout = null;
 
-// Drag state
 let dragState = {
   active: false, akshar: null, sourceElement: null,
   startX: 0, startY: 0, currentX: 0, currentY: 0,
   feedbackElement: null, targetFrameIndex: null
 };
 
-function unlockAudio() {
-  if (audioUnlocked) return;
-  if (audioContext && audioContext.state === 'suspended') {
-    audioContext.resume().then(() => { audioUnlocked = true; }).catch(() => {});
+function debugLog(msg) {
+  console.log(msg);
+  const debugDiv = document.getElementById('debugConsole');
+  if (debugDiv) {
+    debugDiv.classList.add('visible');
+    const time = new Date().toLocaleTimeString();
+    debugDiv.innerHTML += `<div>[${time}] ${msg}</div>`;
+    debugDiv.scrollTop = debugDiv.scrollHeight;
+    setTimeout(() => {
+      if (debugDiv.children.length > 20) {
+        debugDiv.removeChild(debugDiv.firstChild);
+      }
+    }, 100);
   }
-  if (currentAudio) {
-    const p = currentAudio.play();
-    if (p !== undefined) {
-      p.then(() => { currentAudio.pause(); currentAudio.currentTime = 0; audioUnlocked = true; }).catch(() => {});
-    }
-  }
-}
-
-function setupAudioUnlock() {
-  const h = () => { unlockAudio(); document.removeEventListener('touchstart', h); document.removeEventListener('click', h); };
-  document.addEventListener('touchstart', h);
-  document.addEventListener('click', h);
 }
 
 function renderAksharSet(containerId) {
@@ -782,59 +789,71 @@ async function loadProgress() {
   } catch (err) { console.warn('Progress error:', err); }
 }
 
-function initAudioContext() {
-  if (!audioContext && currentAudio) {
-    try {
-      audioContext = new (window.AudioContext || window.webkitAudioContext)();
-      const source = audioContext.createMediaElementSource(currentAudio);
-      gainNode = audioContext.createGain();
-      source.connect(gainNode);
-      gainNode.connect(audioContext.destination);
-      gainNode.gain.value = currentVolume;
-      sourceNode = source;
-      if (audioContext.state === 'suspended') {
-        const rh = () => { audioContext.resume(); document.removeEventListener('touchstart', rh); document.removeEventListener('click', rh); };
-        document.addEventListener('touchstart', rh);
-        document.addEventListener('click', rh);
-      }
-    } catch (e) { console.warn('Web Audio init failed:', e); }
-  }
-}
-
 function updateVolume(value) {
   currentVolume = value;
-  document.getElementById('volumeValue').innerText = Math.round(value * 100) + '%';
-  if (gainNode) gainNode.gain.value = value;
-  if (currentAudio && !gainNode) currentAudio.volume = Math.min(value, 1.0);
-}
-
-function playSegmentAudio(startMs, endMs) {
-  if (!currentAudio) { showMessage('Audio not ready', 'error'); return; }
-  const startSec = startMs / 1000;
-  const durationSec = (endMs - startMs) / 1000;
-  if (currentPlayTimeout) { clearTimeout(currentPlayTimeout); currentPlayTimeout = null; }
-  const doPlay = () => playAudioSegment(startSec, durationSec);
-  if (audioContext && audioContext.state === 'suspended') audioContext.resume().then(doPlay).catch(doPlay);
-  else doPlay();
-}
-
-function playAudioSegment(startSec, durationSec) {
-  if (!currentAudio) return;
-  currentAudio.pause();
-  currentAudio.currentTime = startSec;
-  const p = currentAudio.play();
-  if (p !== undefined) {
-    p.then(() => {
-      currentPlayTimeout = setTimeout(() => {
-        if (currentAudio && !currentAudio.paused) currentAudio.pause();
-        currentPlayTimeout = null;
-      }, durationSec * 1000);
-    }).catch(err => { console.warn('Playback error:', err); showMessage('Tap the play button first to enable audio', 'info'); });
+  const percent = Math.round(value * 100);
+  document.getElementById('volumeValue').innerHTML = percent + '%';
+  if (currentAudio) {
+    currentAudio.volume = Math.min(value, 1.0);
+    debugLog(`Volume set to ${percent}%`);
   }
-  currentAudio.onended = () => { if (currentPlayTimeout) { clearTimeout(currentPlayTimeout); currentPlayTimeout = null; } };
 }
 
-// ── Multi-select ──
+// TEST FUNCTION - Plays a longer 1-second segment to verify audio output
+function testPlayback() {
+  debugLog('=== TEST PLAYBACK BUTTON CLICKED ===');
+  
+  if (!currentAudio) {
+    debugLog('ERROR: No audio element found');
+    showMessage('Audio not loaded yet', 'error');
+    return;
+  }
+  
+  // Force volume to maximum for test
+  currentAudio.volume = 1.0;
+  if (currentVolume < 1.0) {
+    currentVolume = 1.0;
+    document.getElementById('volumeSlider').value = 1.0;
+    document.getElementById('volumeValue').innerHTML = '100%';
+    debugLog('Volume forced to 100% for test');
+  }
+  
+  // Play from 0.5 seconds for 1 second (longer segment)
+  const testStart = 0.5;
+  const testDuration = 1.0;
+  
+  debugLog(`Test: Playing from ${testStart}s for ${testDuration}s at volume ${currentAudio.volume}`);
+  
+  try {
+    if (currentPlayTimeout) clearTimeout(currentPlayTimeout);
+    
+    currentAudio.pause();
+    currentAudio.currentTime = testStart;
+    
+    const playPromise = currentAudio.play();
+    
+    if (playPromise !== undefined) {
+      playPromise.then(() => {
+        debugLog('✅ TEST PLAYBACK SUCCESSFUL - You should hear sound!');
+        showMessage('✅ Test sound playing! If you still hear nothing, check your iPhone mute switch and volume buttons.', 'success');
+        
+        currentPlayTimeout = setTimeout(() => {
+          if (currentAudio && !currentAudio.paused) {
+            currentAudio.pause();
+            debugLog('Test playback stopped');
+          }
+          currentPlayTimeout = null;
+        }, testDuration * 1000);
+      }).catch(err => {
+        debugLog(`❌ TEST FAILED: ${err.name} - ${err.message}`);
+        showMessage(`❌ Test failed: ${err.message}. Tap the play button on the audio player first.`, 'error');
+      });
+    }
+  } catch (err) {
+    debugLog(`Test exception: ${err.message}`);
+  }
+}
+
 function toggleSegmentSelection(frameIndex) {
   const card = document.querySelector(`.frame-card[data-frame-index="${frameIndex}"]`);
   if (!card) return;
@@ -869,6 +888,7 @@ function playSelectedSegments() {
   if (selectedSegments.size === 0 || !currentData || !currentAudio) return;
   if (currentPlayTimeout) { clearTimeout(currentPlayTimeout); currentPlayTimeout = null; }
   if (multiPlayTimeout) { clearTimeout(multiPlayTimeout); multiPlayTimeout = null; }
+  
   document.querySelectorAll('.frame-card.playing').forEach(c => c.classList.remove('playing'));
   multiPlayQueue = Array.from(selectedSegments).sort((a, b) => a - b);
   multiPlayIndex = 0;
@@ -890,49 +910,90 @@ function playNextInQueue() {
 
   const startSec = frame.start_ms / 1000;
   const durationSec = (frame.end_ms - frame.start_ms) / 1000;
-
-  unlockAudio();
-  currentAudio.pause();
-  currentAudio.currentTime = startSec;
-
-  const doPlay = () => {
-    const p = currentAudio.play();
-    if (p !== undefined) {
-      p.then(() => {
-        multiPlayTimeout = setTimeout(() => {
+  
+  try {
+    if (currentPlayTimeout) clearTimeout(currentPlayTimeout);
+    currentAudio.pause();
+    currentAudio.currentTime = startSec;
+    
+    const playPromise = currentAudio.play();
+    if (playPromise !== undefined) {
+      playPromise.then(() => {
+        currentPlayTimeout = setTimeout(() => {
           if (currentAudio && !currentAudio.paused) currentAudio.pause();
           multiPlayIndex++;
           playNextInQueue();
-        }, durationSec * 1000);
-      }).catch(err => console.warn('multi-play error:', err));
+        }, durationSec * 1000 + 50);
+      }).catch(() => {
+        multiPlayIndex++;
+        playNextInQueue();
+      });
+    } else {
+      multiPlayIndex++;
+      playNextInQueue();
     }
-  };
-
-  if (audioContext && audioContext.state === 'suspended') audioContext.resume().then(doPlay).catch(doPlay);
-  else doPlay();
+  } catch {
+    multiPlayIndex++;
+    playNextInQueue();
+  }
 }
 
-// Original single-segment play
 function playSegmentByIndex(frameIndex) {
-  if (!currentData || !currentAudio) { showMessage('Audio not ready', 'error'); return; }
+  if (!currentData || !currentAudio) { 
+    showMessage('Audio not ready', 'error'); 
+    return; 
+  }
+  
   const frame = currentData.frames[frameIndex];
   if (!frame) return;
-  // stop multi-play
-  if (multiPlayTimeout) { clearTimeout(multiPlayTimeout); multiPlayTimeout = null; }
+  
+  if (multiPlayTimeout) { 
+    clearTimeout(multiPlayTimeout); 
+    multiPlayTimeout = null; 
+  }
+  
   document.querySelectorAll('.frame-card.playing').forEach(c => c.classList.remove('playing'));
   document.querySelectorAll('.frame-card').forEach(c => c.classList.remove('active'));
+  
   const card = document.querySelector(`.frame-card[data-frame-index="${frameIndex}"]`);
   if (card) card.classList.add('active');
-  unlockAudio();
-  playSegmentAudio(frame.start_ms, frame.end_ms);
+  
+  const startSec = frame.start_ms / 1000;
+  const durationSec = (frame.end_ms - frame.start_ms) / 1000;
+  
+  try {
+    if (currentPlayTimeout) clearTimeout(currentPlayTimeout);
+    currentAudio.pause();
+    currentAudio.currentTime = startSec;
+    
+    const playPromise = currentAudio.play();
+    if (playPromise !== undefined) {
+      playPromise.then(() => {
+        currentPlayTimeout = setTimeout(() => {
+          if (currentAudio && !currentAudio.paused) currentAudio.pause();
+          currentPlayTimeout = null;
+        }, durationSec * 1000);
+      }).catch(err => {
+        debugLog(`Segment play error: ${err.name}`);
+        if (err.name === 'NotAllowedError') {
+          showMessage('⚠️ Tap the play button on the audio player first to enable audio', 'info');
+        }
+      });
+    }
+  } catch (err) {
+    debugLog(`Segment play exception: ${err.message}`);
+  }
 }
 
 async function loadNextFile() {
+  debugLog('Loading next file...');
   const contentDiv = document.getElementById('content');
   contentDiv.innerHTML = '<div class="loading">Loading next sample...</div>';
-  if (audioContext) { await audioContext.close(); audioContext = null; gainNode = null; sourceNode = null; }
-  audioUnlocked = false;
+  
+  if (currentPlayTimeout) { clearTimeout(currentPlayTimeout); currentPlayTimeout = null; }
+  if (multiPlayTimeout) { clearTimeout(multiPlayTimeout); multiPlayTimeout = null; }
   selectedSegments.clear();
+  
   try {
     const r = await fetch(`${BASE_PATH}/get-next-file`);
     if (r.status === 401) { window.location.href = `${BASE_PATH}/login`; return; }
@@ -941,7 +1002,10 @@ async function loadNextFile() {
     if (d.error) { showErrorScreen(d.error); return; }
     renderAnnotationInterface(d);
     loadProgress();
-  } catch (err) { showErrorScreen('Connection issue: ' + err); }
+  } catch (err) { 
+    debugLog(`Error loading file: ${err}`);
+    showErrorScreen('Connection issue: ' + err); 
+  }
 }
 
 function showCompletionScreen() {
@@ -970,11 +1034,14 @@ function saveAllPendingEdits() {
 }
 
 function renderAnnotationInterface(data) {
+  debugLog('Rendering annotation interface');
   currentData = data;
+  currentAudioUrl = `${BASE_PATH}/audio/${data.wav_file}`;
+  
   document.getElementById('content').innerHTML = `
     <div class="audio-wrapper">
       <audio id="audioPlayer" controls preload="auto" playsinline>
-        <source src="${BASE_PATH}/audio/${data.wav_file}" type="audio/wav">
+        <source src="${currentAudioUrl}" type="audio/wav">
       </audio>
       <div class="volume-control">
         <span class="volume-icon">🔊</span>
@@ -988,7 +1055,7 @@ function renderAnnotationInterface(data) {
       <div><strong>Sentence:</strong> ${data.sentence || ''}</div>
       <div style="margin-top:8px;font-size:0.8rem;color:#6E6E68;"><strong>Annotator:</strong> ${currentUsername}</div>
     </div>
-    <!-- Akshar set section moved right below file info -->
+    <button class="test-button" id="testPlaybackBtn">🔊 TEST SOUND (1 second)</button>
     <div class="akshar-set-section">
       <div class="akshar-title">Allowed Akshar Set (Drag & Drop)</div>
       <div class="akshar-grid" id="aksharGridTop"></div>
@@ -1010,31 +1077,43 @@ function renderAnnotationInterface(data) {
 
   currentAudio = document.getElementById('audioPlayer');
   if (currentAudio) {
-    currentAudio.onerror = () => showMessage('Audio could not be loaded', 'error');
+    currentAudio.onerror = () => debugLog('Audio loading error');
     currentAudio.setAttribute('playsinline', '');
-    document.getElementById('volumeSlider').addEventListener('input', e => updateVolume(parseFloat(e.target.value)));
+    currentAudio.volume = Math.min(currentVolume, 1.0);
+    
+    const volumeSlider = document.getElementById('volumeSlider');
+    if (volumeSlider) {
+      volumeSlider.addEventListener('input', e => updateVolume(parseFloat(e.target.value)));
+    }
+    
     currentAudio.addEventListener('play', () => {
-      if (!audioContext) initAudioContext();
-      if (audioContext && audioContext.state === 'suspended') audioContext.resume();
+      debugLog('🎵 Audio unlocked!');
+      showMessage('Audio unlocked! Now test with the TEST SOUND button.', 'success');
     });
-    currentAudio.addEventListener('touchstart', () => unlockAudio(), { once: true });
+    
+    currentAudio.load();
+  }
+  
+  // Add test button listener
+  const testBtn = document.getElementById('testPlaybackBtn');
+  if (testBtn) {
+    testBtn.addEventListener('click', testPlayback);
   }
 
   const framesGrid = document.getElementById('framesGrid');
   framesGrid.innerHTML = '';
 
   currentData.frames.forEach((frame, idx) => {
+    const durationMs = frame.end_ms - frame.start_ms;
     const frameCard = document.createElement('div');
     frameCard.className = 'frame-card';
     frameCard.setAttribute('data-frame-index', idx);
-    frameCard.setAttribute('data-start-ms', frame.start_ms);
-    frameCard.setAttribute('data-end-ms', frame.end_ms);
 
     const headerDiv = document.createElement('div');
     headerDiv.className = 'frame-header';
     headerDiv.innerHTML = `
       <span class="frame-label"><span class="sel-dot"></span> Segment ${idx+1}</span>
-      <span class="frame-time">${frame.start_ms}–${frame.end_ms} ms</span>
+      <span class="frame-time">${frame.start_ms}–${frame.end_ms} ms (${durationMs}ms)</span>
     `;
 
     const editDiv = document.createElement('div');
@@ -1053,10 +1132,11 @@ function renderAnnotationInterface(data) {
       }
     });
 
-    // click on text field → play (original behaviour)
-    editDiv.addEventListener('click', e => { e.stopPropagation(); playSegmentByIndex(idx); });
+    editDiv.addEventListener('click', (e) => { 
+      e.stopPropagation();
+      playSegmentByIndex(idx);
+    });
 
-    // click on card header → toggle selection
     frameCard.addEventListener('click', e => {
       if (e.target === editDiv || editDiv.contains(e.target)) return;
       toggleSegmentSelection(idx);
@@ -1069,7 +1149,7 @@ function renderAnnotationInterface(data) {
 
   const hint = document.createElement('div');
   hint.className = 'empty-hint';
-  hint.innerText = '💡 Tap text field to play. Tap segment header to select. Use "Play selected" for multiple.';
+  hint.innerHTML = '💡 <strong>STEP 1:</strong> Tap the play button on the audio player above to unlock audio.<br>📢 <strong>STEP 2:</strong> Click the green "TEST SOUND" button - you should hear a 1-second sound.<br>🎯 <strong>STEP 3:</strong> If you hear the test, then tap any segment to play it.';
   framesGrid.appendChild(hint);
 
   document.getElementById('submitBtn').addEventListener('click', () => submitAnnotation());
@@ -1114,7 +1194,7 @@ function skipFile() {
   if (currentAudio) currentAudio.pause();
   if (currentPlayTimeout) { clearTimeout(currentPlayTimeout); currentPlayTimeout = null; }
   if (multiPlayTimeout) { clearTimeout(multiPlayTimeout); multiPlayTimeout = null; }
-  if (audioContext) { audioContext.close(); audioContext = null; gainNode = null; sourceNode = null; }
+  
   fetch(`${BASE_PATH}/skip-file`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -1128,13 +1208,18 @@ function showMessage(text, type) {
   const msgDiv = document.getElementById('messageArea');
   if (!msgDiv) return;
   msgDiv.innerHTML = `<div class="message ${type}">${text}</div>`;
-  setTimeout(() => { if (msgDiv.firstChild && msgDiv.firstChild.innerText === text) msgDiv.innerHTML = ''; }, 2800);
+  setTimeout(() => { if (msgDiv.firstChild && msgDiv.firstChild.innerText === text) msgDiv.innerHTML = ''; }, 4000);
 }
 
 async function init() {
-  setupAudioUnlock();
+  debugLog('Initializing app...');
   const authed = await checkAuth();
-  if (authed) { loadProgress(); loadNextFile(); setInterval(loadProgress, 10000); }
+  if (authed) { 
+    debugLog('Auth successful');
+    loadProgress(); 
+    loadNextFile(); 
+    setInterval(loadProgress, 10000);
+  }
 }
 
 init();
