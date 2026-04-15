@@ -767,6 +767,30 @@ def verify_page():
         return redirect(url_for_path("verify/login"))
     return render_template("verify.html", base_path=BASE_PATH, verifier_name=session.get('verifier_name', 'Verifier'))
 
+@app.route("/verify/progress")
+@verifier_login_required
+def verify_progress():
+    """Get verification progress stats"""
+    total_files = 0
+    verified_files = 0
+    
+    if os.path.exists(MOBILE_DATASET_FOLDER):
+        json_files = glob.glob(os.path.join(MOBILE_DATASET_FOLDER, "*.json"))
+        total_files = len(json_files)
+    
+    if os.path.exists(MOBILE_VERIFIED_FOLDER):
+        verified_json = glob.glob(os.path.join(MOBILE_VERIFIED_FOLDER, "*.json"))
+        verified_files = len(verified_json)
+    
+    remaining_files = total_files - verified_files
+    
+    return jsonify({
+        "total": total_files,
+        "verified": verified_files,
+        "remaining": remaining_files,
+        "percent": (verified_files / total_files * 100) if total_files > 0 else 0
+    })
+
 def get_next_verification_file():
     """Get next unverified file from MOBILE_DATASET that hasn't been verified yet"""
     if not os.path.exists(MOBILE_DATASET_FOLDER):

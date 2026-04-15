@@ -83,13 +83,71 @@ body {
 
 .logout-btn:hover { color: #B13E3A; }
 
-.remaining-badge {
-  background: #E8E8E3;
+.annotation-link {
+  background: #6B4E2E;
+  border: none;
+  color: white;
+  font-size: 0.75rem;
+  cursor: pointer;
   padding: 6px 14px;
-  border-radius: 40px;
-  font-size: 0.8rem;
   font-weight: 500;
-  color: #2C2C2A;
+  margin: 0;
+  width: auto;
+  border-radius: 40px;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.annotation-link:hover { background: #5A3F24; }
+
+.progress-section {
+  margin-bottom: 12px;
+}
+
+.progress-bar {
+  background: #EBEBE4;
+  height: 6px;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  background: #2C6E49;
+  height: 100%;
+  width: 0%;
+  transition: width 0.25s ease-out;
+  border-radius: 12px;
+}
+
+.stats-cards {
+  display: flex;
+  gap: 12px;
+  margin: 12px 0 8px;
+}
+
+.stat-card {
+  flex: 1;
+  background: #F8F8F4;
+  border-radius: 20px;
+  padding: 12px;
+  text-align: center;
+  border: 1px solid #E9E9E2;
+}
+
+.stat-card-label {
+  font-size: 0.7rem;
+  color: #8E8E88;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 6px;
+}
+
+.stat-card-value {
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: #2C6E49;
 }
 
 .audio-wrapper { margin: 16px 0 18px; }
@@ -274,6 +332,8 @@ audio {
   cursor: text;
   box-sizing: border-box;
   min-height: 50px;
+  white-space: pre-wrap;
+  word-wrap: break-word;
 }
 
 .edit-text:focus {
@@ -478,11 +538,32 @@ button {
       <h2>🔍 Verification Tool</h2>
     </div>
     <div class="header-right">
+      <a href="{{ url_for_path('') }}" class="annotation-link">Annotate</a>
       <div class="user-info">
         <span class="user-name" id="verifierName">Verifier</span>
         <button class="logout-btn" onclick="logout()">Sign out</button>
       </div>
-      <div class="remaining-badge" id="remainingBadge">Verification</div>
+    </div>
+  </div>
+
+  <div class="progress-section">
+    <div class="progress-bar">
+      <div class="progress-fill" id="progressFill"></div>
+    </div>
+  </div>
+
+  <div class="stats-cards">
+    <div class="stat-card">
+      <div class="stat-card-label">Verified</div>
+      <div class="stat-card-value" id="verifiedCount">0</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-card-label">Remaining</div>
+      <div class="stat-card-value" id="remainingCount">0</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-card-label">Total</div>
+      <div class="stat-card-value" id="totalCount">0</div>
     </div>
   </div>
 
@@ -547,6 +628,19 @@ function setupAudioUnlock() {
 async function logout() {
   await fetch(`${BASE_PATH}/verify/api/logout`, { method: 'POST' });
   window.location.href = `${BASE_PATH}/verify/login`;
+}
+
+async function loadVerificationProgress() {
+  try {
+    const r = await fetch(`${BASE_PATH}/verify/progress`);
+    if (r.status === 401) { window.location.href = `${BASE_PATH}/verify/login`; return; }
+    const d = await r.json();
+    document.getElementById('verifiedCount').innerText = d.verified || 0;
+    document.getElementById('remainingCount').innerText = d.remaining || 0;
+    document.getElementById('totalCount').innerText = d.total || 0;
+    const pct = d.percent || 0;
+    document.getElementById('progressFill').style.width = pct + '%';
+  } catch (err) { console.warn('Progress error:', err); }
 }
 
 function renderAksharSet(containerId) {
@@ -808,12 +902,30 @@ function saveAllPendingEdits() {
   if (currentData) currentData.full_sequence = currentData.frames.map(f=>f.text||'').filter(t=>t).join(' ');
 }
 
+// Prevent newlines in contenteditable divs
+function preventNewlines(e) {
+  if (e.key === 'Enter') {
+    e.preventDefault();
+    return false;
+  }
+  return true;
+}
+
+// Also handle paste to remove newlines
+function handlePaste(e) {
+  e.preventDefault();
+  const text = (e.clipboardData || window.clipboardData).getData('text');
+  const cleanedText = text.replace(/[\n\r]/g, '');
+  document.execCommand('insertText', false, cleanedText);
+}
+
 async function loadNextFile() {
   const contentDiv = document.getElementById('content');
   contentDiv.innerHTML = '<div class="loading">Loading next file for verification...</div>';
   if (audioContext) { await audioContext.close(); audioContext = null; gainNode = null; sourceNode = null; }
   audioUnlocked = false;
   selectedSegments.clear();
+  await loadVerificationProgress();
   
   try {
     const r = await fetch(`${BASE_PATH}/verify/get-next-file`);
@@ -914,13 +1026,22 @@ function renderVerificationInterface(data) {
     editDiv.className = 'edit-text';
     editDiv.innerText = frame.text || '';
     editDiv.setAttribute('data-frame-idx', idx);
+    
+    // Prevent newlines
+    editDiv.addEventListener('keydown', preventNewlines);
+    editDiv.addEventListener('paste', handlePaste);
 
     setupDesktopDropZone(editDiv, idx);
 
     editDiv.addEventListener('input', e => {
       const newText = e.target.innerText || '';
+      // Remove any newlines that might have been inserted
+      const cleanedText = newText.replace(/[\n\r]/g, '');
+      if (cleanedText !== newText) {
+        e.target.innerText = cleanedText;
+      }
       if (currentData && currentData.frames[idx]) {
-        currentData.frames[idx].text = newText;
+        currentData.frames[idx].text = cleanedText;
         currentData.full_sequence = currentData.frames.map(f=>f.text||'').filter(t=>t).join(' ');
       }
     });
@@ -980,6 +1101,7 @@ async function submitVerification(action) {
     } else {
       showMessage(d.has_more ? 'File rejected and removed. Loading next...' : 'All done.', 'success');
     }
+    await loadVerificationProgress();
     setTimeout(() => loadNextFile(), 1200);
   } catch (err) {
     showMessage('Error during submission', 'error');
@@ -997,10 +1119,12 @@ async function init() {
   setupAudioUnlock();
   const verifierNameElem = document.getElementById('verifierName');
   if (verifierNameElem) {
-    // Could fetch verifier name from session if needed, but it's in the template
     verifierNameElem.innerText = '{{ verifier_name }}';
   }
+  await loadVerificationProgress();
   loadNextFile();
+  // Refresh progress every 10 seconds
+  setInterval(loadVerificationProgress, 10000);
 }
 
 init();
