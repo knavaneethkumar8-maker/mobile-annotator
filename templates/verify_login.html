@@ -97,7 +97,7 @@
 </div>
 
 <script>
-const BASE_PATH = "{{ base_path }}";
+const BASE_PATH = "{{ base_path }}";   // already passed from Flask
 
 async function login() {
   const name = document.getElementById('verifierName').value.trim();
@@ -109,15 +109,18 @@ async function login() {
     return;
   }
   
+  // Build full URL using origin + base_path
+  const loginUrl = window.location.origin + BASE_PATH + '/verify/api/login';
+  
   try {
-    const res = await fetch(`${BASE_PATH}/verify/api/login`, {
+    const res = await fetch(loginUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ name: name, password: password })
     });
     const data = await res.json();
     if (res.ok) {
-      window.location.href = `${BASE_PATH}/verify`;
+      window.location.href = window.location.origin + BASE_PATH + '/verify';
     } else {
       errorDiv.innerHTML = `<div class="error">${data.error || 'Login failed'}</div>`;
     }
@@ -126,5 +129,7 @@ async function login() {
   }
 }
 </script>
+
+
 </body>
 </html>
