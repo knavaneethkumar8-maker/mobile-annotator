@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<title>Verifier Login</title>
+<style>
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    background: #F5F5F0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 20px;
+  }
+  .login-card {
+    background: white;
+    border-radius: 32px;
+    padding: 32px 24px;
+    max-width: 400px;
+    width: 100%;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.05);
+    text-align: center;
+  }
+  h2 {
+    color: #2C6E49;
+    margin-bottom: 8px;
+    font-weight: 590;
+  }
+  .sub {
+    color: #6E6E68;
+    margin-bottom: 28px;
+    font-size: 0.85rem;
+  }
+  input {
+    width: 100%;
+    padding: 14px 16px;
+    border: 1px solid #E5E5DE;
+    border-radius: 44px;
+    font-size: 1rem;
+    margin-bottom: 16px;
+    outline: none;
+    font-family: inherit;
+  }
+  input:focus {
+    border-color: #2C6E49;
+    box-shadow: 0 0 0 2px rgba(44,110,73,0.2);
+  }
+  button {
+    width: 100%;
+    padding: 14px;
+    background: #2C6E49;
+    color: white;
+    border: none;
+    border-radius: 44px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.15s;
+  }
+  button:active {
+    transform: scale(0.97);
+    background: #215A3A;
+  }
+  .error {
+    background: #FDE9E7;
+    color: #B13E3A;
+    padding: 10px;
+    border-radius: 40px;
+    margin-top: 16px;
+    font-size: 0.8rem;
+  }
+  .back-link {
+    margin-top: 20px;
+    display: inline-block;
+    color: #8E8E88;
+    text-decoration: none;
+    font-size: 0.8rem;
+  }
+</style>
+</head>
+<body>
+<div class="login-card">
+  <h2>🔍 Verifier Access</h2>
+  <div class="sub">Professional annotator verification portal</div>
+  <input type="text" id="verifierName" placeholder="Your name" autocomplete="off">
+  <input type="password" id="password" placeholder="Verifier password">
+  <button onclick="login()">Enter Verification Mode</button>
+  <div id="errorMsg"></div>
+  <a href="{{ url_for_path('') }}" class="back-link">← Back to annotation tool</a>
+</div>
+
+<script>
+const BASE_PATH = "{{ base_path }}";
+
+async function login() {
+  const name = document.getElementById('verifierName').value.trim();
+  const password = document.getElementById('password').value.trim();
+  const errorDiv = document.getElementById('errorMsg');
+  
+  if (!name || !password) {
+    errorDiv.innerHTML = '<div class="error">Please enter your name and password</div>';
+    return;
+  }
+  
+  try {
+    const res = await fetch(`${BASE_PATH}/verify/api/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: name, password: password })
+    });
+    const data = await res.json();
+    if (res.ok) {
+      window.location.href = `${BASE_PATH}/verify`;
+    } else {
+      errorDiv.innerHTML = `<div class="error">${data.error || 'Login failed'}</div>`;
+    }
+  } catch (err) {
+    errorDiv.innerHTML = '<div class="error">Connection error</div>';
+  }
+}
+</script>
+</body>
+</html>

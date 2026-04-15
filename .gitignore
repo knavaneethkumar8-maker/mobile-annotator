@@ -8,4 +8,6 @@ hreembheej1008/
 user_submissions/
 MOBILE_DATASET/
 *.json
+MOBILE_VERIFIED_DATA/
+completed_files.json
 

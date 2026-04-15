@@ -1,3 +1,4 @@
+# app.py
 from flask import Flask, render_template, request, jsonify, send_from_directory, session, redirect, url_for
 import wave
 import math
@@ -37,14 +38,17 @@ SUBMIT_FOLDER = "annotation_submitted"
 USERS_FILE = "users.json"
 COMPLETED_LOG = "completed_files.json"
 MOBILE_DATASET_FOLDER = "MOBILE_DATASET"
+MOBILE_VERIFIED_FOLDER = "MOBILE_VERIFIED_DATA"
 USER_SUBMISSIONS_FOLDER = "user_submissions"
 FILE_ASSIGNMENTS_FILE = "file_assignments.json"
 USER_STATS_FILE = "user_stats.json"
 SKIPPED_FILES_FILE = "skipped_files.json"
+DAILY_STATS_FILE = "daily_stats.json"
 
 # Create all necessary folders
 os.makedirs(SUBMIT_FOLDER, exist_ok=True)
 os.makedirs(MOBILE_DATASET_FOLDER, exist_ok=True)
+os.makedirs(MOBILE_VERIFIED_FOLDER, exist_ok=True)
 os.makedirs(USER_SUBMISSIONS_FOLDER, exist_ok=True)
 
 from werkzeug.middleware.proxy_fix import ProxyFix
@@ -126,7 +130,7 @@ def save_user_stats(stats):
     with open(USER_STATS_FILE, 'w') as f:
         json.dump(stats, f, indent=2)
 
-def update_user_stats(username, json_file, duration_seconds):
+def update_user_stats(username, json_file, duration_seconds, increment=True):
     stats = load_user_stats()
     
     if username not in stats:
@@ -138,25 +142,35 @@ def update_user_stats(username, json_file, duration_seconds):
             "last_active": None
         }
     
-    if json_file not in stats[username]["completed_files"]:
-        stats[username]["completed_files"].append(json_file)
-        stats[username]["total_files_completed"] += 1
-        stats[username]["total_duration_seconds"] += duration_seconds
-        
-        total_secs = stats[username]["total_duration_seconds"]
-        if total_secs < 60:
-            stats[username]["total_duration_formatted"] = f"{total_secs:.1f}s"
-        elif total_secs < 3600:
-            mins = int(total_secs // 60)
-            secs = int(total_secs % 60)
-            stats[username]["total_duration_formatted"] = f"{mins}m {secs}s"
-        else:
-            hours = int(total_secs // 3600)
-            mins = int((total_secs % 3600) // 60)
-            stats[username]["total_duration_formatted"] = f"{hours}h {mins}m"
-        
-        stats[username]["last_active"] = datetime.now().isoformat()
+    if increment:
+        if json_file not in stats[username]["completed_files"]:
+            stats[username]["completed_files"].append(json_file)
+            stats[username]["total_files_completed"] += 1
+            stats[username]["total_duration_seconds"] += duration_seconds
+    else:
+        # decrement (for rejection)
+        if json_file in stats[username]["completed_files"]:
+            stats[username]["completed_files"].remove(json_file)
+            stats[username]["total_files_completed"] -= 1
+            stats[username]["total_duration_seconds"] -= duration_seconds
+            if stats[username]["total_duration_seconds"] < 0:
+                stats[username]["total_duration_seconds"] = 0
+            if stats[username]["total_files_completed"] < 0:
+                stats[username]["total_files_completed"] = 0
     
+    total_secs = stats[username]["total_duration_seconds"]
+    if total_secs < 60:
+        stats[username]["total_duration_formatted"] = f"{total_secs:.1f}s"
+    elif total_secs < 3600:
+        mins = int(total_secs // 60)
+        secs = int(total_secs % 60)
+        stats[username]["total_duration_formatted"] = f"{mins}m {secs}s"
+    else:
+        hours = int(total_secs // 3600)
+        mins = int((total_secs % 3600) // 60)
+        stats[username]["total_duration_formatted"] = f"{hours}h {mins}m"
+    
+    stats[username]["last_active"] = datetime.now().isoformat()
     save_user_stats(stats)
     return stats[username]
 
@@ -169,6 +183,93 @@ def get_user_stats(username):
         "total_duration_formatted": "0s",
         "last_active": None
     })
+
+def load_daily_stats():
+    if os.path.exists(DAILY_STATS_FILE):
+        with open(DAILY_STATS_FILE, 'r') as f:
+            return json.load(f)
+    return {}
+
+def save_daily_stats(stats):
+    with open(DAILY_STATS_FILE, 'w') as f:
+        json.dump(stats, f, indent=2)
+
+def update_daily_stats(username, json_file, duration_seconds, increment=True):
+    today = datetime.now().strftime("%Y-%m-%d")
+    daily_stats = load_daily_stats()
+    
+    if username not in daily_stats:
+        daily_stats[username] = {
+            "total": {
+                "files_completed": 0,
+                "duration_seconds": 0,
+                "duration_formatted": "0s"
+            },
+            "daily": {}
+        }
+    
+    if today not in daily_stats[username]["daily"]:
+        daily_stats[username]["daily"][today] = {
+            "files_completed": 0,
+            "duration_seconds": 0,
+            "duration_formatted": "0s",
+            "files": []
+        }
+    
+    if increment:
+        if json_file not in daily_stats[username]["daily"][today]["files"]:
+            daily_stats[username]["daily"][today]["files_completed"] += 1
+            daily_stats[username]["daily"][today]["duration_seconds"] += duration_seconds
+            daily_stats[username]["daily"][today]["files"].append(json_file)
+            daily_stats[username]["total"]["files_completed"] += 1
+            daily_stats[username]["total"]["duration_seconds"] += duration_seconds
+    else:
+        # decrement: remove from today's stats if present
+        if json_file in daily_stats[username]["daily"][today]["files"]:
+            daily_stats[username]["daily"][today]["files_completed"] -= 1
+            daily_stats[username]["daily"][today]["duration_seconds"] -= duration_seconds
+            daily_stats[username]["daily"][today]["files"].remove(json_file)
+            daily_stats[username]["total"]["files_completed"] -= 1
+            daily_stats[username]["total"]["duration_seconds"] -= duration_seconds
+            if daily_stats[username]["daily"][today]["files_completed"] < 0:
+                daily_stats[username]["daily"][today]["files_completed"] = 0
+            if daily_stats[username]["daily"][today]["duration_seconds"] < 0:
+                daily_stats[username]["daily"][today]["duration_seconds"] = 0
+            if daily_stats[username]["total"]["files_completed"] < 0:
+                daily_stats[username]["total"]["files_completed"] = 0
+            if daily_stats[username]["total"]["duration_seconds"] < 0:
+                daily_stats[username]["total"]["duration_seconds"] = 0
+    
+    # Format durations
+    for key in ['daily', 'total']:
+        if key == 'daily':
+            for date, data in daily_stats[username]['daily'].items():
+                secs = data['duration_seconds']
+                if secs < 60:
+                    data['duration_formatted'] = f"{secs:.1f}s"
+                elif secs < 3600:
+                    mins = int(secs // 60)
+                    secs_rem = int(secs % 60)
+                    data['duration_formatted'] = f"{mins}m {secs_rem}s"
+                else:
+                    hours = int(secs // 3600)
+                    mins = int((secs % 3600) // 60)
+                    data['duration_formatted'] = f"{hours}h {mins}m"
+        else:
+            secs = daily_stats[username]['total']['duration_seconds']
+            if secs < 60:
+                daily_stats[username]['total']['duration_formatted'] = f"{secs:.1f}s"
+            elif secs < 3600:
+                mins = int(secs // 60)
+                secs_rem = int(secs % 60)
+                daily_stats[username]['total']['duration_formatted'] = f"{mins}m {secs_rem}s"
+            else:
+                hours = int(secs // 3600)
+                mins = int((secs % 3600) // 60)
+                daily_stats[username]['total']['duration_formatted'] = f"{hours}h {mins}m"
+    
+    save_daily_stats(daily_stats)
+    return daily_stats[username]
 
 def assign_file_to_user(username):
     file_assignments = load_file_assignments()
@@ -226,6 +327,14 @@ def login_required(f):
                 "error": "Please login first", 
                 "redirect": url_for_path("login")
             }), 401
+        return f(*args, **kwargs)
+    return decorated_function
+
+def verifier_login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if not session.get('verifier'):
+            return jsonify({"error": "Verifier access required", "redirect": url_for_path("verify/login")}), 401
         return f(*args, **kwargs)
     return decorated_function
 
@@ -293,16 +402,21 @@ def generate_textgrid(frames, duration, sentence, annotator, full_sequence):
     tg_lines.append(f'            text = "{annotator}"')
     return "\n".join(tg_lines)
 
-def save_to_mobile_dataset(annotated_data, username, original_wav_path, json_filename):
+def save_to_mobile_dataset(annotated_data, username, original_wav_path, json_filename, verified=False):
     try:
         base_name = json_filename.replace('.json', '')
-        json_output_path = os.path.join(MOBILE_DATASET_FOLDER, json_filename)
+        # Determine target folder
+        target_folder = MOBILE_VERIFIED_FOLDER if verified else MOBILE_DATASET_FOLDER
+        
+        json_output_path = os.path.join(target_folder, json_filename)
         with open(json_output_path, 'w', encoding='utf-8') as f:
             json.dump(annotated_data, f, indent=2, ensure_ascii=False)
+        
         wav_filename = f"{base_name}.wav"
         if original_wav_path and os.path.exists(original_wav_path):
-            wav_output_path = os.path.join(MOBILE_DATASET_FOLDER, wav_filename)
+            wav_output_path = os.path.join(target_folder, wav_filename)
             shutil.copy2(original_wav_path, wav_output_path)
+        
         frames = annotated_data.get('frames', [])
         duration = annotated_data.get('duration_ms', 0) / 1000.0
         if duration == 0 and frames:
@@ -310,6 +424,7 @@ def save_to_mobile_dataset(annotated_data, username, original_wav_path, json_fil
         sentence = annotated_data.get('sentence', '')
         full_sequence = annotated_data.get('full_sequence', '')
         annotator = annotated_data.get('annotator', username)
+        
         textgrid_content = generate_textgrid(
             frames=frames,
             duration=duration,
@@ -317,16 +432,17 @@ def save_to_mobile_dataset(annotated_data, username, original_wav_path, json_fil
             annotator=annotator,
             full_sequence=full_sequence
         )
-        textgrid_output_path = os.path.join(MOBILE_DATASET_FOLDER, f"{base_name}.TextGrid")
+        textgrid_output_path = os.path.join(target_folder, f"{base_name}.TextGrid")
         with open(textgrid_output_path, 'w', encoding='utf-8') as f:
             f.write(textgrid_content)
-        print(f"Saved annotated data to MOBILE_DATASET: {base_name}")
+        
+        print(f"Saved annotated data to {target_folder}: {base_name}")
         return True
     except Exception as e:
-        print(f"Error saving to MOBILE_DATASET: {e}")
+        print(f"Error saving to dataset: {e}")
         return False
 
-# ============= ROUTES =============
+# ============= ANNOTATION ROUTES (unchanged) =============
 
 @app.route("/")
 def index():
@@ -370,7 +486,8 @@ def api_register():
         "username": username,
         "phone": phone,
         "password": password,
-        "created_at": datetime.now().isoformat()
+        "created_at": datetime.now().isoformat(),
+        "role": "annotator"  # default role
     }
     save_users(users)
     user_folder = os.path.join(USER_SUBMISSIONS_FOLDER, username)
@@ -389,6 +506,7 @@ def api_login():
         return jsonify({"error": "Invalid username or password"}), 401
     session['username'] = username
     session['phone'] = users[username].get('phone', '')
+    session['role'] = users[username].get('role', 'annotator')
     return jsonify({"message": "Login successful", "username": username})
 
 @app.route("/api/logout", methods=["POST"])
@@ -402,7 +520,8 @@ def api_current_user():
         return jsonify({
             "username": session['username'],
             "phone": session.get('phone', ''),
-            "logged_in": True
+            "logged_in": True,
+            "role": session.get('role', 'annotator')
         })
     return jsonify({"logged_in": False})
 
@@ -475,20 +594,27 @@ def submit():
     data["submitted_by"] = username
     data["submitted_by_phone"] = session.get('phone', '')
     data["annotator"] = username
+    data["verification_status"] = "pending"  # add status for verification
+    
     user_submit_folder = os.path.join(USER_SUBMISSIONS_FOLDER, username)
     os.makedirs(user_submit_folder, exist_ok=True)
     user_submit_path = os.path.join(user_submit_folder, json_file)
     with open(user_submit_path, "w", encoding='utf-8') as f:
         json.dump(data, f, indent=2, ensure_ascii=False)
+    
     old_submit_path = os.path.join(SUBMIT_FOLDER, f"{username}_{json_file}")
     with open(old_submit_path, "w", encoding='utf-8') as f:
         json.dump(data, f, indent=2, ensure_ascii=False)
+    
     save_to_mobile_dataset(data, username, original_wav_path, json_file)
-    update_user_stats(username, json_file, duration_seconds)
+    update_user_stats(username, json_file, duration_seconds, increment=True)
+    update_daily_stats(username, json_file, duration_seconds, increment=True)
+    
     completed_files.add(json_file)
     save_completed_files(completed_files)
     release_file_assignment(json_file)
     clear_skipped_file(username, json_file)
+    
     all_json_files = glob.glob(os.path.join(AUDIO_FOLDER, "*.json"))
     total = len(all_json_files)
     remaining = total - len(completed_files)
@@ -518,81 +644,6 @@ def skip_file():
             "skipped": True
         })
     return jsonify({"message": "No file to skip", "has_more": True})
-
-def load_daily_stats():
-    DAILY_STATS_FILE = "daily_stats.json"
-    if os.path.exists(DAILY_STATS_FILE):
-        with open(DAILY_STATS_FILE, 'r') as f:
-            return json.load(f)
-    return {}
-
-def save_daily_stats(stats):
-    DAILY_STATS_FILE = "daily_stats.json"
-    with open(DAILY_STATS_FILE, 'w') as f:
-        json.dump(stats, f, indent=2)
-
-def update_daily_stats(username, json_file, duration_seconds):
-    today = datetime.now().strftime("%Y-%m-%d")
-    daily_stats = load_daily_stats()
-    if username not in daily_stats:
-        daily_stats[username] = {
-            "total": {
-                "files_completed": 0,
-                "duration_seconds": 0,
-                "duration_formatted": "0s"
-            },
-            "daily": {}
-        }
-    if today not in daily_stats[username]["daily"]:
-        daily_stats[username]["daily"][today] = {
-            "files_completed": 0,
-            "duration_seconds": 0,
-            "duration_formatted": "0s",
-            "files": []
-        }
-    if json_file not in daily_stats[username]["daily"][today]["files"]:
-        daily_stats[username]["daily"][today]["files_completed"] += 1
-        daily_stats[username]["daily"][today]["duration_seconds"] += duration_seconds
-        daily_stats[username]["daily"][today]["files"].append(json_file)
-        secs = daily_stats[username]["daily"][today]["duration_seconds"]
-        if secs < 60:
-            daily_stats[username]["daily"][today]["duration_formatted"] = f"{secs:.1f}s"
-        elif secs < 3600:
-            mins = int(secs // 60)
-            secs_rem = int(secs % 60)
-            daily_stats[username]["daily"][today]["duration_formatted"] = f"{mins}m {secs_rem}s"
-        else:
-            hours = int(secs // 3600)
-            mins = int((secs % 3600) // 60)
-            daily_stats[username]["daily"][today]["duration_formatted"] = f"{hours}h {mins}m"
-    daily_stats[username]["total"]["files_completed"] += 1
-    daily_stats[username]["total"]["duration_seconds"] += duration_seconds
-    total_secs = daily_stats[username]["total"]["duration_seconds"]
-    if total_secs < 60:
-        daily_stats[username]["total"]["duration_formatted"] = f"{total_secs:.1f}s"
-    elif total_secs < 3600:
-        mins = int(total_secs // 60)
-        secs_rem = int(total_secs % 60)
-        daily_stats[username]["total"]["duration_formatted"] = f"{mins}m {secs_rem}s"
-    else:
-        hours = int(total_secs // 3600)
-        mins = int((total_secs % 3600) // 60)
-        daily_stats[username]["total"]["duration_formatted"] = f"{hours}h {mins}m"
-    save_daily_stats(daily_stats)
-    return daily_stats[username]
-
-def get_user_daily_stats(username):
-    daily_stats = load_daily_stats()
-    if username in daily_stats:
-        return daily_stats[username]
-    return {
-        "total": {
-            "files_completed": 0,
-            "duration_seconds": 0,
-            "duration_formatted": "0s"
-        },
-        "daily": {}
-    }
 
 @app.route("/progress")
 @login_required
@@ -685,6 +736,199 @@ def serve_user_submission(username, filename):
     if not os.path.exists(file_path):
         return jsonify({"error": "File not found"}), 404
     return send_from_directory(os.path.dirname(file_path), filename)
+
+# ============= VERIFICATION ROUTES =============
+
+VERIFIER_PASSWORD = "verify123"  # Change this to a secure password
+
+@app.route("/verify/login")
+def verify_login_page():
+    return render_template("verify_login.html", base_path=BASE_PATH)
+
+@app.route("/verify/api/login", methods=["POST"])
+def verify_api_login():
+    data = request.json
+    password = data.get('password', '').strip()
+    if password == VERIFIER_PASSWORD:
+        session['verifier'] = True
+        session['verifier_name'] = data.get('name', 'Verifier')
+        return jsonify({"message": "Verifier login successful", "verified": True})
+    return jsonify({"error": "Invalid verifier password"}), 401
+
+@app.route("/verify/api/logout", methods=["POST"])
+def verify_api_logout():
+    session.pop('verifier', None)
+    session.pop('verifier_name', None)
+    return jsonify({"message": "Logged out from verification"})
+
+@app.route("/verify")
+def verify_page():
+    if not session.get('verifier'):
+        return redirect(url_for_path("verify/login"))
+    return render_template("verify.html", base_path=BASE_PATH, verifier_name=session.get('verifier_name', 'Verifier'))
+
+def get_next_verification_file():
+    """Get next unverified file from MOBILE_DATASET that hasn't been verified yet"""
+    if not os.path.exists(MOBILE_DATASET_FOLDER):
+        return None
+    
+    json_files = glob.glob(os.path.join(MOBILE_DATASET_FOLDER, "*.json"))
+    for json_path in json_files:
+        json_file = os.path.basename(json_path)
+        # Check if already verified (exists in MOBILE_VERIFIED_FOLDER)
+        verified_json = os.path.join(MOBILE_VERIFIED_FOLDER, json_file)
+        if not os.path.exists(verified_json):
+            # Also check if there's a corresponding wav
+            wav_file = json_file.replace('.json', '.wav')
+            wav_path = os.path.join(MOBILE_DATASET_FOLDER, wav_file)
+            if os.path.exists(wav_path):
+                return json_file
+    return None
+
+def load_mobile_json(json_file):
+    json_path = os.path.join(MOBILE_DATASET_FOLDER, json_file)
+    try:
+        with open(json_path, 'r', encoding='utf-8') as f:
+            data = json.load(f)
+            data['json_file'] = json_file
+            data['wav_file'] = json_file.replace('.json', '.wav')
+            return data
+    except Exception as e:
+        print(f"Error loading mobile JSON {json_file}: {e}")
+        return None
+
+def delete_from_mobile_dataset(json_file):
+    """Delete JSON, WAV, TextGrid from MOBILE_DATASET"""
+    base = json_file.replace('.json', '')
+    paths = [
+        os.path.join(MOBILE_DATASET_FOLDER, json_file),
+        os.path.join(MOBILE_DATASET_FOLDER, f"{base}.wav"),
+        os.path.join(MOBILE_DATASET_FOLDER, f"{base}.TextGrid")
+    ]
+    for p in paths:
+        if os.path.exists(p):
+            os.remove(p)
+            print(f"Deleted {p}")
+
+def revert_completion_status(json_file, original_submitter, duration_seconds):
+    """Remove file from completed sets and subtract from user stats"""
+    global completed_files
+    # Remove from global completed set
+    if json_file in completed_files:
+        completed_files.remove(json_file)
+        save_completed_files(completed_files)
+    
+    # Remove from user stats (decrement)
+    update_user_stats(original_submitter, json_file, duration_seconds, increment=False)
+    update_daily_stats(original_submitter, json_file, duration_seconds, increment=False)
+    
+    # Remove from file assignments if present
+    release_file_assignment(json_file)
+    
+    # Remove from skipped files if present
+    clear_skipped_file(original_submitter, json_file)
+    
+    # Also remove from user's submission folder if exists
+    user_submit_path = os.path.join(USER_SUBMISSIONS_FOLDER, original_submitter, json_file)
+    if os.path.exists(user_submit_path):
+        os.remove(user_submit_path)
+    
+    # Remove from SUBMIT_FOLDER backup
+    backup_path = os.path.join(SUBMIT_FOLDER, f"{original_submitter}_{json_file}")
+    if os.path.exists(backup_path):
+        os.remove(backup_path)
+
+@app.route("/verify/get-next-file")
+@verifier_login_required
+def verify_get_next_file():
+    next_file = get_next_verification_file()
+    if not next_file:
+        return jsonify({"completed": True, "message": "All files have been verified!"})
+    
+    json_data = load_mobile_json(next_file)
+    if not json_data:
+        return jsonify({"error": "Could not load file", "completed": False})
+    
+    # Ensure duration_ms is present
+    wav_path = os.path.join(MOBILE_DATASET_FOLDER, json_data['wav_file'])
+    if 'duration_ms' not in json_data or json_data['duration_ms'] == 0:
+        json_data['duration_ms'] = get_audio_length(wav_path)
+    
+    return jsonify(json_data)
+
+@app.route("/verify/submit", methods=["POST"])
+@verifier_login_required
+def verify_submit():
+    data = request.json
+    json_file = data.get('json_file')
+    action = data.get('action')  # 'verify' or 'reject'
+    verifier_name = session.get('verifier_name', 'Verifier')
+    
+    if not json_file:
+        return jsonify({"error": "No file specified"}), 400
+    
+    if action == 'verify':
+        # Get original submitter and duration from the data
+        original_submitter = data.get('submitted_by', 'unknown')
+        duration_ms = data.get('duration_ms', 0)
+        duration_seconds = duration_ms / 1000.0
+        
+        # Update verification metadata
+        data['verified_by'] = verifier_name
+        data['verified_at'] = datetime.now().isoformat()
+        data['verification_status'] = 'verified'
+        
+        # Save to MOBILE_VERIFIED_FOLDER
+        wav_path = os.path.join(MOBILE_DATASET_FOLDER, data['wav_file'])
+        save_to_mobile_dataset(data, original_submitter, wav_path, json_file, verified=True)
+        
+        # Also update/overwrite in MOBILE_DATASET with corrected version
+        save_to_mobile_dataset(data, original_submitter, wav_path, json_file, verified=False)
+        
+        return jsonify({
+            "message": "File verified and saved to verified folder",
+            "has_more": True,
+            "verified": True
+        })
+    
+    elif action == 'reject':
+        # Load original data to get submitter and duration
+        original_data = load_mobile_json(json_file)
+        if not original_data:
+            return jsonify({"error": "Could not load file data"}), 400
+        
+        original_submitter = original_data.get('submitted_by', 'unknown')
+        duration_ms = original_data.get('duration_ms', 0)
+        duration_seconds = duration_ms / 1000.0
+        
+        # Delete from MOBILE_DATASET
+        delete_from_mobile_dataset(json_file)
+        
+        # Revert completion status (so file goes back to annotation pool)
+        revert_completion_status(json_file, original_submitter, duration_seconds)
+        
+        return jsonify({
+            "message": "File rejected and removed from dataset. It will be re-annotated.",
+            "has_more": True,
+            "rejected": True
+        })
+    
+    else:
+        return jsonify({"error": "Invalid action"}), 400
+
+# Helper for daily stats in verification
+def get_user_daily_stats(username):
+    daily_stats = load_daily_stats()
+    if username in daily_stats:
+        return daily_stats[username]
+    return {
+        "total": {
+            "files_completed": 0,
+            "duration_seconds": 0,
+            "duration_formatted": "0s"
+        },
+        "daily": {}
+    }
 
 if __name__ == "__main__":
     print("=" * 50)
