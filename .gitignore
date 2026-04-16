@@ -10,4 +10,7 @@ MOBILE_DATASET/
 *.json
 MOBILE_VERIFIED_DATA/
 completed_files.json
+mnt/
+.DS_Store/
+.DS_Store
 

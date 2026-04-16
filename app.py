@@ -55,6 +55,407 @@ from werkzeug.middleware.proxy_fix import ProxyFix
 if BASE_PATH:
     app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
 
+
+# ==============================
+# TRAINING DATA FOLDER CONFIGURATION
+# ==============================
+
+# Base folder for mobile training data
+MOBILE_TRAINING_DATA_BASE_FOLDER = "/mnt/data_disk_2/UI_TRAINING_DATA/MOBILE_DATA/normal_data"
+
+# Create the base directory
+os.makedirs(MOBILE_TRAINING_DATA_BASE_FOLDER, exist_ok=True)
+print(f"Mobile training data base folder ready: {MOBILE_TRAINING_DATA_BASE_FOLDER}")
+
+def get_mobile_training_date_folder():
+    """Get current date folder for mobile training data (YYYY-MM-DD)"""
+    current_date = datetime.now().strftime("%Y-%m-%d")
+    date_folder = os.path.join(MOBILE_TRAINING_DATA_BASE_FOLDER, current_date)
+    return date_folder
+
+def save_to_mobile_training_data(audio_source_path, textgrid_source_path, json_source_path, base_filename):
+    """
+    Save complete package (WAV + TextGrid + JSON) to mobile training data folder with date-wise organization
+    """
+    try:
+        # Get date-wise folder for today
+        training_folder = get_mobile_training_date_folder()
+        os.makedirs(training_folder, exist_ok=True)
+        print(f"Saving to mobile training date folder: {training_folder}")
+        
+        saved_files = []
+        
+        # Save WAV file
+        if audio_source_path and os.path.exists(audio_source_path):
+            dest_wav = os.path.join(training_folder, f"{base_filename}.wav")
+            # Check if file already exists
+            if os.path.exists(dest_wav):
+                print(f"WAV file already exists, skipping: {dest_wav}")
+            else:
+                shutil.copy2(audio_source_path, dest_wav)
+                saved_files.append(dest_wav)
+                print(f"Saved WAV to mobile training data: {dest_wav}")
+        else:
+            print(f"Warning: Audio source not found: {audio_source_path}")
+        
+        # Save TextGrid file
+        if textgrid_source_path and os.path.exists(textgrid_source_path):
+            dest_tg = os.path.join(training_folder, f"{base_filename}.TextGrid")
+            if os.path.exists(dest_tg):
+                print(f"TextGrid file already exists, skipping: {dest_tg}")
+            else:
+                shutil.copy2(textgrid_source_path, dest_tg)
+                saved_files.append(dest_tg)
+                print(f"Saved TextGrid to mobile training data: {dest_tg}")
+        else:
+            print(f"Warning: TextGrid source not found: {textgrid_source_path}")
+        
+        # Save JSON file
+        if json_source_path and os.path.exists(json_source_path):
+            dest_json = os.path.join(training_folder, f"{base_filename}.json")
+            if os.path.exists(dest_json):
+                print(f"JSON file already exists, skipping: {dest_json}")
+            else:
+                shutil.copy2(json_source_path, dest_json)
+                saved_files.append(dest_json)
+                print(f"Saved JSON to mobile training data: {dest_json}")
+        else:
+            print(f"Warning: JSON source not found: {json_source_path}")
+        
+        print(f"Successfully saved {len(saved_files)} files to {training_folder}")
+        return len(saved_files) > 0
+        
+    except Exception as e:
+        print(f"Error saving to mobile training data: {e}")
+        import traceback
+        traceback.print_exc()
+        return False
+
+def delete_from_mobile_training_data(base_filename):
+    """
+    Delete files from mobile training data folder when rejected
+    Checks all date folders to find and delete the files
+    """
+    try:
+        deleted = []
+        
+        print(f"Looking for files to delete with base name: {base_filename}")
+        print(f"Searching in base folder: {MOBILE_TRAINING_DATA_BASE_FOLDER}")
+        
+        # Check if base folder exists
+        if not os.path.exists(MOBILE_TRAINING_DATA_BASE_FOLDER):
+            print(f"Mobile training data base folder does not exist: {MOBILE_TRAINING_DATA_BASE_FOLDER}")
+            return deleted
+        
+        # Get all date subfolders in training data base folder
+        date_found = False
+        for date_folder in os.listdir(MOBILE_TRAINING_DATA_BASE_FOLDER):
+            folder_path = os.path.join(MOBILE_TRAINING_DATA_BASE_FOLDER, date_folder)
+            
+            # Only process directories (date folders)
+            if os.path.isdir(folder_path):
+                # Files to delete in this date folder
+                wav_path = os.path.join(folder_path, f"{base_filename}.wav")
+                tg_path = os.path.join(folder_path, f"{base_filename}.TextGrid")
+                json_path = os.path.join(folder_path, f"{base_filename}.json")
+                
+                # Check and delete each file
+                for file_path in [wav_path, tg_path, json_path]:
+                    if os.path.exists(file_path):
+                        os.remove(file_path)
+                        deleted.append(file_path)
+                        print(f"Deleted from mobile training data: {file_path}")
+                        date_found = True
+        
+        if not date_found:
+            print(f"No files found for {base_filename} in any date folder")
+        else:
+            print(f"Successfully deleted {len(deleted)} files from mobile training data")
+        
+        return deleted
+        
+    except Exception as e:
+        print(f"Error deleting from mobile training data: {e}")
+        import traceback
+        traceback.print_exc()
+        return []
+
+
+
+
+# ==============================
+# TEXTGRID TIER GENERATION HELPERS
+# ==============================
+
+AKSHAR_SET = {
+    "अ", "आ", "इ", "ई", "उ", "ऊ", "ऋ", "ए", "ऐ", "ओ", "औ",
+    "क", "ख", "ग", "घ", "ङ",
+    "च", "छ", "ज", "झ", "ञ",
+    "ट", "ठ", "ड", "ढ", "ण",
+    "त", "थ", "द", "ध", "न",
+    "प", "फ", "ब", "भ", "म",
+    "य", "र", "ल", "व",
+    "श", "ष", "स", "ह",
+    "क्ष", "त्र", "ज्ञ",
+    "ं", "ँ", "ः", "ॉ", "ऑ", "०", "१", "२", "३", "४", "५", "६", "७", "८", "९"
+}
+
+VYANJAN_SET = {
+    "क", "ख", "ग", "घ", "ङ",
+    "च", "छ", "ज", "झ", "ञ",
+    "ट", "ठ", "ड", "ढ", "ण",
+    "त", "थ", "द", "ध", "न",
+    "प", "फ", "ब", "भ", "म",
+    "य", "र", "ल", "व",
+    "श", "ष", "स", "ह",
+    "क्ष", "त्र", "ज्ञ"
+}
+
+SWAR_SET = {"अ", "आ", "इ", "ई", "उ", "ऊ", "ऋ", "ए", "ऐ", "ओ", "औ"}
+NAASIKA_SET = {"म", "न", "ण", "ङ", "ञ", "ं", "ँ"}
+
+# Normalization map for cleaning
+norm_map = {
+    "ा": "आ", "ि": "इ", "ी": "ई", "ु": "उ", "ू": "ऊ", "ृ": "ऋ",
+    "े": "ए", "ै": "ऐ", "ो": "ओ", "ौ": "औ",
+    "ँ": "ं",
+    "ण": "न", "ङ": "न", "ञ": "न",
+    "श": "स", "ष": "स",
+    "ई": "इ", "ऊ": "उ", "ऐ": "ए", "औ": "ओ"
+}
+
+def clean_text(text):
+    """Clean and normalize text"""
+    text = text.strip()
+    if text == "":
+        return ""
+    
+    # normalize + filter
+    chars = []
+    for ch in text:
+        if ch in norm_map:
+            ch = norm_map[ch]
+        if ch in AKSHAR_SET:
+            chars.append(ch)
+    
+    if not chars:
+        return ""
+    
+    # dedup
+    dedup = [chars[0]]
+    for ch in chars[1:]:
+        if ch != dedup[-1]:
+            dedup.append(ch)
+    
+    # remove implicit अ
+    final = []
+    i = 0
+    while i < len(dedup):
+        ch = dedup[i]
+        if (ch in VYANJAN_SET and
+            i + 1 < len(dedup) and
+            dedup[i + 1] == "अ"):
+            final.append(ch)
+            i += 2
+        else:
+            final.append(ch)
+            i += 1
+    
+    return "".join(final)
+
+def get_swar(text):
+    """Extract swar (vowels) from text"""
+    text = text.strip()
+    if text == "":
+        return ""
+    
+    swars = []
+    i = 0
+    while i < len(text):
+        ch = text[i]
+        
+        if ch in SWAR_SET:
+            swars.append(ch)
+        
+        elif ch in VYANJAN_SET:
+            if i + 1 < len(text) and text[i + 1] in SWAR_SET:
+                swars.append(text[i + 1])
+                i += 1
+            else:
+                swars.append("अ")
+        
+        i += 1
+    
+    return "".join(swars)
+
+def get_vyanjan(text):
+    """Extract vyanjan (consonants) from text"""
+    out = []
+    for ch in text:
+        if ch in VYANJAN_SET:
+            if not out or out[-1] != ch:
+                out.append(ch)
+    return "".join(out)
+
+def get_naasika(text):
+    """Extract naasika (nasal sounds) from text"""
+    out = []
+    for ch in text:
+        if ch in NAASIKA_SET:
+            if not out or out[-1] != ch:
+                out.append(ch)
+    return "".join(out)
+
+def create_enhanced_textgrid(frames, duration, sentence, annotator, full_sequence):
+    """
+    Create enhanced TextGrid with 7 tiers:
+    - sentence: original sentence
+    - annotations: original frames (108ms windows)
+    - window_108ms: cleaned version of annotations
+    - swar: extracted vowels
+    - vyanjan: extracted consonants
+    - naasika: extracted nasal sounds
+    - annotator: annotator name
+    """
+    tg = []
+    
+    tg.append('File type = "ooTextFile"')
+    tg.append('Object class = "TextGrid"\n')
+    
+    tg.append(f"xmin = 0")
+    tg.append(f"xmax = {duration}")
+    tg.append("tiers? <exists>")
+    tg.append("size = 7")
+    tg.append("item []:")
+    
+    # ========== 1. sentence tier ==========
+    tg.append("    item [1]:")
+    tg.append('        class = "IntervalTier"')
+    tg.append('        name = "sentence"')
+    tg.append(f"        xmin = 0")
+    tg.append(f"        xmax = {duration}")
+    tg.append("        intervals: size = 1")
+    
+    tg.append("        intervals [1]:")
+    tg.append(f"            xmin = 0")
+    tg.append(f"            xmax = {duration}")
+    tg.append(f'            text = "{sentence if sentence else full_sequence}"')
+    
+    # ========== 2. annotations tier (original frames) ==========
+    tg.append("    item [2]:")
+    tg.append('        class = "IntervalTier"')
+    tg.append('        name = "annotations"')
+    tg.append(f"        xmin = 0")
+    tg.append(f"        xmax = {duration}")
+    tg.append(f"        intervals: size = {len(frames)}")
+    
+    for i, f in enumerate(frames, 1):
+        start = f.get("start_ms", 0) / 1000.0
+        end = f.get("end_ms", 0) / 1000.0
+        text = f.get("text", "") if f.get("text") else ""
+        
+        tg.append(f"        intervals [{i}]:")
+        tg.append(f"            xmin = {start}")
+        tg.append(f"            xmax = {end}")
+        tg.append(f'            text = "{text}"')
+    
+    # ========== 3. window_108ms tier (cleaned version) ==========
+    # For mobile, frames are already 108ms, so just clean the text
+    cleaned_frames = []
+    for f in frames:
+        cleaned_text = clean_text(f.get("text", "")) if f.get("text") else ""
+        cleaned_frames.append({
+            "start_ms": f.get("start_ms", 0),
+            "end_ms": f.get("end_ms", 0),
+            "text": cleaned_text
+        })
+    
+    tg.append("    item [3]:")
+    tg.append('        class = "IntervalTier"')
+    tg.append('        name = "window_108ms"')
+    tg.append(f"        xmin = 0")
+    tg.append(f"        xmax = {duration}")
+    tg.append(f"        intervals: size = {len(cleaned_frames)}")
+    
+    for i, f in enumerate(cleaned_frames, 1):
+        start = f["start_ms"] / 1000.0
+        end = f["end_ms"] / 1000.0
+        text = f["text"] if f["text"] else ""
+        
+        tg.append(f"        intervals [{i}]:")
+        tg.append(f"            xmin = {start}")
+        tg.append(f"            xmax = {end}")
+        tg.append(f'            text = "{text}"')
+    
+    # ========== 4. swar tier (from cleaned frames) ==========
+    tg.append("    item [4]:")
+    tg.append('        class = "IntervalTier"')
+    tg.append('        name = "swar"')
+    tg.append(f"        xmin = 0")
+    tg.append(f"        xmax = {duration}")
+    tg.append(f"        intervals: size = {len(cleaned_frames)}")
+    
+    for i, f in enumerate(cleaned_frames, 1):
+        start = f["start_ms"] / 1000.0
+        end = f["end_ms"] / 1000.0
+        text = get_swar(f["text"]) if f["text"] else ""
+        
+        tg.append(f"        intervals [{i}]:")
+        tg.append(f"            xmin = {start}")
+        tg.append(f"            xmax = {end}")
+        tg.append(f'            text = "{text}"')
+    
+    # ========== 5. vyanjan tier (from cleaned frames) ==========
+    tg.append("    item [5]:")
+    tg.append('        class = "IntervalTier"')
+    tg.append('        name = "vyanjan"')
+    tg.append(f"        xmin = 0")
+    tg.append(f"        xmax = {duration}")
+    tg.append(f"        intervals: size = {len(cleaned_frames)}")
+    
+    for i, f in enumerate(cleaned_frames, 1):
+        start = f["start_ms"] / 1000.0
+        end = f["end_ms"] / 1000.0
+        text = get_vyanjan(f["text"]) if f["text"] else ""
+        
+        tg.append(f"        intervals [{i}]:")
+        tg.append(f"            xmin = {start}")
+        tg.append(f"            xmax = {end}")
+        tg.append(f'            text = "{text}"')
+    
+    # ========== 6. naasika tier (from cleaned frames) ==========
+    tg.append("    item [6]:")
+    tg.append('        class = "IntervalTier"')
+    tg.append('        name = "naasika"')
+    tg.append(f"        xmin = 0")
+    tg.append(f"        xmax = {duration}")
+    tg.append(f"        intervals: size = {len(cleaned_frames)}")
+    
+    for i, f in enumerate(cleaned_frames, 1):
+        start = f["start_ms"] / 1000.0
+        end = f["end_ms"] / 1000.0
+        text = get_naasika(f["text"]) if f["text"] else ""
+        
+        tg.append(f"        intervals [{i}]:")
+        tg.append(f"            xmin = {start}")
+        tg.append(f"            xmax = {end}")
+        tg.append(f'            text = "{text}"')
+    
+    # ========== 7. annotator tier ==========
+    tg.append("    item [7]:")
+    tg.append('        class = "IntervalTier"')
+    tg.append('        name = "annotator"')
+    tg.append(f"        xmin = 0")
+    tg.append(f"        xmax = {duration}")
+    tg.append("        intervals: size = 1")
+    
+    tg.append("        intervals [1]:")
+    tg.append(f"            xmin = 0")
+    tg.append(f"            xmax = {duration}")
+    tg.append(f'            text = "{annotator}"')
+    
+    return "\n".join(tg)
+
 # Load users
 def load_users():
     if os.path.exists(USERS_FILE):
@@ -270,6 +671,19 @@ def update_daily_stats(username, json_file, duration_seconds, increment=True):
     save_daily_stats(daily_stats)
     return daily_stats[username]
 
+def get_user_daily_stats(username):
+    daily_stats = load_daily_stats()
+    if username in daily_stats:
+        return daily_stats[username]
+    return {
+        "total": {
+            "files_completed": 0,
+            "duration_seconds": 0,
+            "duration_formatted": "0s"
+        },
+        "daily": {}
+    }
+
 def assign_file_to_user(username):
     file_assignments = load_file_assignments()
     user_stats = get_user_stats(username)
@@ -356,50 +770,7 @@ def load_json_data(json_file):
         print(f"Error loading {json_file}: {e}")
         return None
 
-def generate_textgrid(frames, duration, sentence, annotator, full_sequence):
-    tg_lines = []
-    tg_lines.append('File type = "ooTextFile"')
-    tg_lines.append('Object class = "TextGrid"\n')
-    tg_lines.append(f"xmin = 0")
-    tg_lines.append(f"xmax = {duration}")
-    tg_lines.append("tiers? <exists>")
-    tg_lines.append("size = 3")
-    tg_lines.append("item []:")
-    tg_lines.append("    item [1]:")
-    tg_lines.append('        class = "IntervalTier"')
-    tg_lines.append('        name = "sentence"')
-    tg_lines.append(f"        xmin = 0")
-    tg_lines.append(f"        xmax = {duration}")
-    tg_lines.append("        intervals: size = 1")
-    tg_lines.append("        intervals [1]:")
-    tg_lines.append(f"            xmin = 0")
-    tg_lines.append(f"            xmax = {duration}")
-    tg_lines.append(f'            text = "{sentence if sentence else full_sequence}"')
-    tg_lines.append("    item [2]:")
-    tg_lines.append('        class = "IntervalTier"')
-    tg_lines.append('        name = "annotations"')
-    tg_lines.append(f"        xmin = 0")
-    tg_lines.append(f"        xmax = {duration}")
-    tg_lines.append(f"        intervals: size = {len(frames)}")
-    for i, frame in enumerate(frames, 1):
-        start = frame.get("start_ms", 0) / 1000.0
-        end = frame.get("end_ms", 0) / 1000.0
-        text = frame.get("text", "") if frame.get("text") else ""
-        tg_lines.append(f"        intervals [{i}]:")
-        tg_lines.append(f"            xmin = {start}")
-        tg_lines.append(f"            xmax = {end}")
-        tg_lines.append(f'            text = "{text}"')
-    tg_lines.append("    item [3]:")
-    tg_lines.append('        class = "IntervalTier"')
-    tg_lines.append('        name = "annotator"')
-    tg_lines.append(f"        xmin = 0")
-    tg_lines.append(f"        xmax = {duration}")
-    tg_lines.append("        intervals: size = 1")
-    tg_lines.append("        intervals [1]:")
-    tg_lines.append(f"            xmin = 0")
-    tg_lines.append(f"            xmax = {duration}")
-    tg_lines.append(f'            text = "{annotator}"')
-    return "\n".join(tg_lines)
+
 
 def save_to_mobile_dataset(annotated_data, username, original_wav_path, json_filename, verified=False):
     try:
@@ -412,6 +783,7 @@ def save_to_mobile_dataset(annotated_data, username, original_wav_path, json_fil
             json.dump(annotated_data, f, indent=2, ensure_ascii=False)
         
         wav_filename = f"{base_name}.wav"
+        wav_output_path = None
         if original_wav_path and os.path.exists(original_wav_path):
             wav_output_path = os.path.join(target_folder, wav_filename)
             shutil.copy2(original_wav_path, wav_output_path)
@@ -424,7 +796,8 @@ def save_to_mobile_dataset(annotated_data, username, original_wav_path, json_fil
         full_sequence = annotated_data.get('full_sequence', '')
         annotator = annotated_data.get('annotator', username)
         
-        textgrid_content = generate_textgrid(
+        # Use enhanced TextGrid with 7 tiers
+        textgrid_content = create_enhanced_textgrid(
             frames=frames,
             duration=duration,
             sentence=sentence,
@@ -436,12 +809,27 @@ def save_to_mobile_dataset(annotated_data, username, original_wav_path, json_fil
             f.write(textgrid_content)
         
         print(f"Saved annotated data to {target_folder}: {base_name}")
+        
+        # =========================
+        # 🔥 SAVE TO MOBILE TRAINING DATA FOLDER
+        # =========================
+        try:
+            save_to_mobile_training_data(
+                audio_source_path=wav_output_path if wav_output_path else original_wav_path,
+                textgrid_source_path=textgrid_output_path,
+                json_source_path=json_output_path,
+                base_filename=base_name
+            )
+        except Exception as e:
+            print(f"Warning: Mobile training data save failed: {e}")
+        
         return True
     except Exception as e:
         print(f"Error saving to dataset: {e}")
         return False
 
-# ============= ANNOTATION ROUTES (unchanged) =============
+
+# ============= ANNOTATION ROUTES =============
 
 @app.route("/")
 def index():
@@ -486,7 +874,7 @@ def api_register():
         "phone": phone,
         "password": password,
         "created_at": datetime.now().isoformat(),
-        "role": "annotator"  # default role
+        "role": "annotator"
     }
     save_users(users)
     user_folder = os.path.join(USER_SUBMISSIONS_FOLDER, username)
@@ -593,7 +981,7 @@ def submit():
     data["submitted_by"] = username
     data["submitted_by_phone"] = session.get('phone', '')
     data["annotator"] = username
-    data["verification_status"] = "pending"  # add status for verification
+    data["verification_status"] = "pending"
     
     user_submit_folder = os.path.join(USER_SUBMISSIONS_FOLDER, username)
     os.makedirs(user_submit_folder, exist_ok=True)
@@ -738,7 +1126,7 @@ def serve_user_submission(username, filename):
 
 # ============= VERIFICATION ROUTES =============
 
-VERIFIER_PASSWORD = "verify123"  # Change this to a secure password
+VERIFIER_PASSWORD = "verify123"
 
 @app.route("/verify/login")
 def verify_login_page():
@@ -916,9 +1304,12 @@ def load_mobile_json(json_file):
         print(f"Error loading mobile JSON {json_file}: {e}")
         return None
 
+
 def delete_from_mobile_dataset(json_file):
-    """Delete JSON, WAV, TextGrid from MOBILE_DATASET"""
+    """Delete JSON, WAV, TextGrid from MOBILE_DATASET and from training folder"""
     base = json_file.replace('.json', '')
+    
+    # Delete from MOBILE_DATASET
     paths = [
         os.path.join(MOBILE_DATASET_FOLDER, json_file),
         os.path.join(MOBILE_DATASET_FOLDER, f"{base}.wav"),
@@ -928,6 +1319,14 @@ def delete_from_mobile_dataset(json_file):
         if os.path.exists(p):
             os.remove(p)
             print(f"Deleted {p}")
+    
+    # =========================
+    # 🔥 DELETE FROM MOBILE TRAINING DATA FOLDER
+    # =========================
+    try:
+        delete_from_mobile_training_data(base)
+    except Exception as e:
+        print(f"Warning: Failed to delete from mobile training data: {e}")
 
 def revert_completion_status(json_file, original_submitter, duration_seconds):
     """Remove file from completed sets and subtract from user stats"""
@@ -997,7 +1396,7 @@ def verify_submit():
         data['verified_at'] = datetime.now().isoformat()
         data['verification_status'] = 'verified'
         
-        # Save to MOBILE_VERIFIED_FOLDER
+        # Save to MOBILE_VERIFIED_FOLDER (this uses enhanced TextGrid)
         wav_path = os.path.join(MOBILE_DATASET_FOLDER, data['wav_file'])
         save_to_mobile_dataset(data, original_submitter, wav_path, json_file, verified=True)
         
@@ -1035,23 +1434,9 @@ def verify_submit():
     else:
         return jsonify({"error": "Invalid action"}), 400
 
-# Helper for daily stats in verification
-def get_user_daily_stats(username):
-    daily_stats = load_daily_stats()
-    if username in daily_stats:
-        return daily_stats[username]
-    return {
-        "total": {
-            "files_completed": 0,
-            "duration_seconds": 0,
-            "duration_formatted": "0s"
-        },
-        "daily": {}
-    }
-
 if __name__ == "__main__":
     print("=" * 50)
-    print("Annotation Tool Server")
+    print("Mobile Annotation Tool Server")
     print("=" * 50)
     print(f"Mode: {'PRODUCTION' if BASE_PATH else 'DEVELOPMENT'}")
     print(f"Base URL: {BASE_PATH if BASE_PATH else '/'}")
