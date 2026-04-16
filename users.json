@@ -64,5 +64,19 @@
     "phone": "9277345684",
     "password": "palak@@",
     "created_at": "2026-04-14T19:33:02.485018"
+  },
+  "Sujalsoni": {
+    "username": "Sujalsoni",
+    "phone": "9755925457",
+    "password": "sujal124421",
+    "created_at": "2026-04-15T20:50:31.951325",
+    "role": "annotator"
+  },
+  "Vinita": {
+    "username": "Vinita",
+    "phone": "9821957445",
+    "password": "jesinijhon",
+    "created_at": "2026-04-15T22:42:06.487250",
+    "role": "annotator"
   }
 }
