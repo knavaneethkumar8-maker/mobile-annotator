@@ -1,4 +1,3 @@
-# app.py
 from flask import Flask, render_template, request, jsonify, send_from_directory, session, redirect, url_for
 import wave
 import math
@@ -790,6 +789,102 @@ def verify_progress():
         "remaining": remaining_files,
         "percent": (verified_files / total_files * 100) if total_files > 0 else 0
     })
+
+@app.route("/verify/api/annotators")
+@verifier_login_required
+def get_annotators_list():
+    """Get list of annotators who have submitted files for verification"""
+    if not os.path.exists(MOBILE_DATASET_FOLDER):
+        return jsonify({"annotators": [], "selected": None})
+    
+    annotators = set()
+    json_files = glob.glob(os.path.join(MOBILE_DATASET_FOLDER, "*.json"))
+    
+    for json_path in json_files:
+        try:
+            with open(json_path, 'r', encoding='utf-8') as f:
+                data = json.load(f)
+                submitted_by = data.get('submitted_by', 'unknown')
+                annotators.add(submitted_by)
+        except Exception as e:
+            print(f"Error reading {json_path}: {e}")
+    
+    return jsonify({
+        "annotators": sorted(list(annotators)),
+        "selected": None
+    })
+
+@app.route("/verify/api/annotator-files")
+@verifier_login_required
+def get_annotator_files():
+    """Get list of unverified files for a specific annotator"""
+    annotator = request.args.get('annotator', '')
+    if not annotator:
+        return jsonify({"error": "No annotator specified", "files": []}), 400
+    
+    if not os.path.exists(MOBILE_DATASET_FOLDER):
+        return jsonify({"files": []})
+    
+    unverified_files = []
+    json_files = glob.glob(os.path.join(MOBILE_DATASET_FOLDER, "*.json"))
+    
+    for json_path in json_files:
+        json_file = os.path.basename(json_path)
+        
+        # Check if already verified (exists in MOBILE_VERIFIED_FOLDER)
+        verified_json = os.path.join(MOBILE_VERIFIED_FOLDER, json_file)
+        if os.path.exists(verified_json):
+            continue
+        
+        try:
+            with open(json_path, 'r', encoding='utf-8') as f:
+                data = json.load(f)
+                submitted_by = data.get('submitted_by', 'unknown')
+                
+                if submitted_by == annotator:
+                    # Check if corresponding wav exists
+                    wav_file = json_file.replace('.json', '.wav')
+                    wav_path = os.path.join(MOBILE_DATASET_FOLDER, wav_file)
+                    if os.path.exists(wav_path):
+                        unverified_files.append(json_file)
+        except Exception as e:
+            print(f"Error reading {json_path}: {e}")
+    
+    return jsonify({
+        "files": unverified_files,
+        "annotator": annotator,
+        "count": len(unverified_files)
+    })
+
+@app.route("/verify/api/get-file/<path:json_file>")
+@verifier_login_required
+def get_verification_file(json_file):
+    """Get a specific file for verification"""
+    annotator = request.args.get('annotator', '')
+    
+    json_path = os.path.join(MOBILE_DATASET_FOLDER, json_file)
+    if not os.path.exists(json_path):
+        return jsonify({"error": "File not found"}), 404
+    
+    try:
+        with open(json_path, 'r', encoding='utf-8') as f:
+            data = json.load(f)
+            
+        # Verify this file belongs to the requested annotator
+        if annotator and data.get('submitted_by') != annotator:
+            return jsonify({"error": f"This file belongs to {data.get('submitted_by')}, not {annotator}"}), 403
+        
+        data['json_file'] = json_file
+        data['wav_file'] = json_file.replace('.json', '.wav')
+        
+        # Ensure duration_ms is present
+        wav_path = os.path.join(MOBILE_DATASET_FOLDER, data['wav_file'])
+        if 'duration_ms' not in data or data['duration_ms'] == 0:
+            data['duration_ms'] = get_audio_length(wav_path)
+        
+        return jsonify(data)
+    except Exception as e:
+        return jsonify({"error": f"Error loading file: {e}"}), 500
 
 def get_next_verification_file():
     """Get next unverified file from MOBILE_DATASET that hasn't been verified yet"""

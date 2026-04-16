@@ -150,6 +150,49 @@ body {
   color: #2C6E49;
 }
 
+.annotator-selector {
+  background: #F8F8F4;
+  border-radius: 20px;
+  padding: 16px;
+  margin: 12px 0;
+  border: 1px solid #E9E9E2;
+}
+
+.annotator-selector label {
+  font-weight: 590;
+  font-size: 0.85rem;
+  color: #2C6E49;
+  display: block;
+  margin-bottom: 10px;
+}
+
+.annotator-dropdown {
+  width: 100%;
+  padding: 12px 16px;
+  font-size: 1rem;
+  border: 1px solid #DCDCD4;
+  border-radius: 40px;
+  background: white;
+  font-family: inherit;
+  cursor: pointer;
+  outline: none;
+  transition: 0.18s ease;
+}
+
+.annotator-dropdown:focus {
+  border-color: #2C6E49;
+  box-shadow: 0 0 0 2px rgba(44,110,73,0.2);
+}
+
+.load-btn {
+  background: #2C6E49;
+  color: white;
+  margin-top: 12px;
+  padding: 10px 20px;
+  border-radius: 40px;
+  font-size: 0.9rem;
+}
+
 .audio-wrapper { margin: 16px 0 18px; }
 
 .volume-control {
@@ -567,8 +610,16 @@ button {
     </div>
   </div>
 
+  <div class="annotator-selector" id="annotatorSelector">
+    <label>👤 Select Annotator to Verify</label>
+    <select id="annotatorSelect" class="annotator-dropdown">
+      <option value="">-- Select Annotator --</option>
+    </select>
+    <button id="loadAnnotatorFiles" class="load-btn">📂 Load Files</button>
+  </div>
+
   <div id="content">
-    <div class="loading">Loading next file for verification...</div>
+    <div class="loading">Select an annotator and click "Load Files" to start verification</div>
   </div>
 </div>
 
@@ -606,6 +657,9 @@ let dragState = {
   feedbackElement: null, targetFrameIndex: null
 };
 
+let currentAnnotator = null;
+let annotatorFilesList = [];
+
 function unlockAudio() {
   if (audioUnlocked) return;
   if (audioContext && audioContext.state === 'suspended') {
@@ -641,6 +695,72 @@ async function loadVerificationProgress() {
     const pct = d.percent || 0;
     document.getElementById('progressFill').style.width = pct + '%';
   } catch (err) { console.warn('Progress error:', err); }
+}
+
+async function loadAnnotators() {
+  try {
+    const r = await fetch(`${BASE_PATH}/verify/api/annotators`);
+    if (r.status === 401) { window.location.href = `${BASE_PATH}/verify/login`; return; }
+    const data = await r.json();
+    const select = document.getElementById('annotatorSelect');
+    select.innerHTML = '<option value="">-- Select Annotator --</option>';
+    data.annotators.forEach(annotator => {
+      const option = document.createElement('option');
+      option.value = annotator;
+      option.textContent = `${annotator} (${annotator === data.selected ? 'current' : ''})`;
+      select.appendChild(option);
+    });
+    if (data.selected) {
+      select.value = data.selected;
+    }
+  } catch (err) {
+    console.error('Error loading annotators:', err);
+  }
+}
+
+document.getElementById('loadAnnotatorFiles').addEventListener('click', async () => {
+  const select = document.getElementById('annotatorSelect');
+  const annotator = select.value;
+  if (!annotator) {
+    showMessage('Please select an annotator first', 'error');
+    return;
+  }
+  
+  currentAnnotator = annotator;
+  showMessage(`Loading files for annotator: ${annotator}...`, 'info');
+  
+  try {
+    const r = await fetch(`${BASE_PATH}/verify/api/annotator-files?annotator=${encodeURIComponent(annotator)}`);
+    if (r.status === 401) { window.location.href = `${BASE_PATH}/verify/login`; return; }
+    const data = await r.json();
+    
+    if (data.files && data.files.length > 0) {
+      annotatorFilesList = data.files;
+      showMessage(`Found ${data.files.length} files for ${annotator}. Loading first file...`, 'success');
+      await loadSpecificFile(annotatorFilesList[0]);
+    } else {
+      showMessage(`No pending files found for annotator: ${annotator}`, 'info');
+      document.getElementById('content').innerHTML = '<div class="loading">No files to verify for this annotator</div>';
+    }
+  } catch (err) {
+    showMessage('Error loading annotator files: ' + err, 'error');
+  }
+});
+
+async function loadSpecificFile(jsonFile) {
+  const contentDiv = document.getElementById('content');
+  contentDiv.innerHTML = '<div class="loading">Loading file for verification...</div>';
+  if (audioContext) { await audioContext.close(); audioContext = null; gainNode = null; sourceNode = null; }
+  audioUnlocked = false;
+  selectedSegments.clear();
+  
+  try {
+    const r = await fetch(`${BASE_PATH}/verify/api/get-file/${encodeURIComponent(jsonFile)}?annotator=${encodeURIComponent(currentAnnotator)}`);
+    if (r.status === 401) { window.location.href = `${BASE_PATH}/verify/login`; return; }
+    const d = await r.json();
+    if (d.error) { showErrorScreen(d.error); return; }
+    renderVerificationInterface(d);
+  } catch (err) { showErrorScreen('Connection issue: ' + err); }
 }
 
 function renderAksharSet(containerId) {
@@ -902,7 +1022,6 @@ function saveAllPendingEdits() {
   if (currentData) currentData.full_sequence = currentData.frames.map(f=>f.text||'').filter(t=>t).join(' ');
 }
 
-// Prevent newlines in contenteditable divs
 function preventNewlines(e) {
   if (e.key === 'Enter') {
     e.preventDefault();
@@ -911,7 +1030,6 @@ function preventNewlines(e) {
   return true;
 }
 
-// Also handle paste to remove newlines
 function handlePaste(e) {
   e.preventDefault();
   const text = (e.clipboardData || window.clipboardData).getData('text');
@@ -919,30 +1037,12 @@ function handlePaste(e) {
   document.execCommand('insertText', false, cleanedText);
 }
 
-async function loadNextFile() {
-  const contentDiv = document.getElementById('content');
-  contentDiv.innerHTML = '<div class="loading">Loading next file for verification...</div>';
-  if (audioContext) { await audioContext.close(); audioContext = null; gainNode = null; sourceNode = null; }
-  audioUnlocked = false;
-  selectedSegments.clear();
-  await loadVerificationProgress();
-  
-  try {
-    const r = await fetch(`${BASE_PATH}/verify/get-next-file`);
-    if (r.status === 401) { window.location.href = `${BASE_PATH}/verify/login`; return; }
-    const d = await r.json();
-    if (d.completed) { showCompletionScreen(); return; }
-    if (d.error) { showErrorScreen(d.error); return; }
-    renderVerificationInterface(d);
-  } catch (err) { showErrorScreen('Connection issue: ' + err); }
-}
-
 function showCompletionScreen() {
   document.getElementById('content').innerHTML = `
     <div class="completion-box">
-      <h2>All files verified</h2>
-      <p>All annotated files have been reviewed.</p>
-      <button class="btn-verify" onclick="location.reload()">Reload page</button>
+      <h2>All files verified for ${currentAnnotator}</h2>
+      <p>All annotated files for this annotator have been reviewed.</p>
+      <button class="btn-verify" onclick="location.reload()">Select Another Annotator</button>
     </div>`;
 }
 
@@ -950,7 +1050,7 @@ function showErrorScreen(message) {
   document.getElementById('content').innerHTML = `
     <div class="message error" style="margin-top:20px;">Error: ${message}</div>
     <div class="button-group" style="margin-top:20px;">
-      <button class="btn-verify" onclick="loadNextFile()">Try again</button>
+      <button class="btn-verify" onclick="location.reload()">Go Back</button>
     </div>`;
 }
 
@@ -972,6 +1072,7 @@ function renderVerificationInterface(data) {
       <div><strong>Word:</strong> ${data.word || '—'}</div>
       <div><strong>Sentence:</strong> ${data.sentence || ''}</div>
       <div style="margin-top:8px;font-size:0.8rem;color:#6E6E68;"><strong>Original Annotator:</strong> ${data.submitted_by || 'unknown'}</div>
+      <div style="margin-top:4px;font-size:0.75rem;color:#8E8E88;"><strong>Progress:</strong> ${annotatorFilesList.indexOf(data.json_file) + 1} of ${annotatorFilesList.length} files for this annotator</div>
     </div>
     <div class="akshar-set-section">
       <div class="akshar-title">Allowed Akshar Set (Drag & Drop)</div>
@@ -1027,7 +1128,6 @@ function renderVerificationInterface(data) {
     editDiv.innerText = frame.text || '';
     editDiv.setAttribute('data-frame-idx', idx);
     
-    // Prevent newlines
     editDiv.addEventListener('keydown', preventNewlines);
     editDiv.addEventListener('paste', handlePaste);
 
@@ -1035,7 +1135,6 @@ function renderVerificationInterface(data) {
 
     editDiv.addEventListener('input', e => {
       const newText = e.target.innerText || '';
-      // Remove any newlines that might have been inserted
       const cleanedText = newText.replace(/[\n\r]/g, '');
       if (cleanedText !== newText) {
         e.target.innerText = cleanedText;
@@ -1083,7 +1182,8 @@ async function submitVerification(action) {
     language: currentData.language,
     duration_ms: currentData.duration_ms || 0,
     submitted_by: currentData.submitted_by,
-    action: action
+    action: action,
+    annotator_filter: currentAnnotator
   };
   
   showMessage(action === 'verify' ? 'Verifying and saving...' : 'Rejecting file...', 'info');
@@ -1096,13 +1196,26 @@ async function submitVerification(action) {
     });
     if (r.status === 401) { window.location.href = `${BASE_PATH}/verify/login`; return; }
     const d = await r.json();
+    
     if (action === 'verify') {
-      showMessage(d.has_more ? 'File verified and saved! Loading next...' : 'All files verified!', 'success');
+      showMessage('File verified and saved!', 'success');
     } else {
-      showMessage(d.has_more ? 'File rejected and removed. Loading next...' : 'All done.', 'success');
+      showMessage('File rejected and removed. It will be re-annotated.', 'success');
     }
+    
+    // Remove current file from list and load next
+    const currentIndex = annotatorFilesList.indexOf(currentData.json_file);
+    if (currentIndex !== -1) {
+      annotatorFilesList.splice(currentIndex, 1);
+    }
+    
     await loadVerificationProgress();
-    setTimeout(() => loadNextFile(), 1200);
+    
+    if (annotatorFilesList.length > 0) {
+      setTimeout(() => loadSpecificFile(annotatorFilesList[0]), 1200);
+    } else {
+      showCompletionScreen();
+    }
   } catch (err) {
     showMessage('Error during submission', 'error');
   }
@@ -1122,8 +1235,7 @@ async function init() {
     verifierNameElem.innerText = '{{ verifier_name }}';
   }
   await loadVerificationProgress();
-  loadNextFile();
-  // Refresh progress every 10 seconds
+  await loadAnnotators();
   setInterval(loadVerificationProgress, 10000);
 }
 

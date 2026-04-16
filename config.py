@@ -1,6 +1,6 @@
 # config.py
 # Set this to False for local development, True for server deployment
-USE_BASE_PATH = True  # Change this manually: False for local, True for server
+USE_BASE_PATH = False  # Change this manually: False for local, True for server
 
 # Base path configuration
 BASE_PATH = "/mobile-annotator" if USE_BASE_PATH else ""
