@@ -43,12 +43,14 @@ FILE_ASSIGNMENTS_FILE = "file_assignments.json"
 USER_STATS_FILE = "user_stats.json"
 SKIPPED_FILES_FILE = "skipped_files.json"
 DAILY_STATS_FILE = "daily_stats.json"
+SELF_RECORDINGS_FOLDER = "self_recordings"  # New folder for self-recorded audio
 
 # Create all necessary folders
 os.makedirs(SUBMIT_FOLDER, exist_ok=True)
 os.makedirs(MOBILE_DATASET_FOLDER, exist_ok=True)
 os.makedirs(MOBILE_VERIFIED_FOLDER, exist_ok=True)
 os.makedirs(USER_SUBMISSIONS_FOLDER, exist_ok=True)
+os.makedirs(SELF_RECORDINGS_FOLDER, exist_ok=True)  # Create self-recordings folder
 
 from werkzeug.middleware.proxy_fix import ProxyFix
 
@@ -837,6 +839,14 @@ def index():
         return render_template("index.html", username=session['username'], base_path=BASE_PATH)
     return redirect(url_for_path("login"))
 
+@app.route("/self-record")
+@login_required
+def self_record_page():
+    """Self recording and annotation page for mobile"""
+    return render_template("self_record.html", 
+                         username=session.get('username'),
+                         base_path=BASE_PATH)
+
 @app.route("/login")
 def login_page():
     return render_template("login.html", base_path=BASE_PATH)
@@ -1123,6 +1133,179 @@ def serve_user_submission(username, filename):
     if not os.path.exists(file_path):
         return jsonify({"error": "File not found"}), 404
     return send_from_directory(os.path.dirname(file_path), filename)
+
+# ============= SELF-RECORD API ROUTES =============
+
+@app.route("/api/self-record/save", methods=["POST"])
+@login_required
+def self_record_save():
+    """Save self-recorded audio for annotation"""
+    try:
+        if 'audio' not in request.files:
+            return jsonify({"success": False, "error": "No audio file"}), 400
+        
+        audio_file = request.files['audio']
+        username = session.get('username')
+        
+        # Generate unique filename
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        original_filename = f"{username}_self_{timestamp}.webm"
+        
+        # Save original recording
+        user_recording_folder = os.path.join(SELF_RECORDINGS_FOLDER, username)
+        os.makedirs(user_recording_folder, exist_ok=True)
+        
+        original_path = os.path.join(user_recording_folder, original_filename)
+        audio_file.save(original_path)
+        
+        # Get duration from client
+        duration = float(request.form.get('duration', 0))
+        
+        return jsonify({
+            "success": True,
+            "filename": original_filename,
+            "duration": duration,
+            "message": "Recording saved"
+        })
+        
+    except Exception as e:
+        print(f"Error saving recording: {e}")
+        return jsonify({"success": False, "error": str(e)}), 500
+
+@app.route("/api/self-record/create-annotation", methods=["POST"])
+@login_required
+def self_record_create_annotation():
+    """Create annotation frames for self-recorded audio"""
+    try:
+        data = request.json
+        username = session.get('username')
+        filename = data.get('filename')
+        duration = data.get('duration', 0)
+        speed = data.get('speed', '2x')
+        
+        # Frame size based on speed
+        if speed == 'normal':
+            frame_size_ms = 54
+        elif speed == '2x':
+            frame_size_ms = 108
+        else:  # 4x
+            frame_size_ms = 216
+        
+        # Calculate number of frames
+        total_duration_ms = duration * 1000
+        num_frames = int(total_duration_ms / frame_size_ms) + 1
+        
+        # Create frames
+        frames = []
+        for i in range(num_frames):
+            start_ms = i * frame_size_ms
+            end_ms = min((i + 1) * frame_size_ms, total_duration_ms)
+            frames.append({
+                "index": i,
+                "start_ms": start_ms,
+                "end_ms": end_ms,
+                "text": ""
+            })
+        
+        # Create annotation data
+        annotation_data = {
+            "audio_file": filename,
+            "annotator": username,
+            "timestamp": datetime.now().isoformat(),
+            "window_ms": frame_size_ms,
+            "sentence": "",
+            "full_sequence": "",
+            "frames": frames,
+            "duration_ms": total_duration_ms,
+            "speed": speed,
+            "self_recorded": True
+        }
+        
+        # Save annotation JSON
+        user_recording_folder = os.path.join(SELF_RECORDINGS_FOLDER, username)
+        os.makedirs(user_recording_folder, exist_ok=True)
+        json_filename = filename.replace('.webm', '.json')
+        json_path = os.path.join(user_recording_folder, json_filename)
+        
+        with open(json_path, 'w', encoding='utf-8') as f:
+            json.dump(annotation_data, f, indent=2, ensure_ascii=False)
+        
+        return jsonify({
+            "success": True,
+            "frames": frames,
+            "window_ms": frame_size_ms,
+            "duration_ms": total_duration_ms,
+            "json_filename": json_filename
+        })
+        
+    except Exception as e:
+        print(f"Error creating annotation: {e}")
+        return jsonify({"success": False, "error": str(e)}), 500
+
+@app.route("/api/self-record/submit", methods=["POST"])
+@login_required
+def self_record_submit():
+    """Submit self-recorded annotation"""
+    try:
+        data = request.json
+        username = session.get('username')
+        json_filename = data.get('json_filename')
+        frames = data.get('frames', [])
+        sentence = data.get('sentence', '')
+        
+        # Load the annotation file
+        user_recording_folder = os.path.join(SELF_RECORDINGS_FOLDER, username)
+        json_path = os.path.join(user_recording_folder, json_filename)
+        
+        if not os.path.exists(json_path):
+            return jsonify({"success": False, "error": "Annotation file not found"}), 404
+        
+        with open(json_path, 'r', encoding='utf-8') as f:
+            annotation_data = json.load(f)
+        
+        # Update with submitted data
+        annotation_data['frames'] = frames
+        annotation_data['sentence'] = sentence
+        annotation_data['full_sequence'] = ' '.join([f['text'] for f in frames if f.get('text')])
+        annotation_data['submitted_at'] = datetime.now().isoformat()
+        annotation_data['submitted_by'] = username
+        annotation_data['verification_status'] = 'pending'
+        
+        # Convert webm to wav (copy with wav extension)
+        audio_filename = annotation_data['audio_file']
+        audio_path = os.path.join(user_recording_folder, audio_filename)
+        wav_filename = audio_filename.replace('.webm', '.wav')
+        wav_path = os.path.join(user_recording_folder, wav_filename)
+        
+        # For now, just copy the file (in production you'd convert using ffmpeg)
+        if os.path.exists(audio_path):
+            shutil.copy2(audio_path, wav_path)
+        
+        # Save to mobile dataset (this creates TextGrid too)
+        save_to_mobile_dataset(annotation_data, username, wav_path, json_filename)
+        
+        # Update user stats
+        duration_seconds = annotation_data.get('duration_ms', 0) / 1000.0
+        update_user_stats(username, json_filename, duration_seconds, increment=True)
+        update_daily_stats(username, json_filename, duration_seconds, increment=True)
+        
+        # Also add to completed files to track
+        completed_files.add(json_filename)
+        save_completed_files(completed_files)
+        
+        akshar_count = sum(1 for f in frames if f.get('text') and f['text'].strip())
+        
+        return jsonify({
+            "success": True,
+            "message": "Self-recorded annotation submitted successfully",
+            "akshar_count": akshar_count
+        })
+        
+    except Exception as e:
+        print(f"Error submitting self-record: {e}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({"success": False, "error": str(e)}), 500
 
 # ============= VERIFICATION ROUTES =============
 

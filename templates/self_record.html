@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+<title>Self Record & Annotate</title>
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  background: #F5F5F0;
+  padding: 16px 0px;
+  color: #1C1C1A;
+  line-height: 1.4;
+}
+
+.container {
+  max-width: 680px;
+  margin: 0 auto;
+  background: #FFFFFF;
+  border-radius: 28px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02), 0 2px 6px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+  padding: 20px 18px 28px;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 18px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.header-left h2 {
+  font-size: 1.65rem;
+  font-weight: 590;
+  letter-spacing: -0.02em;
+  color: #1C1C1A;
+  margin: 0;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #F0F0EB;
+  padding: 6px 14px;
+  border-radius: 40px;
+}
+
+.user-name {
+  font-weight: 550;
+  font-size: 0.85rem;
+  color: #2C6E49;
+}
+
+.back-btn {
+  background: none;
+  border: none;
+  color: #2C6E49;
+  font-size: 0.85rem;
+  cursor: pointer;
+  padding: 6px 12px;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.back-btn:hover { color: #215A3A; }
+
+.recording-card, .annotation-card {
+  background: #FEFEFC;
+  border: 1px solid #E5E5DE;
+  border-radius: 24px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.speed-selection {
+  margin-bottom: 24px;
+}
+
+.speed-label {
+  font-size: 0.85rem;
+  font-weight: 550;
+  color: #1C1C1A;
+  margin-bottom: 12px;
+  display: block;
+}
+
+.speed-options {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.speed-option {
+  flex: 1;
+  min-width: 80px;
+  padding: 12px;
+  border: 2px solid #E5E5DE;
+  border-radius: 16px;
+  background: white;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.speed-option.selected {
+  border-color: #2C6E49;
+  background: #E8F3EC;
+}
+
+.speed-name {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: #1C1C1A;
+}
+
+.speed-desc {
+  font-size: 0.7rem;
+  color: #8E8E88;
+  margin-top: 4px;
+}
+
+.timer-display {
+  text-align: center;
+  margin: 20px 0;
+}
+
+.timer-value {
+  font-size: 3rem;
+  font-weight: 600;
+  font-family: monospace;
+  background: #F8F8F4;
+  display: inline-block;
+  padding: 16px 32px;
+  border-radius: 60px;
+  letter-spacing: 2px;
+}
+
+.timer-value.recording {
+  color: #dc2626;
+  animation: pulse 1s infinite;
+}
+
+.timer-value.max-time {
+  color: #dc2626;
+  animation: pulse 0.5s infinite;
+  background: #FEE2E2;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+.max-time-warning {
+  text-align: center;
+  color: #dc2626;
+  font-size: 0.8rem;
+  margin-top: 8px;
+  font-weight: 500;
+  display: none;
+}
+
+.max-time-warning.show {
+  display: block;
+}
+
+.record-controls {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.record-btn {
+  padding: 14px 24px;
+  border-radius: 44px;
+  border: none;
+  font-size: 1rem;
+  font-weight: 550;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex: 1;
+}
+
+.record-btn-start {
+  background: #2C6E49;
+  color: white;
+}
+
+.record-btn-start:active { transform: scale(0.97); }
+.record-btn-stop {
+  background: #B13E3A;
+  color: white;
+}
+.record-btn-play {
+  background: #4A6FA5;
+  color: white;
+}
+.record-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.btn-annotate, .btn-discard {
+  flex: 1;
+  padding: 14px;
+  border-radius: 44px;
+  border: none;
+  font-size: 1rem;
+  font-weight: 550;
+  cursor: pointer;
+}
+
+.btn-annotate {
+  background: #2C6E49;
+  color: white;
+}
+
+.btn-discard {
+  background: #F0F0EB;
+  color: #6E6E68;
+}
+
+.preview-player {
+  background: #F8F8F4;
+  border-radius: 44px;
+  padding: 12px 16px;
+  margin-top: 16px;
+}
+
+.preview-player audio {
+  width: 100%;
+}
+
+.sentence-input {
+  width: 100%;
+  padding: 14px;
+  font-size: 1rem;
+  border: 2px solid #E5E5DE;
+  border-radius: 20px;
+  margin-bottom: 16px;
+  font-family: inherit;
+}
+
+.sentence-input:focus {
+  outline: none;
+  border-color: #2C6E49;
+}
+
+.frames-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-height: 500px;
+  overflow-y: auto;
+  margin: 16px 0;
+}
+
+.frame-card {
+  background: #FEFEFC;
+  border: 1px solid #E5E5DE;
+  border-radius: 16px;
+  padding: 12px;
+  cursor: pointer;
+}
+
+.frame-card.playing {
+  background: #D6EFE0;
+  border-color: #2C6E49;
+}
+
+.frame-time {
+  font-size: 0.7rem;
+  color: #8E8E88;
+  margin-bottom: 8px;
+  font-family: monospace;
+}
+
+.frame-input {
+  width: 100%;
+  padding: 10px;
+  font-size: 1rem;
+  border: 1px solid #E5E5DE;
+  border-radius: 12px;
+  font-family: monospace;
+}
+
+.frame-input:focus {
+  outline: none;
+  border-color: #2C6E49;
+}
+
+.akshar-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 16px 0;
+}
+
+.akshar-item {
+  background: #F0F0EB;
+  border: 1px solid #E5E5DE;
+  border-radius: 12px;
+  padding: 8px 12px;
+  font-size: 1rem;
+  font-weight: 500;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.1s ease;
+}
+
+.akshar-item:active {
+  transform: scale(0.95);
+  background: #2C6E49;
+  color: white;
+}
+
+.button-group {
+  display: flex;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.btn-submit, .btn-cancel {
+  flex: 1;
+  padding: 14px;
+  border-radius: 44px;
+  border: none;
+  font-size: 1rem;
+  font-weight: 550;
+  cursor: pointer;
+}
+
+.btn-submit {
+  background: #2C6E49;
+  color: white;
+}
+
+.btn-cancel {
+  background: #F0F0EB;
+  color: #6E6E68;
+}
+
+.message {
+  padding: 12px;
+  border-radius: 20px;
+  text-align: center;
+  margin-top: 12px;
+  font-size: 0.85rem;
+}
+
+.message.success { background: #E0F0E6; color: #1E5631; }
+.message.error { background: #FDE9E7; color: #B13E3A; }
+.message.info { background: #E9EDF2; color: #2B4F6C; }
+.message.warning { background: #FEF3C7; color: #92400E; }
+
+.hidden {
+  display: none;
+}
+
+@media (max-width: 560px) {
+  .container { padding: 16px; }
+  .timer-value { font-size: 2rem; padding: 12px 24px; }
+  .record-btn { padding: 12px 16px; }
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="header">
+    <div class="header-left">
+      <h2>Self Record</h2>
+    </div>
+    <div class="header-right">
+      <div class="user-info">
+        <span class="user-name" id="usernameDisplay">Loading...</span>
+        <a href="{{ url_for_path('') }}" class="back-btn">Back</a>
+      </div>
+    </div>
+  </div>
+
+  <div id="content">
+    <!-- Recording Section -->
+    <div id="recordingSection" class="recording-card">
+      <div class="speed-selection">
+        <div class="speed-label">Select Annotation Speed</div>
+        <div class="speed-options">
+          <div class="speed-option" data-speed="normal" data-factor="1">
+            <div class="speed-name">Normal</div>
+            <div class="speed-desc">54ms frames</div>
+          </div>
+          <div class="speed-option selected" data-speed="2x" data-factor="2">
+            <div class="speed-name">2x Slow</div>
+            <div class="speed-desc">108ms frames</div>
+          </div>
+          <div class="speed-option" data-speed="4x" data-factor="4">
+            <div class="speed-name">4x Slow</div>
+            <div class="speed-desc">216ms frames</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="timer-display">
+        <div class="timer-value" id="timerValue">00:00.00</div>
+        <div class="max-time-warning" id="maxTimeWarning">
+          ⚠️ Maximum recording time is 2 seconds
+        </div>
+      </div>
+
+      <div class="record-controls">
+        <button class="record-btn record-btn-start" id="startBtn">Start</button>
+        <button class="record-btn record-btn-stop" id="stopBtn" disabled>Stop</button>
+        <button class="record-btn record-btn-play" id="playBtn" disabled>Play</button>
+      </div>
+
+      <div id="previewContainer" class="hidden">
+        <div class="preview-player">
+          <audio id="previewAudio" controls></audio>
+        </div>
+      </div>
+
+      <div class="action-buttons">
+        <button class="btn-discard" id="discardBtn" disabled>Discard</button>
+        <button class="btn-annotate" id="annotateBtn" disabled>Annotate</button>
+      </div>
+    </div>
+
+    <!-- Annotation Section (hidden initially) -->
+    <div id="annotationSection" class="annotation-card hidden">
+      <h3 style="margin-bottom: 16px;">Annotate Frames</h3>
+      
+      <input type="text" id="sentenceInput" class="sentence-input" placeholder="Enter the sentence (optional)">
+      
+      <div class="akshar-grid" id="aksharGrid"></div>
+      
+      <div class="frames-grid" id="framesGrid"></div>
+      
+      <div class="button-group">
+        <button class="btn-submit" id="submitBtn">Submit</button>
+        <button class="btn-cancel" id="cancelBtn">Cancel</button>
+      </div>
+    </div>
+  </div>
+  
+  <div id="messageArea"></div>
+</div>
+
+<script>
+const BASE_PATH = "{{ base_path }}";
+const MAX_RECORDING_SECONDS = 2;
+const AKSHAR_SET = [
+  "अ", "आ", "इ", "उ", "ए", "ओ",
+  "क", "ख", "ग", "घ", "च", "छ", "ज", "झ",
+  "ट", "ठ", "ड", "ढ", "त", "थ", "द", "ध",
+  "प", "फ", "ब", "भ",
+  "न", "म",
+  "य", "र", "ल", "व",
+  "स", "ह", "०"
+];
+
+let mediaRecorder = null;
+let audioChunks = [];
+let isRecording = false;
+let startTime = null;
+let timerInterval = null;
+let recordedBlob = null;
+let recordedUrl = null;
+let currentSpeed = '2x';
+let currentFactor = 2;
+let currentFrames = [];
+let currentJsonFilename = null;
+let currentDuration = 0;
+let currentUsername = '';
+let autoStopTimer = null;
+
+// Initialize
+async function init() {
+  await checkAuth();
+  setupEventListeners();
+  renderAksharSet();
+}
+
+async function checkAuth() {
+  try {
+    const r = await fetch(`${BASE_PATH}/api/current-user`);
+    const d = await r.json();
+    if (!d.logged_in) {
+      window.location.href = `${BASE_PATH}/login`;
+      return false;
+    }
+    currentUsername = d.username;
+    document.getElementById('usernameDisplay').innerText = d.username;
+    return true;
+  } catch {
+    window.location.href = `${BASE_PATH}/login`;
+    return false;
+  }
+}
+
+function setupEventListeners() {
+  // Speed selection
+  document.querySelectorAll('.speed-option').forEach(opt => {
+    opt.addEventListener('click', () => {
+      document.querySelectorAll('.speed-option').forEach(o => o.classList.remove('selected'));
+      opt.classList.add('selected');
+      currentSpeed = opt.dataset.speed;
+      currentFactor = parseInt(opt.dataset.factor);
+    });
+  });
+  
+  document.getElementById('startBtn').addEventListener('click', startRecording);
+  document.getElementById('stopBtn').addEventListener('click', stopRecording);
+  document.getElementById('playBtn').addEventListener('click', playPreview);
+  document.getElementById('discardBtn').addEventListener('click', discardRecording);
+  document.getElementById('annotateBtn').addEventListener('click', startAnnotation);
+  document.getElementById('submitBtn').addEventListener('click', submitAnnotation);
+  document.getElementById('cancelBtn').addEventListener('click', cancelAnnotation);
+}
+
+function formatTime(seconds) {
+  const mins = Math.floor(seconds / 60);
+  const secs = (seconds % 60).toFixed(2);
+  return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(5, '0')}`;
+}
+
+function updateMaxTimeWarning(elapsed) {
+  const warningDiv = document.getElementById('maxTimeWarning');
+  const timerDiv = document.getElementById('timerValue');
+  
+  if (elapsed >= MAX_RECORDING_SECONDS - 0.5 && elapsed < MAX_RECORDING_SECONDS) {
+    warningDiv.classList.add('show');
+    timerDiv.classList.add('max-time');
+    showMessage(`Maximum ${MAX_RECORDING_SECONDS} seconds limit!`, 'warning');
+  } else if (elapsed >= MAX_RECORDING_SECONDS) {
+    warningDiv.classList.add('show');
+    timerDiv.classList.add('max-time');
+    // Auto-stop when max time reached
+    if (isRecording) {
+      stopRecording();
+      showMessage(`Recording stopped at ${MAX_RECORDING_SECONDS} seconds limit`, 'warning');
+    }
+  } else {
+    warningDiv.classList.remove('show');
+    timerDiv.classList.remove('max-time');
+  }
+}
+
+async function startRecording() {
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    audioChunks = [];
+    mediaRecorder = new MediaRecorder(stream);
+    
+    mediaRecorder.ondataavailable = (event) => {
+      if (event.data.size > 0) audioChunks.push(event.data);
+    };
+    
+    mediaRecorder.onstop = () => {
+      recordedBlob = new Blob(audioChunks, { type: 'audio/webm' });
+      recordedUrl = URL.createObjectURL(recordedBlob);
+      const previewAudio = document.getElementById('previewAudio');
+      previewAudio.src = recordedUrl;
+      document.getElementById('previewContainer').classList.remove('hidden');
+      document.getElementById('playBtn').disabled = false;
+      document.getElementById('discardBtn').disabled = false;
+      document.getElementById('annotateBtn').disabled = false;
+      stream.getTracks().forEach(track => track.stop());
+      
+      // Calculate actual duration from blob (approximate)
+      if (audioChunks.length > 0) {
+        const blobSize = audioChunks.reduce((size, chunk) => size + chunk.size, 0);
+        // Approximate: webm at ~100KB per second
+        currentDuration = Math.min(blobSize / 100000, MAX_RECORDING_SECONDS);
+      }
+      
+      showMessage('Recording saved!', 'success');
+    };
+    
+    mediaRecorder.start(100);
+    isRecording = true;
+    startTime = Date.now();
+    
+    document.getElementById('startBtn').disabled = true;
+    document.getElementById('stopBtn').disabled = false;
+    document.getElementById('playBtn').disabled = true;
+    document.getElementById('discardBtn').disabled = true;
+    document.getElementById('annotateBtn').disabled = true;
+    
+    document.getElementById('timerValue').classList.add('recording');
+    
+    // Clear any existing auto-stop timer
+    if (autoStopTimer) clearTimeout(autoStopTimer);
+    
+    // Set auto-stop after MAX_RECORDING_SECONDS
+    autoStopTimer = setTimeout(() => {
+      if (isRecording) {
+        stopRecording();
+        showMessage(`Auto-stopped at ${MAX_RECORDING_SECONDS} second limit`, 'warning');
+      }
+    }, MAX_RECORDING_SECONDS * 1000);
+    
+    timerInterval = setInterval(() => {
+      if (startTime) {
+        const elapsed = (Date.now() - startTime) / 1000;
+        if (elapsed <= MAX_RECORDING_SECONDS) {
+          document.getElementById('timerValue').textContent = formatTime(elapsed);
+          updateMaxTimeWarning(elapsed);
+        } else {
+          document.getElementById('timerValue').textContent = formatTime(MAX_RECORDING_SECONDS);
+          updateMaxTimeWarning(MAX_RECORDING_SECONDS);
+        }
+      }
+    }, 10);
+    
+    showMessage(`Recording... Maximum ${MAX_RECORDING_SECONDS} seconds`, 'info');
+  } catch (err) {
+    showMessage('Could not access microphone. Please check permissions.', 'error');
+  }
+}
+
+function stopRecording() {
+  if (mediaRecorder && isRecording) {
+    mediaRecorder.stop();
+    isRecording = false;
+    if (autoStopTimer) {
+      clearTimeout(autoStopTimer);
+      autoStopTimer = null;
+    }
+    clearInterval(timerInterval);
+    document.getElementById('timerValue').classList.remove('recording');
+    document.getElementById('startBtn').disabled = false;
+    document.getElementById('stopBtn').disabled = true;
+  }
+}
+
+function playPreview() {
+  const audio = document.getElementById('previewAudio');
+  if (audio.src) audio.play();
+}
+
+function discardRecording() {
+  if (recordedUrl) URL.revokeObjectURL(recordedUrl);
+  recordedBlob = null;
+  recordedUrl = null;
+  document.getElementById('previewAudio').src = '';
+  document.getElementById('previewContainer').classList.add('hidden');
+  document.getElementById('timerValue').textContent = '00:00.00';
+  document.getElementById('playBtn').disabled = true;
+  document.getElementById('discardBtn').disabled = true;
+  document.getElementById('annotateBtn').disabled = true;
+  showMessage('Recording discarded', 'info');
+}
+
+async function startAnnotation() {
+  if (!recordedBlob) {
+    showMessage('No recording to annotate', 'error');
+    return;
+  }
+  
+  showMessage('Processing audio...', 'info');
+  document.getElementById('annotateBtn').disabled = true;
+  
+  try {
+    // Get duration from timer display (capped at MAX_RECORDING_SECONDS)
+    const timerText = document.getElementById('timerValue').textContent;
+    const parts = timerText.split(':');
+    let recordedDuration = parseInt(parts[0]) * 60 + parseFloat(parts[1]);
+    recordedDuration = Math.min(recordedDuration, MAX_RECORDING_SECONDS);
+    currentDuration = recordedDuration;
+    
+    // Save recording
+    const formData = new FormData();
+    formData.append('audio', recordedBlob, `recording_${Date.now()}.webm`);
+    formData.append('duration', currentDuration);
+    
+    const saveResponse = await fetch(`${BASE_PATH}/api/self-record/save`, {
+      method: 'POST',
+      body: formData
+    });
+    
+    const saveData = await saveResponse.json();
+    if (!saveData.success) throw new Error(saveData.error);
+    
+    // Create annotation frames
+    const createResponse = await fetch(`${BASE_PATH}/api/self-record/create-annotation`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        filename: saveData.filename,
+        duration: currentDuration,
+        speed: currentSpeed
+      })
+    });
+    
+    const createData = await createResponse.json();
+    if (!createData.success) throw new Error(createData.error);
+    
+    currentFrames = createData.frames;
+    currentJsonFilename = createData.json_filename;
+    
+    // Show annotation UI
+    renderAnnotationUI();
+    
+    document.getElementById('recordingSection').classList.add('hidden');
+    document.getElementById('annotationSection').classList.remove('hidden');
+    
+  } catch (err) {
+    showMessage('Error preparing annotation: ' + err.message, 'error');
+    document.getElementById('annotateBtn').disabled = false;
+  }
+}
+
+function renderAksharSet() {
+  const container = document.getElementById('aksharGrid');
+  if (!container) return;
+  container.innerHTML = '';
+  AKSHAR_SET.forEach(akshar => {
+    const span = document.createElement('span');
+    span.className = 'akshar-item';
+    span.textContent = akshar;
+    span.onclick = () => insertAkshar(akshar);
+    container.appendChild(span);
+  });
+}
+
+let activeFrameIndex = null;
+
+function insertAkshar(akshar) {
+  if (activeFrameIndex !== null && currentFrames[activeFrameIndex]) {
+    const input = document.querySelector(`.frame-input[data-index="${activeFrameIndex}"]`);
+    if (input) {
+      let newText = (currentFrames[activeFrameIndex].text || '') + akshar;
+      // Limit to maximum 2 akshars per frame
+      const aksharCount = newText.split('').filter(c => AKSHAR_SET.includes(c)).length;
+      if (aksharCount > 2) {
+        showMessage('Maximum 2 akshars per frame!', 'warning');
+        return;
+      }
+      input.value = newText;
+      currentFrames[activeFrameIndex].text = newText;
+    }
+  }
+}
+
+function renderAnnotationUI() {
+  const framesGrid = document.getElementById('framesGrid');
+  framesGrid.innerHTML = '';
+  
+  currentFrames.forEach((frame, idx) => {
+    const card = document.createElement('div');
+    card.className = 'frame-card';
+    card.setAttribute('data-index', idx);
+    
+    const timeDiv = document.createElement('div');
+    timeDiv.className = 'frame-time';
+    timeDiv.textContent = `${frame.start_ms}–${frame.end_ms} ms`;
+    
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.className = 'frame-input';
+    input.placeholder = 'Enter akshars (max 2)...';
+    input.value = frame.text || '';
+    input.setAttribute('data-index', idx);
+    input.setAttribute('maxlength', '4'); // Rough limit for 2 akshars
+    
+    input.addEventListener('focus', () => { activeFrameIndex = idx; });
+    input.addEventListener('input', (e) => {
+      let value = e.target.value;
+      // Count akshars (Unicode Devanagari characters)
+      const aksharCount = value.split('').filter(c => /[\u0900-\u097F]/.test(c)).length;
+      if (aksharCount > 2) {
+        // Keep only first 2 akshars
+        let kept = '';
+        let count = 0;
+        for (let char of value) {
+          if (/[\u0900-\u097F]/.test(char)) {
+            if (count < 2) {
+              kept += char;
+              count++;
+            }
+          } else {
+            kept += char;
+          }
+        }
+        e.target.value = kept;
+        showMessage('Maximum 2 akshars per frame!', 'warning');
+      }
+      currentFrames[idx].text = e.target.value;
+    });
+    input.addEventListener('click', (e) => {
+      e.stopPropagation();
+      playSegment(idx);
+    });
+    
+    card.appendChild(timeDiv);
+    card.appendChild(input);
+    framesGrid.appendChild(card);
+  });
+  
+  // Add hint about max akshars
+  const hint = document.createElement('div');
+  hint.className = 'message info';
+  hint.style.marginTop = '12px';
+  hint.style.fontSize = '0.75rem';
+  hint.style.padding = '8px';
+  hint.innerHTML = '💡 Tip: Maximum 2 akshars per frame. Tap on a frame to play that segment.';
+  framesGrid.appendChild(hint);
+}
+
+function playSegment(frameIndex) {
+  // For self-recorded, we need to play from the original recording
+  // Since we don't have server-side slowed audio yet, just show a message
+  showMessage('Tap the play button below the recording to preview', 'info');
+}
+
+async function submitAnnotation() {
+  const sentence = document.getElementById('sentenceInput').value;
+  
+  // Validate frames - check for empty or too many akshars
+  const emptyFrames = currentFrames.filter(f => !f.text || f.text.trim() === '');
+  const invalidFrames = currentFrames.filter(f => {
+    if (!f.text) return false;
+    const aksharCount = f.text.split('').filter(c => /[\u0900-\u097F]/.test(c)).length;
+    return aksharCount > 2;
+  });
+  
+  if (invalidFrames.length > 0) {
+    showMessage(`${invalidFrames.length} frame(s) have more than 2 akshars. Please fix them.`, 'error');
+    return;
+  }
+  
+  if (emptyFrames.length > 0) {
+    if (!confirm(`${emptyFrames.length} frame(s) are empty. Submit anyway?`)) return;
+  }
+  
+  showMessage('Submitting...', 'info');
+  document.getElementById('submitBtn').disabled = true;
+  
+  try {
+    const response = await fetch(`${BASE_PATH}/api/self-record/submit`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        json_filename: currentJsonFilename,
+        frames: currentFrames,
+        sentence: sentence
+      })
+    });
+    
+    const data = await response.json();
+    if (data.success) {
+      showMessage(`Submitted! Added ${data.akshar_count} akshars`, 'success');
+      setTimeout(() => {
+        window.location.href = `${BASE_PATH}/`;
+      }, 2000);
+    } else {
+      throw new Error(data.error);
+    }
+  } catch (err) {
+    showMessage('Error submitting: ' + err.message, 'error');
+    document.getElementById('submitBtn').disabled = false;
+  }
+}
+
+function cancelAnnotation() {
+  if (confirm('Cancel annotation? Your progress will be lost.')) {
+    window.location.reload();
+  }
+}
+
+function showMessage(text, type) {
+  const msgDiv = document.getElementById('messageArea');
+  msgDiv.innerHTML = `<div class="message ${type}">${text}</div>`;
+  setTimeout(() => {
+    if (msgDiv.firstChild && msgDiv.firstChild.innerText === text) {
+      msgDiv.innerHTML = '';
+    }
+  }, 3000);
+}
+
+// Start the app
+init();
+</script>
+</body>
+</html>

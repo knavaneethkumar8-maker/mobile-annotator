@@ -52,6 +52,7 @@ body {
   display: flex;
   align-items: center;
   gap: 12px;
+  flex-wrap: wrap;
 }
 
 .user-info {
@@ -95,9 +96,27 @@ body {
   width: auto;
   border-radius: 40px;
   text-decoration: none;
+  display: inline-block;
 }
 
 .stats-btn:hover { background: #215A3A; }
+
+.self-record-btn {
+  background: #4A6FA5;
+  border: none;
+  color: white;
+  font-size: 0.75rem;
+  cursor: pointer;
+  padding: 6px 14px;
+  font-weight: 500;
+  margin: 0;
+  width: auto;
+  border-radius: 40px;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.self-record-btn:hover { background: #3A5A8A; }
 
 .remaining-badge {
   background: #E8E8E3;
@@ -526,6 +545,8 @@ button {
   .stat-card-value { font-size: 1rem; }
   .volume-control { gap: 8px; padding: 6px 10px; }
   .volume-value { min-width: 48px; font-size: 0.75rem; }
+  .header-right { gap: 8px; }
+  .stats-btn, .self-record-btn { padding: 6px 10px; font-size: 0.7rem; }
 }
 
 .empty-hint {
@@ -545,8 +566,9 @@ button {
       <h2>Annotation Tool</h2>
     </div>
     <div class="header-right">
-      <button class="stats-btn" onclick="window.location.href='{{ url_for_path("stats") }}'">Stats</button>
-      <button class="stats-btn" onclick="window.location.href='{{ url_for_path("verify") }}'">Verify</button>
+      <button class="self-record-btn" onclick="window.location.href='{{ url_for_path('self-record') }}'">🎙️ Self Record</button>
+      <button class="stats-btn" onclick="window.location.href='{{ url_for_path('stats') }}'">Stats</button>
+      <button class="stats-btn" onclick="window.location.href='{{ url_for_path('verify') }}'">Verify</button>
       <div class="user-info">
         <span class="user-name" id="usernameDisplay">Loading...</span>
         <button class="logout-btn" onclick="logout()">Sign out</button>
