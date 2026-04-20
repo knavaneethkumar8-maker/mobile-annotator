@@ -63,7 +63,7 @@ if BASE_PATH:
 # ==============================
 
 # Base folder for mobile training data
-MOBILE_TRAINING_DATA_BASE_FOLDER = "/mnt/data_disk_2/UI_TRAINING_DATA/MOBILE_DATA/normal_data"
+MOBILE_TRAINING_DATA_BASE_FOLDER = "mnt/data_disk_2/UI_TRAINING_DATA/MOBILE_DATA/normal_data"
 
 # Create the base directory
 os.makedirs(MOBILE_TRAINING_DATA_BASE_FOLDER, exist_ok=True)
@@ -1284,6 +1284,31 @@ def self_record_submit():
         # Save to mobile dataset (this creates TextGrid too)
         save_to_mobile_dataset(annotation_data, username, wav_path, json_filename)
         
+        # ALSO save TextGrid to self_recordings folder
+        base_name = json_filename.replace('.json', '')
+        textgrid_filename = f"{base_name}.TextGrid"
+        
+        # Generate TextGrid content
+        duration = annotation_data.get('duration_ms', 0) / 1000.0
+        if duration == 0 and frames:
+            duration = frames[-1].get('end_ms', 0) / 1000.0
+        full_sequence = annotation_data.get('full_sequence', '')
+        
+        textgrid_content = create_enhanced_textgrid(
+            frames=frames,
+            duration=duration,
+            sentence=sentence,
+            annotator=username,
+            full_sequence=full_sequence
+        )
+        
+        # Save TextGrid to self_recordings folder
+        textgrid_path = os.path.join(user_recording_folder, textgrid_filename)
+        with open(textgrid_path, 'w', encoding='utf-8') as f:
+            f.write(textgrid_content)
+        
+        print(f"TextGrid saved to: {textgrid_path}")
+        
         # Update user stats
         duration_seconds = annotation_data.get('duration_ms', 0) / 1000.0
         update_user_stats(username, json_filename, duration_seconds, increment=True)
@@ -1298,7 +1323,8 @@ def self_record_submit():
         return jsonify({
             "success": True,
             "message": "Self-recorded annotation submitted successfully",
-            "akshar_count": akshar_count
+            "akshar_count": akshar_count,
+            "textgrid_path": textgrid_path
         })
         
     except Exception as e:
