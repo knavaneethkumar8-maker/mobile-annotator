@@ -63,7 +63,7 @@ if BASE_PATH:
 # ==============================
 
 # Base folder for mobile training data
-MOBILE_TRAINING_DATA_BASE_FOLDER = "mnt/data_disk_2/UI_TRAINING_DATA/MOBILE_DATA/normal_data"
+MOBILE_TRAINING_DATA_BASE_FOLDER = "/mnt/data_disk_2/UI_TRAINING_DATA/MOBILE_DATA/normal_data"
 
 # Create the base directory
 os.makedirs(MOBILE_TRAINING_DATA_BASE_FOLDER, exist_ok=True)
