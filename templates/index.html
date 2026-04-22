@@ -118,6 +118,23 @@ body {
 
 .self-record-btn:hover { background: #3A5A8A; }
 
+.live-stream-btn {
+  background: #B13E3A;
+  border: none;
+  color: white;
+  font-size: 0.75rem;
+  cursor: pointer;
+  padding: 6px 14px;
+  font-weight: 500;
+  margin: 0;
+  width: auto;
+  border-radius: 40px;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.live-stream-btn:hover { background: #8B2C2A; }
+
 .remaining-badge {
   background: #E8E8E3;
   padding: 6px 14px;
@@ -546,7 +563,7 @@ button {
   .volume-control { gap: 8px; padding: 6px 10px; }
   .volume-value { min-width: 48px; font-size: 0.75rem; }
   .header-right { gap: 8px; }
-  .stats-btn, .self-record-btn { padding: 6px 10px; font-size: 0.7rem; }
+  .stats-btn, .self-record-btn, .live-stream-btn { padding: 6px 10px; font-size: 0.7rem; }
 }
 
 .empty-hint {
@@ -567,6 +584,7 @@ button {
     </div>
     <div class="header-right">
       <button class="self-record-btn" onclick="window.location.href='{{ url_for_path('self-record') }}'">🎙️ Self Record</button>
+      <button class="live-stream-btn" onclick="window.location.href='{{ url_for_path('live-stream') }}'">📺 Live Stream</button>
       <button class="stats-btn" onclick="window.location.href='{{ url_for_path('stats') }}'">Stats</button>
       <button class="stats-btn" onclick="window.location.href='{{ url_for_path('verify') }}'">Verify</button>
       <div class="user-info">

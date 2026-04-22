@@ -63,7 +63,7 @@ if BASE_PATH:
 # ==============================
 
 # Base folder for mobile training data
-MOBILE_TRAINING_DATA_BASE_FOLDER = "/mnt/data_disk_2/UI_TRAINING_DATA/MOBILE_DATA/normal_data"
+MOBILE_TRAINING_DATA_BASE_FOLDER = "mnt/data_disk_2/UI_TRAINING_DATA/MOBILE_DATA/normal_data"
 
 # Create the base directory
 os.makedirs(MOBILE_TRAINING_DATA_BASE_FOLDER, exist_ok=True)
@@ -847,6 +847,14 @@ def self_record_page():
                          username=session.get('username'),
                          base_path=BASE_PATH)
 
+@app.route("/live-stream")
+@login_required
+def live_stream_page():
+    """Live streaming annotation page - real-time news clips"""
+    return render_template("live_stream.html", 
+                         username=session.get('username'),
+                         base_path=BASE_PATH)
+
 @app.route("/login")
 def login_page():
     return render_template("login.html", base_path=BASE_PATH)
@@ -1329,6 +1337,130 @@ def self_record_submit():
         
     except Exception as e:
         print(f"Error submitting self-record: {e}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({"success": False, "error": str(e)}), 500
+
+# ============= LIVE STREAMING API ROUTES =============
+
+# Sample news stream URLs (replace with actual M3U8 URLs)
+NEWS_STREAMS = {
+    'hi': 'https://sample-hindi-news-stream.m3u8',
+    'te': 'https://sample-telugu-news-stream.m3u8',
+    'ta': 'https://sample-tamil-news-stream.m3u8',
+    'bn': 'https://sample-bengali-news-stream.m3u8',
+    'gu': 'https://sample-gujarati-news-stream.m3u8',
+    'mr': 'https://sample-marathi-news-stream.m3u8',
+}
+
+@app.route("/api/live-stream/fetch")
+@login_required
+def live_stream_fetch():
+    """Fetch a live news clip for the selected language"""
+    try:
+        lang = request.args.get('lang', 'hi')
+        
+        # For demo - create a sample audio clip
+        # In production, you would:
+        # 1. Get M3U8 URL for the selected language
+        # 2. Use ffmpeg to extract a 5-7 second clip
+        # 3. Optionally use Whisper for transcription
+        
+        # Demo response
+        return jsonify({
+            "success": True,
+            "language": lang,
+            "duration": 5.0,
+            "audio_url": None,  # In production, return URL to generated clip
+            "transcript": f"Sample news clip in {lang} language. In production, this would be real-time transcription."
+        })
+        
+    except Exception as e:
+        print(f"Error fetching live stream: {e}")
+        return jsonify({"success": False, "error": str(e)}), 500
+
+@app.route("/api/live-stream/submit", methods=["POST"])
+@login_required
+def live_stream_submit():
+    """Submit annotation for a live stream clip"""
+    try:
+        username = session.get('username')
+        
+        if 'audio' not in request.files:
+            return jsonify({"success": False, "error": "No audio file"}), 400
+        
+        audio_file = request.files['audio']
+        language = request.form.get('language', 'unknown')
+        frames_json = request.form.get('frames', '[]')
+        duration = float(request.form.get('duration', 0))
+        
+        frames = json.loads(frames_json)
+        
+        # Create unique filename
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        filename = f"live_{language}_{username}_{timestamp}"
+        
+        # Save audio to live recordings folder
+        live_folder = os.path.join(SELF_RECORDINGS_FOLDER, "live_streams", username)
+        os.makedirs(live_folder, exist_ok=True)
+        
+        wav_filename = f"{filename}.wav"
+        wav_path = os.path.join(live_folder, wav_filename)
+        
+        # Save audio file
+        audio_file.save(wav_path)
+        
+        # Save annotation JSON
+        annotation_data = {
+            "audio_file": wav_filename,
+            "annotator": username,
+            "timestamp": datetime.now().isoformat(),
+            "language": language,
+            "duration_ms": duration * 1000,
+            "frames": frames,
+            "type": "live_stream",
+            "window_ms": 108
+        }
+        
+        json_filename = f"{filename}.json"
+        json_path = os.path.join(live_folder, json_filename)
+        with open(json_path, 'w', encoding='utf-8') as f:
+            json.dump(annotation_data, f, indent=2, ensure_ascii=False)
+        
+        # Generate TextGrid
+        textgrid_content = create_enhanced_textgrid(
+            frames=frames,
+            duration=duration,
+            sentence="",
+            annotator=username,
+            full_sequence=""
+        )
+        
+        textgrid_path = os.path.join(live_folder, f"{filename}.TextGrid")
+        with open(textgrid_path, 'w', encoding='utf-8') as f:
+            f.write(textgrid_content)
+        
+        # Also save to mobile dataset
+        save_to_mobile_dataset(annotation_data, username, wav_path, json_filename)
+        
+        # Update stats
+        akshar_count = sum(1 for f in frames if f.get('text') and f['text'].strip())
+        update_user_stats(username, json_filename, duration, increment=True)
+        update_daily_stats(username, json_filename, duration, increment=True)
+        
+        # Add to completed files
+        completed_files.add(json_filename)
+        save_completed_files(completed_files)
+        
+        return jsonify({
+            "success": True,
+            "message": "Live stream annotation submitted successfully",
+            "akshar_count": akshar_count,
+            "filename": filename
+        })
+        
+    except Exception as e:
+        print(f"Error submitting live stream annotation: {e}")
         import traceback
         traceback.print_exc()
         return jsonify({"success": False, "error": str(e)}), 500
