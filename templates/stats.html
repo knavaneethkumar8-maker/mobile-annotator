@@ -26,6 +26,15 @@
 
     .dashboard-header {
       margin-bottom: 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .header-left {
+      flex: 1;
     }
 
     .dashboard-header h1 {
@@ -45,6 +54,38 @@
       border-left: 3px solid #2C6E49;
       padding-left: 10px;
       margin-top: 4px;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .home-btn {
+      background: #2C6E49;
+      color: white;
+      border: none;
+      padding: 8px 18px;
+      border-radius: 40px;
+      font-size: 0.85rem;
+      font-weight: 550;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+    }
+
+    .home-btn:active {
+      transform: scale(0.96);
+      background: #1E5631;
+    }
+
+    .home-btn svg {
+      width: 18px;
+      height: 18px;
     }
 
     .kpi-grid {
@@ -125,6 +166,12 @@
       color: #2C6E49;
       cursor: pointer;
       margin-left: auto;
+      transition: all 0.2s ease;
+    }
+
+    .refresh-btn:active {
+      transform: scale(0.95);
+      background: #DCDCD4;
     }
 
     .annotator-list {
@@ -213,14 +260,24 @@
       body { padding: 12px 10px 24px; }
       .kpi-value { font-size: 1.5rem; }
       .annotator-row { padding: 14px; }
+      .dashboard-header { flex-direction: column; }
+      .header-actions { width: 100%; }
+      .home-btn { width: 100%; justify-content: center; }
     }
   </style>
 </head>
 <body>
 <div class="stats-container">
   <div class="dashboard-header">
-    <h1>📊 Annotation Dashboard</h1>
-    <div class="dashboard-sub">Real-time annotator performance</div>
+    <div class="header-left">
+      <h1>📊 Annotation Dashboard</h1>
+      <div class="dashboard-sub">Real-time annotator performance</div>
+    </div>
+    <div class="header-actions">
+      <a href="{{ base_path }}/" class="home-btn">
+        Back to Home
+      </a>
+    </div>
   </div>
 
   <div class="kpi-grid">

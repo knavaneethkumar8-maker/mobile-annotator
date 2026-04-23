@@ -9,6 +9,12 @@ import glob
 from functools import wraps
 from config import BASE_PATH, DEBUG, HOST, PORT
 
+import subprocess
+import tempfile
+import base64
+import time
+import requests
+
 app = Flask(__name__)
 app.secret_key = 'your-secret-key-change-this-in-production'
 
@@ -1341,51 +1347,165 @@ def self_record_submit():
         traceback.print_exc()
         return jsonify({"success": False, "error": str(e)}), 500
 
+
+
+
+
+
+# ============= LIVE STREAMING API ROUTES =============
+
 # ============= LIVE STREAMING API ROUTES =============
 
 # Real Indian News Channel M3U8 Streams for audio
-# Updated working streams for 10-second clips
+# Multiple stream options for each language with working sources
 NEWS_STREAMS = {
-    'hi': 'https://ndtvindiaelemarchana.akamaized.net/hls/live/2003679/ndtvindia/master.m3u8',  # NDTV India (Hindi)
-    'te': 'https://indiatodaylivereplay.akamaized.net/hls/live/2041802/india_today_live_mpeg/master.m3u8',  # India Today
-    'ta': 'https://ndtv24x7elemarchana.akamaized.net/hls/live/2003678/ndtv24x7/ndtv24x7master.m3u8',  # NDTV 24x7
-    'bn': 'https://mumt01.tangotv.in/NEWSLIVEBANGLA/index.m3u8',  # Bangla News
-    'gu': 'https://ndtvindiaelemarchana.akamaized.net/hls/live/2003679/ndtvindia/master.m3u8',  # NDTV India
-    'mr': 'https://ndtvindiaelemarchana.akamaized.net/hls/live/2003679/ndtvindia/master.m3u8',  # NDTV India
+    'hi': [
+        'https://ndtvindiaelemarchana.akamaized.net/hls/live/2003679/ndtvindia/master.m3u8',
+        'https://d2eautcwwe3jnm.cloudfront.net/hotstar/star_bharat_hindi_hd/v2/index.m3u8',
+    ],
+    'te': [
+        'https://5a836e436eccd.streamlock.net/ashok/telugunewslive/telugunewslive/playlist.m3u8',
+        'https://bighra.crik.live/ETV/telugu1/index.m3u8',
+        'https://live.revdigi.com/telugu1/index.m3u8'
+    ],
+    'ta': [
+        'https://ndtv24x7elemarchana.akamaized.net/hls/live/2003678/ndtv24x7/ndtv24x7master.m3u8',
+        'https://live.revdigi.com/tamil1/index.m3u8'
+    ],
+    'bn': [
+        'https://live.revdigi.com/bangla2/index.m3u8',
+        'https://mumt01.tangotv.in/NEWSLIVEBANGLA/index.m3u8'
+    ],
+    'gu': [
+        'https://ndtvindiaelemarchana.akamaized.net/hls/live/2003679/ndtvindia/master.m3u8',
+    ],
+    'mr': [
+        'https://ndtvindiaelemarchana.akamaized.net/hls/live/2003679/ndtvindia/master.m3u8'
+    ]
 }
 
-def get_sample_transcript(lang):
-    """Get sample transcript text for the selected language"""
-    transcripts = {
-        'hi': 'आज दिल्ली में मौसम साफ रहेगा। तापमान 25 डिग्री सेल्सियस रहेगा।',
-        'te': 'ఈరోజు ఢిల్లీలో వాతావరణం స్వచ్ఛంగా ఉంటుంది. ఉష్ణోగ్రత 25 డిగ్రీల సెల్సియస్ ఉంటుంది.',
-        'ta': 'இன்று டெல்லியில் வானிலை தெளிவாக இருக்கும். வெப்பநிலை 25 டிகிரி செல்சியஸ் இருக்கும்.',
-        'bn': 'আজ দিল্লিতে আবহাওয়া পরিষ্কার থাকবে। তাপমাত্রা ২৫ ডিগ্রি সেলসিয়াস থাকবে।',
-        'gu': 'આજે દિલ્હીમાં હવામાન સ્વચ્છ રહેશે. તાપમાન 25 ડિગ્રી સેલ્સિયસ રહેશે.',
-        'mr': 'आज दिल्लीत हवामान स्वच्छ राहील. तापमान 25 डिग्री सेल्सिअस असेल.'
-    }
-    return transcripts.get(lang, transcripts['hi'])
+def fetch_live_audio_chunk(stream_urls, duration_seconds=2):
+    """
+    Fetch a live audio chunk from HLS streams, trying multiple URLs.
+    Returns the audio as WAV bytes.
+    """
+    if isinstance(stream_urls, str):
+        stream_urls = [stream_urls]
+    
+    for attempt, stream_url in enumerate(stream_urls):
+        try:
+            print(f"Trying stream {attempt + 1}/{len(stream_urls)}: {stream_url[:80]}...")
+            
+            with tempfile.NamedTemporaryFile(suffix='.wav', delete=False) as temp_wav:
+                temp_wav_path = temp_wav.name
+            
+            cmd = [
+                'ffmpeg',
+                '-i', stream_url,
+                '-t', str(duration_seconds),
+                '-vn',
+                '-acodec', 'pcm_s16le',
+                '-ar', '16000',
+                '-ac', '1',
+                '-y',
+                temp_wav_path
+            ]
+            
+            print(f"Running ffmpeg command for {duration_seconds}s...")
+            
+            result = subprocess.run(
+                cmd,
+                capture_output=True,
+                text=True,
+                timeout=duration_seconds + 15
+            )
+            
+            if result.returncode != 0:
+                print(f"FFmpeg failed for {stream_url[:80]}")
+                print(f"Error: {result.stderr[:200]}")
+                continue
+            
+            with open(temp_wav_path, 'rb') as f:
+                wav_bytes = f.read()
+            
+            os.unlink(temp_wav_path)
+            
+            # Minimum size check (2KB for 2s at 16kHz mono)
+            min_size = 2000
+            if len(wav_bytes) >= min_size:
+                print(f"Success! Got {len(wav_bytes)} bytes from stream {attempt + 1}")
+                return wav_bytes
+            else:
+                print(f"File too small: {len(wav_bytes)} bytes < {min_size}")
+                
+        except subprocess.TimeoutExpired:
+            print(f"Timeout for stream: {stream_url[:80]}")
+            continue
+        except Exception as e:
+            print(f"Error with stream {attempt + 1}: {e}")
+            continue
+    
+    print("All streams failed, generating silent audio")
+    return generate_silent_audio(duration_seconds)
+
+def generate_silent_audio(duration_seconds=2, sample_rate=16000):
+    """Generate silent audio as WAV bytes"""
+    import struct
+    
+    num_samples = int(sample_rate * duration_seconds)
+    
+    data_size = num_samples * 2
+    riff_size = 36 + data_size
+    
+    header = struct.pack('<4sI4s', b'RIFF', riff_size, b'WAVE')
+    header += struct.pack('<4sI2s2s', b'fmt ', 16, b'\x01\x00', b'\x01\x00')
+    header += struct.pack('<II2s2s', sample_rate, sample_rate * 2, b'\x02\x00', b'\x10\x00')
+    header += struct.pack('<4sI', b'data', data_size)
+    
+    samples = b'\x00\x00' * num_samples
+    
+    return header + samples
+
+def get_stream_urls_for_lang(lang):
+    """Get list of stream URLs for language"""
+    return NEWS_STREAMS.get(lang, NEWS_STREAMS['hi'])
+
 
 @app.route("/api/live-stream/fetch", methods=["GET"])
 @login_required
 def live_stream_fetch():
-    """Fetch a live news stream URL for the selected language"""
+    """Fetch a 2-second live audio chunk from the selected language stream"""
     try:
         lang = request.args.get('lang', 'hi')
+        duration = int(request.args.get('duration', 2))
         
-        # Get the stream URL for selected language
-        stream_url = NEWS_STREAMS.get(lang, NEWS_STREAMS['hi'])
+        # Ensure duration is between 1 and 5 seconds for faster clips
+        duration = max(1, min(duration, 5))
+        
+        stream_urls = get_stream_urls_for_lang(lang)
+        
+        print(f"Fetching {duration}s audio for {lang} language")
+        print(f"Will try {len(stream_urls)} stream(s)")
+        
+        audio_bytes = fetch_live_audio_chunk(stream_urls, duration)
+        
+        audio_base64 = base64.b64encode(audio_bytes).decode('utf-8')
+        
+        is_real_audio = len(audio_bytes) > 2000
         
         return jsonify({
             "success": True,
             "language": lang,
-            "duration": 10.0,  # 10 seconds for mobile annotation
-            "stream_url": stream_url,
-            "transcript": get_sample_transcript(lang)
+            "duration": duration,
+            "audio_blob": audio_base64,
+            "mime_type": "audio/wav",
+            "has_audio": is_real_audio
         })
         
     except Exception as e:
         print(f"Error fetching live stream: {e}")
+        import traceback
+        traceback.print_exc()
         return jsonify({"success": False, "error": str(e)}), 500
 
 @app.route("/api/live-stream/submit", methods=["POST"])
@@ -1401,34 +1521,37 @@ def live_stream_submit():
         audio_file = request.files['audio']
         language = request.form.get('language', 'unknown')
         frames_json = request.form.get('frames', '[]')
-        duration = float(request.form.get('duration', 0))
+        duration = float(request.form.get('duration', 2))
         
         frames = json.loads(frames_json)
         
-        # Create unique filename
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         filename = f"live_{language}_{username}_{timestamp}"
         
-        # Save audio to live recordings folder
         live_folder = os.path.join(SELF_RECORDINGS_FOLDER, "live_streams", username)
         os.makedirs(live_folder, exist_ok=True)
         
         wav_filename = f"{filename}.wav"
         wav_path = os.path.join(live_folder, wav_filename)
         
-        # Save audio file
         audio_file.save(wav_path)
         
-        # Save annotation JSON
+        full_sequence = ' '.join([f.get('text', '') for f in frames if f.get('text')])
+        
         annotation_data = {
             "audio_file": wav_filename,
             "annotator": username,
             "timestamp": datetime.now().isoformat(),
             "language": language,
-            "duration_ms": duration * 1000,
+            "duration_ms": int(duration * 1000),
             "frames": frames,
             "type": "live_stream",
-            "window_ms": 108
+            "window_ms": 108,
+            "full_sequence": full_sequence,
+            "sentence": "",
+            "submitted_by": username,
+            "submitted_at": datetime.now().isoformat(),
+            "verification_status": "pending"
         }
         
         json_filename = f"{filename}.json"
@@ -1436,30 +1559,28 @@ def live_stream_submit():
         with open(json_path, 'w', encoding='utf-8') as f:
             json.dump(annotation_data, f, indent=2, ensure_ascii=False)
         
-        # Generate TextGrid
         textgrid_content = create_enhanced_textgrid(
             frames=frames,
             duration=duration,
             sentence="",
             annotator=username,
-            full_sequence=""
+            full_sequence=full_sequence
         )
         
         textgrid_path = os.path.join(live_folder, f"{filename}.TextGrid")
         with open(textgrid_path, 'w', encoding='utf-8') as f:
             f.write(textgrid_content)
         
-        # Also save to mobile dataset
         save_to_mobile_dataset(annotation_data, username, wav_path, json_filename)
         
-        # Update stats
         akshar_count = sum(1 for f in frames if f.get('text') and f['text'].strip())
         update_user_stats(username, json_filename, duration, increment=True)
         update_daily_stats(username, json_filename, duration, increment=True)
         
-        # Add to completed files
         completed_files.add(json_filename)
         save_completed_files(completed_files)
+        
+        print(f"Live stream annotation submitted: {filename} with {akshar_count} akshars")
         
         return jsonify({
             "success": True,
@@ -1473,6 +1594,8 @@ def live_stream_submit():
         import traceback
         traceback.print_exc()
         return jsonify({"success": False, "error": str(e)}), 500
+
+
 
 # ============= VERIFICATION ROUTES =============
 

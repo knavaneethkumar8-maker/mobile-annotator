@@ -323,14 +323,148 @@ body {
   text-align: center;
   margin-top: 12px;
   font-size: 0.85rem;
+  animation: slideIn 0.3s ease;
 }
-.message.success { background: #E0F0E6; color: #1E5631; }
-.message.error { background: #FDE9E7; color: #B13E3A; }
-.message.info { background: #E9EDF2; color: #2B4F6C; }
+@keyframes slideIn {
+  from {
+    transform: translateY(-10px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+.message.success { background: #D1FAE5; color: #065F46; border-left: 4px solid #10B981; }
+.message.error { background: #FEE2E2; color: #991B1B; border-left: 4px solid #EF4444; }
+.message.info { background: #DBEAFE; color: #1E40AF; border-left: 4px solid #3B82F6; }
+.message.warning { background: #FEF3C7; color: #92400E; border-left: 4px solid #F59E0B; }
 .hidden { display: none; }
+.fetch-indicator {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid #2C6E49;
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+  margin-right: 8px;
+  vertical-align: middle;
+}
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Success Popup Modal Styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.2s ease;
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.success-modal {
+  background: white;
+  border-radius: 32px;
+  padding: 32px 24px;
+  max-width: 320px;
+  width: 90%;
+  text-align: center;
+  animation: popIn 0.3s cubic-bezier(0.34, 1.2, 0.64, 1);
+  box-shadow: 0 20px 35px -10px rgba(0, 0, 0, 0.3);
+}
+@keyframes popIn {
+  from {
+    transform: scale(0.9);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+.success-icon {
+  width: 72px;
+  height: 72px;
+  background: #10B981;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 20px;
+  animation: bounce 0.5s ease;
+}
+@keyframes bounce {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+.success-icon svg {
+  width: 40px;
+  height: 40px;
+  color: white;
+}
+.success-modal h3 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #1C1C1A;
+  margin-bottom: 8px;
+}
+.success-modal p {
+  color: #6B7280;
+  font-size: 0.9rem;
+  margin-bottom: 20px;
+}
+.success-stats {
+  background: #F3F4F6;
+  border-radius: 20px;
+  padding: 16px;
+  margin-bottom: 20px;
+}
+.stat-item {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.85rem;
+  margin-bottom: 8px;
+}
+.stat-label {
+  color: #6B7280;
+}
+.stat-value {
+  font-weight: 600;
+  color: #2C6E49;
+}
+.modal-close-btn {
+  background: #2C6E49;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 40px;
+  font-size: 1rem;
+  font-weight: 550;
+  cursor: pointer;
+  width: 100%;
+  transition: all 0.2s;
+}
+.modal-close-btn:active {
+  transform: scale(0.97);
+}
+
 @media (max-width: 560px) {
   .container { padding: 16px; }
   .lang-btn { padding: 8px 16px; font-size: 0.8rem; }
+  .success-modal { padding: 24px 20px; }
+  .success-icon { width: 60px; height: 60px; }
+  .success-icon svg { width: 32px; height: 32px; }
 }
 </style>
 </head>
@@ -354,7 +488,6 @@ body {
       <div class="language-label">Select News Language</div>
       <div class="language-options" id="languageOptions">
         <button class="lang-btn" data-lang="hi">हिंदी</button>
-        <button class="lang-btn" data-lang="te">తెలుగు</button>
         <button class="lang-btn" data-lang="ta">தமிழ்</button>
         <button class="lang-btn" data-lang="bn">বাংলা</button>
         <button class="lang-btn" data-lang="gu">ગુજરાતી</button>
@@ -364,20 +497,24 @@ body {
 
     <div class="stream-card">
       <div class="clip-info">
-        <span class="clip-duration" id="clipDuration">📺 Fetching live news clip...</span>
+        <span class="clip-duration" id="clipDuration">📺 Select language and fetch news</span>
       </div>
 
       <audio id="audioPlayer" class="audio-player" controls playsinline style="width:100%"></audio>
       
       <div class="volume-control">
         <span class="volume-icon">🔊</span>
-        <input type="range" id="volumeSlider" class="volume-slider" min="0" max="6" step="0.05" value="1.0">
-        <span class="volume-value" id="volumeValue">100%</span>
+        <input type="range" id="volumeSlider" class="volume-slider" min="0" max="1" step="0.01" value="0.8">
+        <span class="volume-value" id="volumeValue">80%</span>
       </div>
 
       <div class="button-group">
-        <button class="btn btn-primary" id="fetchBtn">🎙️ Fetch Live News</button>
+        <button class="btn btn-primary" id="fetchBtn">🎙️ Fetch Live News (2s)</button>
         <button class="btn btn-secondary" id="annotateBtn" disabled>✍️ Annotate Clip</button>
+      </div>
+      
+      <div id="loadingIndicator" class="hidden" style="text-align: center; margin-top: 12px; color: #2C6E49;">
+        <span class="fetch-indicator"></span> Fetching live stream...
       </div>
     </div>
 
@@ -415,20 +552,23 @@ body {
 
 <script>
 const BASE_PATH = "{{ base_path }}";
-const CLIP_DURATION = 7;  // 7 seconds for desktop
+const CLIP_DURATION = 2;  // 2 seconds for live news chunks
 const FRAME_SIZE_MS = 108;
 const AKSHAR_SET = [
-  "अ", "आ", "इ", "उ", "ए", "ओ",
-  "क", "ख", "ग", "घ", "च", "छ", "ज", "झ",
-  "ट", "ठ", "ड", "ढ", "त", "थ", "द", "ध",
-  "प", "फ", "ब", "भ", "न", "म", "य", "र", "ल", "व", "स", "ह", "०"
+    "अ", "आ", "इ", "उ", "ए", "ओ",
+    "क", "ख", "ग", "घ", "च", "छ", "ज", "झ",
+    "ट", "ठ", "ड", "ढ", "त", "थ", "द", "ध",
+    "प", "फ", "ब", "भ",
+    "न", "म",
+    "य", "र", "ल", "व",
+    "स", "ह", "ं", "ँ", "ॉ", "०"
 ];
 
 let currentUsername = '';
 let currentLanguage = 'hi';
 let currentAudio = null;
 let currentAudioBlob = null;
-let currentVolume = 1.0;
+let currentVolume = 0.8;
 let audioContext = null;
 let gainNode = null;
 let currentPlayTimeout = null;
@@ -439,12 +579,14 @@ let multiPlayQueue = [];
 let multiPlayIndex = 0;
 let multiPlayTimeout = null;
 let activeFrameIndex = null;
+let isFetching = false;
 
 async function init() {
   await checkAuth();
   setupEventListeners();
   renderAksharSet();
   setupAudioUnlock();
+  document.querySelector('.lang-btn[data-lang="hi"]').classList.add('selected');
 }
 
 async function checkAuth() {
@@ -478,6 +620,7 @@ function unlockAudio() {
   if (currentAudio) {
     currentAudio.play().then(() => { currentAudio.pause(); currentAudio.currentTime = 0; }).catch(() => {});
   }
+  audioUnlocked = true;
 }
 
 function initAudioContext() {
@@ -506,6 +649,13 @@ function setupEventListeners() {
       document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('selected'));
       btn.classList.add('selected');
       currentLanguage = btn.dataset.lang;
+      showMessage(`Language changed to ${btn.innerText}`, 'info');
+      if (currentAudio) {
+        currentAudio.pause();
+        currentAudio.src = '';
+      }
+      document.getElementById('clipDuration').innerHTML = `📺 Select "${btn.innerText}" and fetch news`;
+      document.getElementById('annotateBtn').disabled = true;
     });
   });
   
@@ -524,10 +674,11 @@ function setupEventListeners() {
   if (volumeSlider) {
     volumeSlider.addEventListener('input', e => updateVolume(parseFloat(e.target.value)));
   }
+  updateVolume(0.8);
 }
 
 function playFullAudio() {
-  if (!currentAudio) { showMessage('Audio not ready', 'error'); return; }
+  if (!currentAudio) { showMessage('No audio loaded. Fetch news first!', 'error'); return; }
   stopPlayback();
   currentAudio.currentTime = 0;
   currentAudio.play().catch(err => showMessage('Tap the play button first', 'info'));
@@ -561,19 +712,34 @@ function playSegmentAudio(startMs, endMs) {
 }
 
 async function fetchLiveNews() {
-  showMessage(`Fetching live ${currentLanguage} news...`, 'info');
-  document.getElementById('fetchBtn').disabled = true;
+  if (isFetching) return;
+  
+  isFetching = true;
+  const fetchBtn = document.getElementById('fetchBtn');
+  const loadingIndicator = document.getElementById('loadingIndicator');
+  
+  fetchBtn.disabled = true;
+  loadingIndicator.classList.remove('hidden');
+  showMessage(`Fetching live ${currentLanguage} news (2 sec)...`, 'info');
   document.getElementById('annotateBtn').disabled = true;
   
   try {
-    const response = await fetch(`${BASE_PATH}/api/live-stream/fetch?lang=${currentLanguage}&duration=${CLIP_DURATION}`);
+    const response = await fetch(`${BASE_PATH}/api/live-stream/fetch?lang=${currentLanguage}&duration=2`);
     
     if (!response.ok) {
-      throw new Error('Failed to fetch news clip');
+      const errorData = await response.json();
+      throw new Error(errorData.error || 'Failed to fetch news clip');
     }
     
-    currentAudioBlob = await response.blob();
-    const audioUrl = URL.createObjectURL(currentAudioBlob);
+    const data = await response.json();
+    
+    if (!data.success || !data.audio_blob) {
+      throw new Error(data.error || 'No audio received');
+    }
+    
+    const audioBlob = base64ToBlob(data.audio_blob, 'audio/wav');
+    currentAudioBlob = audioBlob;
+    const audioUrl = URL.createObjectURL(audioBlob);
     
     if (currentAudio) {
       currentAudio.pause();
@@ -583,20 +749,35 @@ async function fetchLiveNews() {
     currentAudio.src = audioUrl;
     currentAudio.load();
     
-    document.getElementById('clipDuration').innerHTML = `📺 ${CLIP_DURATION} sec live news clip (${currentLanguage.toUpperCase()})`;
+    const langNames = { hi: 'हिंदी', te: 'తెలుగు', ta: 'தமிழ்', bn: 'বাংলা', gu: 'ગુજરાતી', mr: 'मराठी' };
+    document.getElementById('clipDuration').innerHTML = `📺 2 sec live news clip (${langNames[currentLanguage] || currentLanguage.toUpperCase()})`;
     document.getElementById('annotateBtn').disabled = false;
-    showMessage(`Live news clip ready! ${CLIP_DURATION} seconds. Click "Annotate Clip".`, 'success');
+    showMessage(`Live news clip ready! 2 seconds. Click "Annotate Clip" to label.`, 'success');
     
   } catch (err) {
+    console.error('Fetch error:', err);
     showMessage('Error fetching news: ' + err.message, 'error');
+    document.getElementById('clipDuration').innerHTML = `⚠️ Failed to fetch. Try again!`;
   } finally {
-    document.getElementById('fetchBtn').disabled = false;
+    isFetching = false;
+    fetchBtn.disabled = false;
+    loadingIndicator.classList.add('hidden');
   }
+}
+
+function base64ToBlob(base64, mimeType) {
+  const byteCharacters = atob(base64);
+  const byteNumbers = new Array(byteCharacters.length);
+  for (let i = 0; i < byteCharacters.length; i++) {
+    byteNumbers[i] = byteCharacters.charCodeAt(i);
+  }
+  const byteArray = new Uint8Array(byteNumbers);
+  return new Blob([byteArray], { type: mimeType });
 }
 
 function startAnnotation() {
   if (!currentAudioBlob) {
-    showMessage('No clip to annotate', 'error');
+    showMessage('No clip to annotate. Fetch news first!', 'error');
     return;
   }
   
@@ -614,7 +795,7 @@ function startAnnotation() {
   renderAnnotationFrames();
   initAudioContext();
   document.getElementById('annotationSection').classList.remove('hidden');
-  showMessage(`Ready! ${numFrames} frames to annotate.`, 'success');
+  showMessage(`Ready! ${numFrames} frames to annotate. Click on each frame to play that segment.`, 'success');
 }
 
 function renderAksharSet() {
@@ -701,7 +882,7 @@ function playNextInQueue() {
   multiPlayTimeout = setTimeout(() => {
     multiPlayIndex++;
     playNextInQueue();
-  }, (frame.end_ms - frame.start_ms));
+  }, (frame.end_ms - frame.start_ms) + 50);
 }
 
 function playSegmentByIndex(frameIndex) {
@@ -714,7 +895,7 @@ function playSegmentByIndex(frameIndex) {
   playSegmentAudio(frame.start_ms, frame.end_ms);
   if (card) {
     card.classList.add('playing');
-    setTimeout(() => card.classList.remove('playing'), frame.end_ms - frame.start_ms);
+    setTimeout(() => card.classList.remove('playing'), (frame.end_ms - frame.start_ms));
   }
 }
 
@@ -731,7 +912,7 @@ function renderAnnotationFrames() {
     headerDiv.className = 'frame-header';
     headerDiv.innerHTML = `
       <span class="frame-label"><span class="sel-dot"></span> ${idx+1}</span>
-      <span class="frame-time">${frame.start_ms}–${frame.end_ms} ms</span>
+      <span class="frame-time">${(frame.start_ms/1000).toFixed(2)}–${(frame.end_ms/1000).toFixed(2)}s</span>
     `;
     
     const input = document.createElement('input');
@@ -767,9 +948,71 @@ function renderAnnotationFrames() {
   });
 }
 
+function showSuccessModal(aksharCount) {
+  // Remove any existing modal
+  const existingModal = document.querySelector('.modal-overlay');
+  if (existingModal) {
+    existingModal.remove();
+  }
+  
+  // Create modal overlay
+  const modalOverlay = document.createElement('div');
+  modalOverlay.className = 'modal-overlay';
+  
+  // Create modal content
+  modalOverlay.innerHTML = `
+    <div class="success-modal">
+      <div class="success-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="20 6 9 17 4 12"></polyline>
+        </svg>
+      </div>
+      <h3>✓ Submitted!</h3>
+      <p>Your annotation has been successfully saved.</p>
+      <div class="success-stats">
+        <div class="stat-item">
+          <span class="stat-label">Akshars Added</span>
+          <span class="stat-value">${aksharCount}</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Duration</span>
+          <span class="stat-value">${CLIP_DURATION} sec</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Language</span>
+          <span class="stat-value">${currentLanguage.toUpperCase()}</span>
+        </div>
+      </div>
+      <button class="modal-close-btn" onclick="this.closest('.modal-overlay').remove()">Continue</button>
+    </div>
+  `;
+  
+  document.body.appendChild(modalOverlay);
+  
+  // Close modal when clicking outside
+  modalOverlay.addEventListener('click', (e) => {
+    if (e.target === modalOverlay) {
+      modalOverlay.remove();
+    }
+  });
+  
+  // Auto close after 3 seconds
+  setTimeout(() => {
+    if (modalOverlay && document.body.contains(modalOverlay)) {
+      modalOverlay.remove();
+    }
+  }, 3000);
+}
+
 async function submitAnnotation() {
   if (!currentFrames || currentFrames.length === 0) {
     showMessage('No clip to submit', 'error');
+    return;
+  }
+  
+  const hasAnnotations = currentFrames.some(f => f.text && f.text.trim().length > 0);
+  if (!hasAnnotations) {
+    showMessage('Please add annotations to at least one frame before submitting', 'warning');
     return;
   }
   
@@ -790,11 +1033,23 @@ async function submitAnnotation() {
     
     const data = await response.json();
     if (data.success) {
-      showMessage(`Submitted! Added ${data.akshar_count} akshars`, 'success');
+      const aksharCount = data.akshar_count || currentFrames.filter(f => f.text && f.text.trim()).length;
+      
+      // Show beautiful success modal
+      showSuccessModal(aksharCount);
+      
+      // Also show a brief toast message
+      showMessage(`✓ Submitted! Added ${aksharCount} akshars`, 'success');
+      
       cancelAnnotation();
-      fetchLiveNews();
+      if (currentAudio) {
+        currentAudio.pause();
+        currentAudio.src = '';
+      }
+      document.getElementById('annotateBtn').disabled = true;
+      document.getElementById('clipDuration').innerHTML = `📺 Select language and fetch news`;
     } else {
-      throw new Error(data.error);
+      throw new Error(data.error || 'Submission failed');
     }
   } catch (err) {
     showMessage('Error: ' + err.message, 'error');
@@ -808,7 +1063,7 @@ function cancelAnnotation() {
   selectedSegments.clear();
   document.getElementById('annotationSection').classList.add('hidden');
   document.getElementById('framesGrid').innerHTML = '';
-  showMessage('Cancelled', 'info');
+  showMessage('Annotation cancelled', 'info');
 }
 
 function showMessage(text, type) {
