@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
-<title>Live Stream Annotation</title>
+<title>Live News Annotation</title>
 <style>
 * {
   margin: 0;
@@ -11,25 +11,22 @@
   box-sizing: border-box;
   -webkit-tap-highlight-color: transparent;
 }
-
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
   background: #F5F5F0;
   padding: 16px 0px;
   color: #1C1C1A;
   line-height: 1.4;
 }
-
 .container {
   max-width: 680px;
   margin: 0 auto;
   background: #FFFFFF;
   border-radius: 28px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02), 0 2px 6px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
   overflow: hidden;
   padding: 20px 18px 28px;
 }
-
 .header {
   display: flex;
   justify-content: space-between;
@@ -38,21 +35,17 @@ body {
   flex-wrap: wrap;
   gap: 12px;
 }
-
 .header-left h2 {
   font-size: 1.65rem;
   font-weight: 590;
-  letter-spacing: -0.02em;
   color: #1C1C1A;
   margin: 0;
 }
-
 .header-right {
   display: flex;
   align-items: center;
   gap: 12px;
 }
-
 .user-info {
   display: flex;
   align-items: center;
@@ -61,13 +54,11 @@ body {
   padding: 6px 14px;
   border-radius: 40px;
 }
-
 .user-name {
   font-weight: 550;
   font-size: 0.85rem;
   color: #2C6E49;
 }
-
 .back-btn {
   background: none;
   border: none;
@@ -75,10 +66,8 @@ body {
   font-size: 0.85rem;
   cursor: pointer;
   padding: 6px 12px;
-  font-weight: 500;
   text-decoration: none;
 }
-
 .live-badge {
   background: #dc2626;
   color: white;
@@ -87,17 +76,16 @@ body {
   font-size: 0.7rem;
   font-weight: 600;
   animation: pulse 1s infinite;
+  display: inline-block;
+  margin-left: 10px;
 }
-
 @keyframes pulse {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.6; }
 }
-
 .language-selector {
   margin-bottom: 20px;
 }
-
 .language-label {
   font-size: 0.85rem;
   font-weight: 550;
@@ -105,13 +93,11 @@ body {
   margin-bottom: 10px;
   display: block;
 }
-
 .language-options {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
 }
-
 .lang-btn {
   padding: 10px 20px;
   border: 2px solid #E5E5DE;
@@ -122,17 +108,11 @@ body {
   cursor: pointer;
   transition: all 0.2s ease;
 }
-
 .lang-btn.selected {
   background: #2C6E49;
   border-color: #2C6E49;
   color: white;
 }
-
-.lang-btn:active {
-  transform: scale(0.95);
-}
-
 .stream-card {
   background: #FEFEFC;
   border: 1px solid #E5E5DE;
@@ -140,37 +120,23 @@ body {
   padding: 20px;
   margin-bottom: 20px;
 }
-
-.stream-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+.clip-info {
+  text-align: center;
   margin-bottom: 16px;
-  flex-wrap: wrap;
-  gap: 10px;
+  padding: 10px;
+  background: #F8F8F4;
+  border-radius: 40px;
 }
-
-.stream-title {
-  font-weight: 600;
-  font-size: 1rem;
-  color: #1C1C1A;
-}
-
 .clip-duration {
-  background: #F0F0EB;
-  padding: 4px 12px;
-  border-radius: 20px;
-  font-size: 0.7rem;
-  color: #6E6E68;
+  font-size: 0.8rem;
+  color: #2C6E49;
+  font-weight: 500;
 }
-
 .audio-player {
   width: 100%;
   margin: 16px 0;
   border-radius: 44px;
-  background: #F9F9F6;
 }
-
 .volume-control {
   display: flex;
   align-items: center;
@@ -181,66 +147,56 @@ body {
   border-radius: 40px;
   border: 1px solid #E9E9E2;
 }
-
-.volume-icon { font-size: 1.2rem; line-height: 1; color: #6E6E68; }
-
+.volume-icon { font-size: 1.2rem; }
 .volume-slider {
   flex: 1;
   height: 4px;
   -webkit-appearance: none;
-  appearance: none;
   background: #DCDCD4;
   border-radius: 4px;
-  outline: none;
 }
-
 .volume-slider::-webkit-slider-thumb {
   -webkit-appearance: none;
-  appearance: none;
   width: 18px;
   height: 18px;
   border-radius: 50%;
   background: #2C6E49;
   cursor: pointer;
 }
-
 .volume-value {
   min-width: 52px;
   font-size: 0.8rem;
   font-weight: 500;
   color: #2C6E49;
-  text-align: right;
 }
-
-.transcript-box {
-  background: #F8F8F4;
-  border-radius: 20px;
+.button-group {
+  display: flex;
+  gap: 12px;
+  margin-top: 20px;
+}
+.btn {
+  flex: 1;
   padding: 14px;
-  margin: 16px 0;
-  border: 1px solid #E9E9E2;
-}
-
-.transcript-label {
-  font-size: 0.7rem;
-  font-weight: 600;
-  color: #2C6E49;
-  text-transform: uppercase;
-  margin-bottom: 8px;
-}
-
-.transcript-text {
+  border-radius: 44px;
+  border: none;
   font-size: 1rem;
-  line-height: 1.5;
-  color: #1C1C1A;
-  word-break: break-word;
+  font-weight: 550;
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
-
-.transcript-text:empty::before {
-  content: "Click 'Fetch Clip' to get live news";
-  color: #8E8E88;
-  font-style: italic;
+.btn-primary {
+  background: #2C6E49;
+  color: white;
 }
-
+.btn-primary:active { transform: scale(0.97); }
+.btn-secondary {
+  background: #F0F0EB;
+  color: #6E6E68;
+}
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
 .frames-grid {
   display: flex;
   flex-direction: column;
@@ -249,14 +205,21 @@ body {
   overflow-y: auto;
   margin: 16px 0;
 }
-
 .frame-card {
   background: #FEFEFC;
   border: 1px solid #E5E5DE;
   border-radius: 16px;
   padding: 12px;
+  cursor: pointer;
 }
-
+.frame-card.playing {
+  background: #D6EFE0;
+  border-color: #2C6E49;
+}
+.frame-card.selected {
+  background: #F0FAF3;
+  border: 2px solid #2C6E49;
+}
 .frame-header {
   display: flex;
   justify-content: space-between;
@@ -265,11 +228,9 @@ body {
   font-size: 0.7rem;
   color: #6E6E68;
 }
-
 .frame-time {
   font-family: monospace;
 }
-
 .frame-input {
   width: 100%;
   padding: 10px;
@@ -279,19 +240,16 @@ body {
   font-family: monospace;
   background: white;
 }
-
 .frame-input:focus {
   outline: none;
   border-color: #2C6E49;
 }
-
 .akshar-grid {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
   margin: 16px 0;
 }
-
 .akshar-item {
   background: #F0F0EB;
   border: 1px solid #E5E5DE;
@@ -303,64 +261,62 @@ body {
   cursor: pointer;
   transition: all 0.1s ease;
 }
-
 .akshar-item:active {
   transform: scale(0.95);
   background: #2C6E49;
   color: white;
 }
-
-.button-group {
+.multi-bar {
   display: flex;
-  gap: 12px;
-  margin-top: 20px;
+  align-items: center;
+  justify-content: space-between;
+  background: #1A4D3A;
+  color: #fff;
+  border-radius: 40px;
+  padding: 10px 16px;
+  margin-bottom: 10px;
+  gap: 10px;
+  font-size: 0.82rem;
 }
-
-.btn {
-  flex: 1;
-  padding: 14px;
-  border-radius: 44px;
+.multi-bar.hidden { display: none; }
+.multi-bar-label { flex: 1; }
+.multi-bar-btn {
+  background: rgba(255,255,255,0.15);
   border: none;
-  font-size: 1rem;
+  color: #fff;
+  font-size: 0.78rem;
+  padding: 6px 14px;
+  border-radius: 30px;
+  cursor: pointer;
+}
+.sel-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  border: 2px solid #2C6E49;
+  background: transparent;
+  display: inline-block;
+  margin-right: 6px;
+}
+.frame-card.selected .sel-dot {
+  background: #2C6E49;
+}
+.play-full-btn {
+  background: #4A6FA5;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 40px;
+  font-size: 0.9rem;
   font-weight: 550;
   cursor: pointer;
-  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 16px;
+  width: 100%;
 }
-
-.btn-primary {
-  background: #2C6E49;
-  color: white;
-}
-
-.btn-primary:active {
-  transform: scale(0.97);
-  background: #215A3A;
-}
-
-.btn-secondary {
-  background: #F0F0EB;
-  color: #6E6E68;
-}
-
-.btn-secondary:active {
-  transform: scale(0.97);
-}
-
-.btn-warning {
-  background: #dc2626;
-  color: white;
-}
-
-.btn-warning:active {
-  transform: scale(0.97);
-  background: #b91c1c;
-}
-
-.btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
 .message {
   padding: 12px;
   border-radius: 20px;
@@ -368,26 +324,13 @@ body {
   margin-top: 12px;
   font-size: 0.85rem;
 }
-
 .message.success { background: #E0F0E6; color: #1E5631; }
 .message.error { background: #FDE9E7; color: #B13E3A; }
 .message.info { background: #E9EDF2; color: #2B4F6C; }
-.message.warning { background: #FEF3C7; color: #92400E; }
-
-.hidden {
-  display: none;
-}
-
-.loading {
-  text-align: center;
-  padding: 40px;
-  color: #6E6E68;
-}
-
+.hidden { display: none; }
 @media (max-width: 560px) {
   .container { padding: 16px; }
   .lang-btn { padding: 8px 16px; font-size: 0.8rem; }
-  .btn { padding: 12px; }
 }
 </style>
 </head>
@@ -396,8 +339,7 @@ body {
 <div class="container">
   <div class="header">
     <div class="header-left">
-      <h2>Live Stream</h2>
-      <span class="live-badge">LIVE</span>
+      <h2>Live News <span class="live-badge">LIVE</span></h2>
     </div>
     <div class="header-right">
       <div class="user-info">
@@ -408,7 +350,6 @@ body {
   </div>
 
   <div id="content">
-    <!-- Language Selection -->
     <div class="language-selector">
       <div class="language-label">Select News Language</div>
       <div class="language-options" id="languageOptions">
@@ -421,14 +362,12 @@ body {
       </div>
     </div>
 
-    <!-- Stream Card -->
     <div class="stream-card">
-      <div class="stream-header">
-        <span class="stream-title">Live News Clip</span>
-        <span class="clip-duration" id="clipDuration">Duration: --s</span>
+      <div class="clip-info">
+        <span class="clip-duration" id="clipDuration">📺 Fetching live news clip...</span>
       </div>
 
-      <audio id="audioPlayer" class="audio-player" controls preload="auto" playsinline style="width:100%"></audio>
+      <audio id="audioPlayer" class="audio-player" controls playsinline style="width:100%"></audio>
       
       <div class="volume-control">
         <span class="volume-icon">🔊</span>
@@ -436,28 +375,37 @@ body {
         <span class="volume-value" id="volumeValue">100%</span>
       </div>
 
-      <div class="transcript-box">
-        <div class="transcript-label">Transcript (Auto-generated)</div>
-        <div class="transcript-text" id="transcriptText"></div>
-      </div>
-
       <div class="button-group">
-        <button class="btn btn-primary" id="fetchBtn">🎙️ Fetch New Clip</button>
-        <button class="btn btn-secondary" id="playBtn">▶ Play</button>
+        <button class="btn btn-primary" id="fetchBtn">🎙️ Fetch Live News</button>
+        <button class="btn btn-secondary" id="annotateBtn" disabled>✍️ Annotate Clip</button>
       </div>
     </div>
 
-    <!-- Annotation Section -->
-    <div id="annotationSection" class="annotation-card hidden">
-      <h3 style="margin-bottom: 16px;">Annotate Frames</h3>
-      
-      <div class="akshar-grid" id="aksharGrid"></div>
-      
-      <div class="frames-grid" id="framesGrid"></div>
-      
-      <div class="button-group">
-        <button class="btn btn-primary" id="submitBtn">Submit Annotation</button>
-        <button class="btn btn-secondary" id="skipBtn">Skip & Next</button>
+    <div id="annotationSection" class="hidden">
+      <div class="stream-card">
+        <h3 style="margin-bottom: 16px;">Annotate Frames</h3>
+        
+        <button class="play-full-btn" id="playFullBtn">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="white">
+            <path d="M8 5v14l11-7z"/>
+          </svg>
+          Play Full Audio
+        </button>
+
+        <div class="akshar-grid" id="aksharGrid"></div>
+        
+        <div class="multi-bar hidden" id="multiBar">
+          <span class="multi-bar-label">0 segments selected</span>
+          <button class="multi-bar-btn" id="playSelectedBtn">▶ Play selected</button>
+          <button class="multi-bar-btn" id="clearSelectionBtn">✕ Clear</button>
+        </div>
+        
+        <div class="frames-grid" id="framesGrid"></div>
+        
+        <div class="button-group">
+          <button class="btn btn-primary" id="submitBtn">Submit Annotation</button>
+          <button class="btn btn-secondary" id="cancelBtn">Cancel</button>
+        </div>
       </div>
     </div>
   </div>
@@ -467,36 +415,31 @@ body {
 
 <script>
 const BASE_PATH = "{{ base_path }}";
+const CLIP_DURATION = 7;  // 7 seconds for desktop
+const FRAME_SIZE_MS = 108;
 const AKSHAR_SET = [
   "अ", "आ", "इ", "उ", "ए", "ओ",
   "क", "ख", "ग", "घ", "च", "छ", "ज", "झ",
   "ट", "ठ", "ड", "ढ", "त", "थ", "द", "ध",
-  "प", "फ", "ब", "भ",
-  "न", "म",
-  "य", "र", "ल", "व",
-  "स", "ह", "०"
+  "प", "फ", "ब", "भ", "न", "म", "य", "र", "ल", "व", "स", "ह", "०"
 ];
 
 let currentUsername = '';
 let currentLanguage = 'hi';
-let currentAudioBlob = null;
-let currentAudioUrl = null;
 let currentAudio = null;
-let currentFrames = [];
-let currentJsonFilename = null;
+let currentAudioBlob = null;
+let currentVolume = 1.0;
 let audioContext = null;
 let gainNode = null;
-let currentVolume = 1.0;
 let currentPlayTimeout = null;
 let audioUnlocked = false;
-
-// Multi-select state
+let currentFrames = [];
 let selectedSegments = new Set();
 let multiPlayQueue = [];
 let multiPlayIndex = 0;
 let multiPlayTimeout = null;
+let activeFrameIndex = null;
 
-// Initialize
 async function init() {
   await checkAuth();
   setupEventListeners();
@@ -533,40 +476,8 @@ function unlockAudio() {
     audioContext.resume().then(() => { audioUnlocked = true; }).catch(() => {});
   }
   if (currentAudio) {
-    const p = currentAudio.play();
-    if (p !== undefined) {
-      p.then(() => { currentAudio.pause(); currentAudio.currentTime = 0; audioUnlocked = true; }).catch(() => {});
-    }
+    currentAudio.play().then(() => { currentAudio.pause(); currentAudio.currentTime = 0; }).catch(() => {});
   }
-}
-
-function setupEventListeners() {
-  // Language selection
-  document.querySelectorAll('.lang-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('selected'));
-      btn.classList.add('selected');
-      currentLanguage = btn.dataset.lang;
-    });
-  });
-  
-  document.getElementById('fetchBtn').addEventListener('click', fetchLiveClip);
-  document.getElementById('playBtn').addEventListener('click', playAudio);
-  document.getElementById('submitBtn').addEventListener('click', submitAnnotation);
-  document.getElementById('skipBtn').addEventListener('click', skipAndNext);
-  
-  const volumeSlider = document.getElementById('volumeSlider');
-  if (volumeSlider) {
-    volumeSlider.addEventListener('input', e => updateVolume(parseFloat(e.target.value)));
-  }
-}
-
-function updateVolume(value) {
-  currentVolume = value;
-  const volumeSpan = document.getElementById('volumeValue');
-  if (volumeSpan) volumeSpan.innerText = Math.round(value * 100) + '%';
-  if (gainNode) gainNode.gain.value = value;
-  if (currentAudio && !gainNode) currentAudio.volume = Math.min(value, 1.0);
 }
 
 function initAudioContext() {
@@ -578,52 +489,162 @@ function initAudioContext() {
       source.connect(gainNode);
       gainNode.connect(audioContext.destination);
       gainNode.gain.value = currentVolume;
-      if (audioContext.state === 'suspended') {
-        const rh = () => { audioContext.resume(); document.removeEventListener('touchstart', rh); document.removeEventListener('click', rh); };
-        document.addEventListener('touchstart', rh);
-        document.addEventListener('click', rh);
-      }
     } catch (e) { console.warn('Web Audio init failed:', e); }
   }
 }
 
-function playAudio() {
-  if (currentAudio) {
-    unlockAudio();
-    currentAudio.play();
+function updateVolume(value) {
+  currentVolume = value;
+  document.getElementById('volumeValue').innerText = Math.round(value * 100) + '%';
+  if (gainNode) gainNode.gain.value = value;
+  if (currentAudio && !gainNode) currentAudio.volume = Math.min(value, 1.0);
+}
+
+function setupEventListeners() {
+  document.querySelectorAll('.lang-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+      currentLanguage = btn.dataset.lang;
+    });
+  });
+  
+  document.getElementById('fetchBtn').addEventListener('click', fetchLiveNews);
+  document.getElementById('annotateBtn').addEventListener('click', startAnnotation);
+  document.getElementById('submitBtn').addEventListener('click', submitAnnotation);
+  document.getElementById('cancelBtn').addEventListener('click', cancelAnnotation);
+  document.getElementById('playFullBtn')?.addEventListener('click', playFullAudio);
+  
+  const playSelectedBtn = document.getElementById('playSelectedBtn');
+  const clearSelectionBtn = document.getElementById('clearSelectionBtn');
+  if (playSelectedBtn) playSelectedBtn.addEventListener('click', playSelectedSegments);
+  if (clearSelectionBtn) clearSelectionBtn.addEventListener('click', clearSelection);
+  
+  const volumeSlider = document.getElementById('volumeSlider');
+  if (volumeSlider) {
+    volumeSlider.addEventListener('input', e => updateVolume(parseFloat(e.target.value)));
   }
 }
 
+function playFullAudio() {
+  if (!currentAudio) { showMessage('Audio not ready', 'error'); return; }
+  stopPlayback();
+  currentAudio.currentTime = 0;
+  currentAudio.play().catch(err => showMessage('Tap the play button first', 'info'));
+}
+
 function stopPlayback() {
-  if (currentPlayTimeout) { clearTimeout(currentPlayTimeout); currentPlayTimeout = null; }
-  if (multiPlayTimeout) { clearTimeout(multiPlayTimeout); multiPlayTimeout = null; }
+  if (currentPlayTimeout) clearTimeout(currentPlayTimeout);
+  if (multiPlayTimeout) clearTimeout(multiPlayTimeout);
   if (currentAudio && !currentAudio.paused) currentAudio.pause();
   document.querySelectorAll('.frame-card.playing').forEach(c => c.classList.remove('playing'));
 }
 
 function playSegmentAudio(startMs, endMs) {
-  if (!currentAudio) { showMessage('Audio not ready', 'error'); return; }
+  if (!currentAudio) return;
   const startSec = startMs / 1000;
   const durationSec = (endMs - startMs) / 1000;
-  if (currentPlayTimeout) { clearTimeout(currentPlayTimeout); currentPlayTimeout = null; }
+  if (currentPlayTimeout) clearTimeout(currentPlayTimeout);
+  
   const doPlay = () => {
     currentAudio.pause();
     currentAudio.currentTime = startSec;
-    const p = currentAudio.play();
-    if (p !== undefined) {
-      p.then(() => {
-        currentPlayTimeout = setTimeout(() => {
-          if (currentAudio && !currentAudio.paused) currentAudio.pause();
-          currentPlayTimeout = null;
-        }, durationSec * 1000);
-      }).catch(err => console.warn('Playback error:', err));
-    }
+    currentAudio.play().then(() => {
+      currentPlayTimeout = setTimeout(() => {
+        if (currentAudio && !currentAudio.paused) currentAudio.pause();
+      }, durationSec * 1000);
+    }).catch(() => {});
   };
-  if (audioContext && audioContext.state === 'suspended') audioContext.resume().then(doPlay).catch(doPlay);
+  
+  if (audioContext && audioContext.state === 'suspended') audioContext.resume().then(doPlay);
   else doPlay();
 }
 
-// Multi-select functions
+async function fetchLiveNews() {
+  showMessage(`Fetching live ${currentLanguage} news...`, 'info');
+  document.getElementById('fetchBtn').disabled = true;
+  document.getElementById('annotateBtn').disabled = true;
+  
+  try {
+    const response = await fetch(`${BASE_PATH}/api/live-stream/fetch?lang=${currentLanguage}&duration=${CLIP_DURATION}`);
+    
+    if (!response.ok) {
+      throw new Error('Failed to fetch news clip');
+    }
+    
+    currentAudioBlob = await response.blob();
+    const audioUrl = URL.createObjectURL(currentAudioBlob);
+    
+    if (currentAudio) {
+      currentAudio.pause();
+      URL.revokeObjectURL(currentAudio.src);
+    }
+    currentAudio = document.getElementById('audioPlayer');
+    currentAudio.src = audioUrl;
+    currentAudio.load();
+    
+    document.getElementById('clipDuration').innerHTML = `📺 ${CLIP_DURATION} sec live news clip (${currentLanguage.toUpperCase()})`;
+    document.getElementById('annotateBtn').disabled = false;
+    showMessage(`Live news clip ready! ${CLIP_DURATION} seconds. Click "Annotate Clip".`, 'success');
+    
+  } catch (err) {
+    showMessage('Error fetching news: ' + err.message, 'error');
+  } finally {
+    document.getElementById('fetchBtn').disabled = false;
+  }
+}
+
+function startAnnotation() {
+  if (!currentAudioBlob) {
+    showMessage('No clip to annotate', 'error');
+    return;
+  }
+  
+  const numFrames = Math.floor((CLIP_DURATION * 1000) / FRAME_SIZE_MS);
+  currentFrames = [];
+  for (let i = 0; i < numFrames; i++) {
+    currentFrames.push({
+      index: i,
+      start_ms: i * FRAME_SIZE_MS,
+      end_ms: (i + 1) * FRAME_SIZE_MS,
+      text: ""
+    });
+  }
+  
+  renderAnnotationFrames();
+  initAudioContext();
+  document.getElementById('annotationSection').classList.remove('hidden');
+  showMessage(`Ready! ${numFrames} frames to annotate.`, 'success');
+}
+
+function renderAksharSet() {
+  const container = document.getElementById('aksharGrid');
+  if (!container) return;
+  container.innerHTML = '';
+  AKSHAR_SET.forEach(akshar => {
+    const span = document.createElement('span');
+    span.className = 'akshar-item';
+    span.textContent = akshar;
+    span.onclick = () => insertAkshar(akshar);
+    container.appendChild(span);
+  });
+}
+
+function insertAkshar(akshar) {
+  if (activeFrameIndex !== null && currentFrames[activeFrameIndex]) {
+    const input = document.querySelector(`.frame-input[data-index="${activeFrameIndex}"]`);
+    if (input) {
+      let newText = (currentFrames[activeFrameIndex].text || '') + akshar;
+      if (newText.length <= 4) {
+        input.value = newText;
+        currentFrames[activeFrameIndex].text = newText;
+      } else {
+        showMessage('Maximum 2 akshars per frame!', 'warning');
+      }
+    }
+  }
+}
+
 function toggleSegmentSelection(frameIndex) {
   const card = document.querySelector(`.frame-card[data-frame-index="${frameIndex}"]`);
   if (!card) return;
@@ -655,10 +676,7 @@ function clearSelection() {
 }
 
 function playSelectedSegments() {
-  if (selectedSegments.size === 0 || !currentAudio) {
-    showMessage('No segments selected', 'warning');
-    return;
-  }
+  if (selectedSegments.size === 0 || !currentAudio) return;
   stopPlayback();
   multiPlayQueue = Array.from(selectedSegments).sort((a, b) => a - b);
   multiPlayIndex = 0;
@@ -676,246 +694,33 @@ function playNextInQueue() {
 
   document.querySelectorAll('.frame-card.playing').forEach(c => c.classList.remove('playing'));
   const card = document.querySelector(`.frame-card[data-frame-index="${frameIndex}"]`);
-  if (card) { card.classList.add('playing'); card.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }
+  if (card) card.classList.add('playing');
 
-  const startSec = frame.start_ms / 1000;
-  const durationSec = (frame.end_ms - frame.start_ms) / 1000;
-
-  unlockAudio();
-  currentAudio.pause();
-  currentAudio.currentTime = startSec;
-
-  const doPlay = () => {
-    const p = currentAudio.play();
-    if (p !== undefined) {
-      p.then(() => {
-        multiPlayTimeout = setTimeout(() => {
-          if (currentAudio && !currentAudio.paused) currentAudio.pause();
-          multiPlayIndex++;
-          playNextInQueue();
-        }, durationSec * 1000);
-      }).catch(err => console.warn('multi-play error:', err));
-    }
-  };
-
-  if (audioContext && audioContext.state === 'suspended') audioContext.resume().then(doPlay).catch(doPlay);
-  else doPlay();
+  playSegmentAudio(frame.start_ms, frame.end_ms);
+  
+  multiPlayTimeout = setTimeout(() => {
+    multiPlayIndex++;
+    playNextInQueue();
+  }, (frame.end_ms - frame.start_ms));
 }
 
 function playSegmentByIndex(frameIndex) {
-  if (!currentFrames || !currentAudio) { showMessage('Audio not ready', 'error'); return; }
+  if (!currentFrames || !currentAudio) return;
   const frame = currentFrames[frameIndex];
   if (!frame) return;
   
-  if (currentPlayTimeout) { clearTimeout(currentPlayTimeout); currentPlayTimeout = null; }
-  if (multiPlayTimeout) { clearTimeout(multiPlayTimeout); multiPlayTimeout = null; }
-  document.querySelectorAll('.frame-card.playing').forEach(c => c.classList.remove('playing'));
+  stopPlayback();
   const card = document.querySelector(`.frame-card[data-frame-index="${frameIndex}"]`);
-  
-  unlockAudio();
   playSegmentAudio(frame.start_ms, frame.end_ms);
-  
   if (card) {
     card.classList.add('playing');
-    setTimeout(() => {
-      if (card) card.classList.remove('playing');
-    }, (frame.end_ms - frame.start_ms));
-  }
-}
-
-function renderAksharSet() {
-  const container = document.getElementById('aksharGrid');
-  if (!container) return;
-  container.innerHTML = '';
-  AKSHAR_SET.forEach(akshar => {
-    const span = document.createElement('span');
-    span.className = 'akshar-item';
-    span.textContent = akshar;
-    span.onclick = () => insertAkshar(akshar);
-    container.appendChild(span);
-  });
-}
-
-let activeFrameIndex = null;
-
-function insertAkshar(akshar) {
-  if (activeFrameIndex !== null && currentFrames[activeFrameIndex]) {
-    const input = document.querySelector(`.frame-input[data-index="${activeFrameIndex}"]`);
-    if (input) {
-      let newText = (currentFrames[activeFrameIndex].text || '') + akshar;
-      const aksharCount = newText.split('').filter(c => AKSHAR_SET.includes(c)).length;
-      if (aksharCount <= 2) {
-        input.value = newText;
-        currentFrames[activeFrameIndex].text = newText;
-      } else {
-        showMessage('Maximum 2 akshars per frame!', 'warning');
-      }
-    }
-  }
-}
-
-async function fetchLiveClip() {
-  showMessage('Fetching live news clip...', 'info');
-  document.getElementById('fetchBtn').disabled = true;
-  document.getElementById('fetchBtn').textContent = 'Fetching...';
-  
-  try {
-    // For demo, create a sample audio blob
-    // In production, this would fetch from actual news stream
-    const response = await fetch(`${BASE_PATH}/api/live-stream/fetch?lang=${currentLanguage}`);
-    
-    if (response.ok) {
-      const data = await response.json();
-      
-      if (data.audio_url) {
-        // Fetch the audio blob
-        const audioResponse = await fetch(data.audio_url);
-        currentAudioBlob = await audioResponse.blob();
-        currentAudioUrl = URL.createObjectURL(currentAudioBlob);
-        
-        currentAudio = document.getElementById('audioPlayer');
-        currentAudio.src = currentAudioUrl;
-        
-        document.getElementById('clipDuration').textContent = `Duration: ${data.duration}s`;
-        
-        if (data.transcript) {
-          document.getElementById('transcriptText').textContent = data.transcript;
-        }
-        
-        // Create frames for annotation (5-7 seconds clip)
-        const duration = data.duration;
-        const frameSizeMs = 108; // 108ms frames for 2x speed
-        const numFrames = Math.floor((duration * 1000) / frameSizeMs);
-        
-        currentFrames = [];
-        for (let i = 0; i < numFrames; i++) {
-          currentFrames.push({
-            index: i,
-            start_ms: i * frameSizeMs,
-            end_ms: (i + 1) * frameSizeMs,
-            text: ""
-          });
-        }
-        
-        renderAnnotationFrames();
-        
-        showMessage('Clip ready! Annotate the frames below.', 'success');
-      }
-    } else {
-      // Demo mode - create a silent audio blob
-      showMessage('Using demo mode. In production, this would fetch live news.', 'info');
-      createDemoAudio();
-    }
-    
-  } catch (err) {
-    console.error('Error fetching clip:', err);
-    createDemoAudio();
-  } finally {
-    document.getElementById('fetchBtn').disabled = false;
-    document.getElementById('fetchBtn').textContent = '🎙️ Fetch New Clip';
-  }
-}
-
-function createDemoAudio() {
-  // Create a simple beep for demo
-  const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-  const duration = 5;
-  const sampleRate = 44100;
-  const samples = duration * sampleRate;
-  const buffer = audioContext.createBuffer(1, samples, sampleRate);
-  const data = buffer.getChannelData(0);
-  
-  // Create a simple tone
-  for (let i = 0; i < samples; i++) {
-    data[i] = Math.sin(2 * Math.PI * 440 * i / sampleRate) * 0.5;
-  }
-  
-  // Convert to WAV
-  const wavBlob = audioBufferToWav(buffer);
-  currentAudioBlob = wavBlob;
-  currentAudioUrl = URL.createObjectURL(wavBlob);
-  
-  currentAudio = document.getElementById('audioPlayer');
-  currentAudio.src = currentAudioUrl;
-  
-  document.getElementById('clipDuration').textContent = 'Duration: 5.0s';
-  document.getElementById('transcriptText').textContent = 'Sample news clip for annotation. In production, this would be real news audio.';
-  
-  // Create frames
-  const frameSizeMs = 108;
-  const numFrames = Math.floor((duration * 1000) / frameSizeMs);
-  
-  currentFrames = [];
-  for (let i = 0; i < numFrames; i++) {
-    currentFrames.push({
-      index: i,
-      start_ms: i * frameSizeMs,
-      end_ms: (i + 1) * frameSizeMs,
-      text: ""
-    });
-  }
-  
-  renderAnnotationFrames();
-  showMessage('Demo clip ready! Annotate the frames.', 'success');
-  audioContext.close();
-}
-
-function audioBufferToWav(buffer) {
-  const numChannels = buffer.numberOfChannels;
-  const sampleRate = buffer.sampleRate;
-  const format = 1;
-  const bitDepth = 16;
-  
-  let samples = buffer.getChannelData(0);
-  let dataLength = samples.length * 2;
-  let bufferLength = 44 + dataLength;
-  const arrayBuffer = new ArrayBuffer(bufferLength);
-  const view = new DataView(arrayBuffer);
-  
-  writeString(view, 0, 'RIFF');
-  view.setUint32(4, bufferLength - 8, true);
-  writeString(view, 8, 'WAVE');
-  writeString(view, 12, 'fmt ');
-  view.setUint32(16, 16, true);
-  view.setUint16(20, format, true);
-  view.setUint16(22, numChannels, true);
-  view.setUint32(24, sampleRate, true);
-  view.setUint32(28, sampleRate * numChannels * (bitDepth / 8), true);
-  view.setUint16(32, numChannels * (bitDepth / 8), true);
-  view.setUint16(34, bitDepth, true);
-  writeString(view, 36, 'data');
-  view.setUint32(40, dataLength, true);
-  
-  let offset = 44;
-  for (let i = 0; i < samples.length; i++) {
-    const sample = Math.max(-1, Math.min(1, samples[i]));
-    view.setInt16(offset, sample < 0 ? sample * 0x8000 : sample * 0x7FFF, true);
-    offset += 2;
-  }
-  
-  return new Blob([view], { type: 'audio/wav' });
-}
-
-function writeString(view, offset, str) {
-  for (let i = 0; i < str.length; i++) {
-    view.setUint8(offset + i, str.charCodeAt(i));
+    setTimeout(() => card.classList.remove('playing'), frame.end_ms - frame.start_ms);
   }
 }
 
 function renderAnnotationFrames() {
   const framesGrid = document.getElementById('framesGrid');
   framesGrid.innerHTML = '';
-  
-  // Add multi-bar
-  const multiBar = document.createElement('div');
-  multiBar.id = 'multiBar';
-  multiBar.className = 'multi-bar hidden';
-  multiBar.innerHTML = `
-    <span class="multi-bar-label">0 segments selected</span>
-    <button class="btn btn-primary" style="padding: 6px 14px; font-size: 0.8rem;" onclick="playSelectedSegments()">▶ Play selected</button>
-    <button class="btn btn-secondary" style="padding: 6px 14px; font-size: 0.8rem;" onclick="clearSelection()">✕ Clear</button>
-  `;
-  framesGrid.appendChild(multiBar);
   
   currentFrames.forEach((frame, idx) => {
     const card = document.createElement('div');
@@ -925,38 +730,26 @@ function renderAnnotationFrames() {
     const headerDiv = document.createElement('div');
     headerDiv.className = 'frame-header';
     headerDiv.innerHTML = `
-      <span class="frame-label"><span class="sel-dot"></span> Segment ${idx+1}</span>
+      <span class="frame-label"><span class="sel-dot"></span> ${idx+1}</span>
       <span class="frame-time">${frame.start_ms}–${frame.end_ms} ms</span>
     `;
     
     const input = document.createElement('input');
     input.type = 'text';
     input.className = 'frame-input';
-    input.placeholder = 'Enter akshars (max 2)...';
+    input.placeholder = 'Akshars (max 2)';
     input.value = frame.text || '';
     input.setAttribute('data-index', idx);
     
     input.addEventListener('focus', () => { activeFrameIndex = idx; });
     input.addEventListener('input', (e) => {
       let value = e.target.value;
-      const aksharCount = value.split('').filter(c => AKSHAR_SET.includes(c)).length;
-      if (aksharCount > 2) {
-        let kept = '';
-        let count = 0;
-        for (let char of value) {
-          if (AKSHAR_SET.includes(char)) {
-            if (count < 2) {
-              kept += char;
-              count++;
-            }
-          } else {
-            kept += char;
-          }
-        }
-        e.target.value = kept;
+      if (value.length > 4) {
+        value = value.slice(0, 4);
+        e.target.value = value;
         showMessage('Maximum 2 akshars per frame!', 'warning');
       }
-      currentFrames[idx].text = e.target.value;
+      currentFrames[idx].text = value;
     });
     input.addEventListener('click', (e) => {
       e.stopPropagation();
@@ -972,9 +765,6 @@ function renderAnnotationFrames() {
     card.appendChild(input);
     framesGrid.appendChild(card);
   });
-  
-  document.getElementById('annotationSection').classList.remove('hidden');
-  initAudioContext();
 }
 
 async function submitAnnotation() {
@@ -983,22 +773,13 @@ async function submitAnnotation() {
     return;
   }
   
-  const emptyFrames = currentFrames.filter(f => !f.text || f.text.trim() === '');
-  if (emptyFrames.length > 0) {
-    if (!confirm(`${emptyFrames.length} frame(s) are empty. Submit anyway?`)) return;
-  }
-  
-  showMessage('Submitting annotation...', 'info');
+  showMessage('Submitting...', 'info');
   document.getElementById('submitBtn').disabled = true;
   
   try {
-    // Create a unique filename for this live clip
-    const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, -5);
-    const filename = `live_${currentLanguage}_${timestamp}`;
-    
     const formData = new FormData();
-    formData.append('audio', currentAudioBlob, `${filename}.webm`);
-    formData.append('duration', (currentFrames.length * 0.108).toFixed(2));
+    formData.append('audio', currentAudioBlob, `live_${currentLanguage}_${Date.now()}.wav`);
+    formData.append('duration', CLIP_DURATION);
     formData.append('language', currentLanguage);
     formData.append('frames', JSON.stringify(currentFrames));
     
@@ -1010,32 +791,24 @@ async function submitAnnotation() {
     const data = await response.json();
     if (data.success) {
       showMessage(`Submitted! Added ${data.akshar_count} akshars`, 'success');
-      
-      // Clear and fetch next clip
-      currentFrames = [];
-      document.getElementById('annotationSection').classList.add('hidden');
-      document.getElementById('framesGrid').innerHTML = '';
-      
-      // Auto-fetch next clip after 1 second
-      setTimeout(() => {
-        fetchLiveClip();
-      }, 1000);
+      cancelAnnotation();
+      fetchLiveNews();
     } else {
       throw new Error(data.error);
     }
   } catch (err) {
-    showMessage('Error submitting: ' + err.message, 'error');
+    showMessage('Error: ' + err.message, 'error');
   } finally {
     document.getElementById('submitBtn').disabled = false;
   }
 }
 
-function skipAndNext() {
+function cancelAnnotation() {
   currentFrames = [];
+  selectedSegments.clear();
   document.getElementById('annotationSection').classList.add('hidden');
   document.getElementById('framesGrid').innerHTML = '';
-  fetchLiveClip();
-  showMessage('Skipped. Fetching next clip...', 'info');
+  showMessage('Cancelled', 'info');
 }
 
 function showMessage(text, type) {
@@ -1048,7 +821,6 @@ function showMessage(text, type) {
   }, 3000);
 }
 
-// Start the app
 init();
 </script>
 </body>
