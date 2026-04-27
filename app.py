@@ -1349,9 +1349,104 @@ def self_record_submit():
         traceback.print_exc()
         return jsonify({"success": False, "error": str(e)}), 500
 
+# ============= NEW 3-TIER SUBMIT ROUTE =============
 
-
-
+@app.route("/submit-3-tier", methods=["POST"])
+@login_required
+def submit_3_tier():
+    """Submit 3-tier annotation (54ms, 108ms, 216ms frames)"""
+    try:
+        data = request.json
+        json_file = data.get('json_file')
+        username = session.get('username')
+        wav_file = data.get('wav_file', json_file.replace('.json', '.wav'))
+        original_wav_path = os.path.join(AUDIO_FOLDER, wav_file)
+        duration_ms = data.get('duration_ms', 0)
+        duration_seconds = duration_ms / 1000.0
+        
+        frames_54 = data.get('frames_54', [])
+        frames_108 = data.get('frames_108', [])
+        frames_216 = data.get('frames_216', [])
+        
+        # Calculate akshar count from all tiers
+        akshar_count = 0
+        for tier_frames in [frames_54, frames_108, frames_216]:
+            akshar_count += sum(1 for f in tier_frames if f.get('text') and f['text'].strip())
+        
+        # Save JSON with all 3 tiers
+        user_dir = get_user_annotation_dir(username)
+        output_file = os.path.join(user_dir, json_file)
+        
+        output_data = {
+            "audio_file": wav_file,
+            "annotator": username,
+            "timestamp": datetime.now().isoformat(),
+            "window_ms_54": 54,
+            "window_ms_108": 108,
+            "window_ms_216": 216,
+            "sentence": data.get("sentence"),
+            "full_sequence": data.get("full_sequence"),
+            "frames_54": frames_54,
+            "frames_108": frames_108,
+            "frames_216": frames_216,
+            "duration_ms": duration_ms,
+            "akshar_count": akshar_count,
+            "category": data.get("category", "3_tier"),
+            "status": "submitted",
+            "submitted_at": datetime.now().isoformat(),
+            "submitted_by": username,
+            "verification_status": "pending"
+        }
+        
+        with open(output_file, "w", encoding="utf-8") as f:
+            json.dump(output_data, f, indent=2, ensure_ascii=False)
+        
+        # Generate TextGrids for each tier
+        for tier_name, frames, window_ms in [('54', frames_54, 54), ('108', frames_108, 108), ('216', frames_216, 216)]:
+            if frames:
+                duration = frames[-1]['end_ms'] / 1000.0 if frames else 0
+                tg_content = create_enhanced_textgrid(
+                    frames=frames,
+                    duration=duration,
+                    sentence=data.get("full_sequence", ""),
+                    annotator=username,
+                    full_sequence=data.get("full_sequence", "")
+                )
+                tg_path = os.path.join(user_dir, f"{json_file.replace('.json', '')}_{tier_name}ms.TextGrid")
+                with open(tg_path, 'w', encoding='utf-8') as f:
+                    f.write(tg_content)
+        
+        # Save to mobile dataset
+        save_to_mobile_dataset(output_data, username, original_wav_path, json_file)
+        
+        # Update user stats
+        update_user_stats(username, json_file, duration_seconds, increment=True)
+        update_daily_stats(username, json_file, duration_seconds, increment=True)
+        
+        # Update completed files
+        completed_files.add(json_file)
+        save_completed_files(completed_files)
+        release_file_assignment(json_file)
+        clear_skipped_file(username, json_file)
+        
+        all_json_files = glob.glob(os.path.join(AUDIO_FOLDER, "*.json"))
+        total = len(all_json_files)
+        remaining = total - len(completed_files)
+        has_more = remaining > 0
+        
+        return jsonify({
+            "message": "3-tier annotation submitted successfully",
+            "file": json_file,
+            "has_more": has_more,
+            "remaining": remaining,
+            "akshar_count": akshar_count
+        })
+        
+    except Exception as e:
+        print(f"Error submitting 3-tier annotation: {e}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({"success": False, "error": str(e)}), 500
 
 
 # ============= LIVE STREAMING API ROUTES =============
@@ -1439,80 +1534,6 @@ NEWS_STREAMS = {
         'http://mhms9.airtel.tv/wh7f454c46tw4163224253_611767333/PLTV/88888888/224/3221226370/index.m3u8',
         # Zee 24 Taas via wmncdn
         'https://live.wmncdn.net/zee24taas/live.stream/tracks-v1a1/mono.m3u8',
-    ],
-
-    # ── Malayalam ─────────────────────────────────────────────────────────
-    'ml': [
-        # 24 News Malayalam - 103.199 CDN
-        'http://103.199.160.85/Content/24news/Live/Channel(24news)/index.m3u8',
-        # News Malayalam 24x7 - CloudFront
-        'https://d35j504z0x2vu2.cloudfront.net/v1/master/0bc8e8376bd8417a1b6761138aa41c26c7309312/news-malayalam-24x7/index.m3u8',
-        # Amrita TV - 103.199
-        'http://103.199.161.254/Content/amrita/Live/Channel(Amrita)/index.m3u8',
-        # Asianet News - 103.199
-        'http://103.199.161.254/Content/asianetnews/Live/Channel(Asianetnews)/index.m3u8',
-        # Manorama News - 103.199
-        'http://103.199.160.85/Content/manoramanews/Live/Channel(Manoramanews)/index.m3u8',
-        # Mangalam TV - 103.199
-        'http://103.199.160.85/Content/mangalam/Live/Channel(Mangalam)/index.m3u8',
-        # Kite Victers - 5centscdn
-        'https://932y4x26ljv8-hls-live.5centscdn.com/victers/tv.stream/playlist.m3u8',
-        # M4 Malayalam
-        'http://m4malayalam.livebox.co.in/mfourmalayalamhls/live.m3u8',
-    ],
-
-    # ── Kannada ───────────────────────────────────────────────────────────
-    'kn': [
-        # TV9 Kannada via airtel CDN
-        'http://mhms5.airtel.tv/wh7f454c46tw3189386479_1439368730/PLTV/88888888/224/3221226094/index.m3u8',
-        # Public TV Kannada via wmncdn
-        'https://live.wmncdn.net/publictv/live.stream/tracks-v1a1/mono.m3u8',
-        # BTV Kannada via airtel CDN
-        'http://mhms9.airtel.tv/wh7f454c46tw4163224253_611767333/PLTV/88888888/224/3221226341/index.m3u8',
-        # Suvarna News via wmncdn
-        'https://live.wmncdn.net/suvarna/live.stream/tracks-v1a1/mono.m3u8',
-    ],
-
-    # ── Bhojpuri ──────────────────────────────────────────────────────────
-    'bh': [
-        # Digi Hindi (carries Bhojpuri content) - Dighvijay
-        'https://vidcdn.vidgyor.com/dighvijay-origin/liveabr/dighvijay-origin/live1/chunks.m3u8',
-        # ABP News Hindi fallback (understood by Bhojpuri speakers)
-        'https://abp-i.akamaihd.net/hls/live/765529/abphindi/masterhls_1564.m3u8',
-        # Aaj Tak fallback
-        'https://aajtakhdlive-amd.akamaized.net/hls/live/2014415/aajtakhd/aajtakhdlive/live_720p/chunks.m3u8',
-    ],
-
-    # ── Odia ──────────────────────────────────────────────────────────────
-    'od': [
-        # Kanak News Odia - airtel CDN
-        'http://mhms9.airtel.tv/wh7f454c46taw1033387593_346937752/PLTV/88888888/224/3221226224/index.m3u8',
-        # Kalinga TV - airtel CDN
-        'http://cshms3.airtel.tv/wh7f454c46tw4163224253_611767333/PLTV/88888888/224/3221226016/index.m3u8',
-        # OTV Odia via wmncdn
-        'https://live.wmncdn.net/otvnews/live.stream/tracks-v1a1/mono.m3u8',
-    ],
-
-    # ── Punjabi ───────────────────────────────────────────────────────────
-    'pa': [
-        # PTC News Punjabi - 5centscdn
-        'https://932y483pdjv8-hls-live.5centscdn.com/stream/deb10bae362f810630ec3abedcae5894.sdp/playlist.m3u8',
-        # TV Punjab - samtv CDN
-        'http://cdn.samtv.ca/tvpunjab/index.m3u8',
-        # Living India News - wmncdn
-        'http://7mbd4njeq3gx-hls-live.wmncdn.net/linews/fdb3289a938b59c7d9cab5f311b09966.sdp/tracks-v1a1/index.m3u8',
-        # E9 Punjabi - samtv
-        'http://cdn.samtv.ca/e9punjabi/index.m3u8',
-    ],
-
-    # ── Urdu ──────────────────────────────────────────────────────────────
-    'ur': [
-        # Amar Ujala Urdu stream
-        'https://streamcdn.amarujala.com/live/smil:stream1.smil/playlist.m3u8',
-        # Hindi ABP fallback (Urdu speakers can follow)
-        'https://abp-i.akamaihd.net/hls/live/765529/abphindi/masterhls_1564.m3u8',
-        # NDTV India fallback
-        'https://ndtvindiaelemarchana.akamaized.net/hls/live/2003679/ndtvindia/master.m3u8',
     ],
 }
 
