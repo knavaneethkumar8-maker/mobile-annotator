@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
-<title>3-Tier Annotation Tool</title>
+<title>Annotation Tool - 3 Tier Hierarchical</title>
 
 <style>
 * {
@@ -262,175 +262,132 @@ audio {
   color: #1A4D3A;
 }
 
-/* ========== 3-TIER TABS ========== */
-.tier-tabs {
-  display: flex;
-  gap: 8px;
+/* ========== 3-TIER HIERARCHICAL GRID ========== */
+.three-tier-container {
   margin: 16px 0;
-  background: #F8F8F4;
-  padding: 6px;
-  border-radius: 60px;
-  border: 1px solid #E9E9E2;
-}
-
-.tier-tab {
-  flex: 1;
-  padding: 10px 8px;
-  text-align: center;
-  background: transparent;
-  border: none;
-  border-radius: 40px;
-  font-size: 0.8rem;
-  font-weight: 550;
-  color: #6E6E68;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.tier-tab.active {
-  background: #2C6E49;
-  color: white;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-}
-
-.tier-tab span {
-  display: block;
-  font-size: 0.7rem;
-  font-weight: normal;
-  opacity: 0.8;
-}
-
-.tier-panel {
-  display: none;
-}
-
-.tier-panel.active {
-  display: block;
-}
-
-.tier-header {
-  background: #EBF2EA;
-  border-radius: 16px;
-  padding: 10px 12px;
-  margin-bottom: 12px;
-  font-size: 0.75rem;
-  font-weight: 550;
-  color: #2C6E49;
-  text-align: center;
-}
-
-/* ========== FRAMES GRID ========== */
-.frames-grid {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  max-height: 450px;
-  overflow-y: auto;
-  padding: 4px 2px 8px 2px;
-  margin-top: 8px;
-  margin-bottom: 16px;
-}
-
-.frame-card {
-  background: #FEFEFC;
   border: 1px solid #E5E5DE;
   border-radius: 20px;
-  padding: 12px 14px;
-  transition: all 0.2s ease;
-  cursor: pointer;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+  background: #FFFFFF;
+  overflow-x: auto;
+  overflow-y: hidden;
 }
 
-.frame-card.active {
-  background: #EBF2EA;
-  border-color: #2C6E49;
-  box-shadow: 0 2px 8px rgba(44,110,73,0.08);
-}
-
-.frame-card.selected {
-  background: #F0FAF3;
-  border: 2px solid #2C6E49;
-  box-shadow: 0 0 0 3px rgba(44,110,73,0.08);
-}
-
-.frame-card.playing {
-  background: #D6EFE0;
-  border: 2px solid #1A4D3A;
-  box-shadow: 0 2px 10px rgba(44,110,73,0.15);
-}
-
-.frame-card.drag-over {
-  background: #E8F0FE;
-  border-color: #2C6E49;
-  border-width: 2px;
-  transform: scale(1.01);
-}
-
-.frame-header {
+.tier-row {
   display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  margin-bottom: 10px;
-  font-size: 0.7rem;
-  font-weight: 480;
-  letter-spacing: 0.3px;
-  color: #6E6E68;
+  gap: 8px;
+  padding: 12px 16px;
+  border-bottom: 1px solid #F0F0EB;
+  background: white;
 }
 
-.frame-time {
-  background: #EEEEE8;
-  padding: 2px 10px;
-  border-radius: 30px;
-  font-size: 0.65rem;
-  font-family: monospace;
+.tier-row:last-child {
+  border-bottom: none;
 }
 
-.frame-label {
-  font-weight: 500;
-  text-transform: uppercase;
-  font-size: 0.7rem;
+.tier-label {
   display: flex;
   align-items: center;
-  gap: 6px;
+  justify-content: center;
+  margin-right: 16px;
+  min-width: 70px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 8px 12px;
+  background: #F0F0EB;
+  border-radius: 30px;
+  color: #2C6E49;
 }
 
-.sel-dot {
-  width: 9px;
-  height: 9px;
-  border-radius: 50%;
-  border: 2px solid #2C6E49;
-  background: transparent;
-  display: inline-block;
-  transition: background 0.15s;
+.tier-cells {
+  display: flex;
+  gap: 8px;
+  flex: 1;
+  overflow-x: auto;
+}
+
+.cell-216, .cell-108, .cell-54 {
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.1s ease;
+  background: white;
   flex-shrink: 0;
 }
 
-.frame-card.selected .sel-dot,
-.frame-card.playing .sel-dot {
-  background: #2C6E49;
+.cell-216 {
+  width: 280px;
+  border: 2px solid #D1E0F0;
+  border-radius: 16px;
+  padding: 12px 8px;
 }
 
-.edit-text {
-  border: 1px solid #DCDCD4;
-  border-radius: 18px;
-  padding: 12px 14px;
-  background: #FFFFFF;
-  font-size: 1rem;
-  font-family: monospace;
+.cell-108 {
+  width: 132px;
+  border: 2px solid #E2EDF7;
+  border-radius: 14px;
+  padding: 10px 6px;
+}
+
+.cell-54 {
+  width: 60px;
+  border: 1.5px solid #E2E8F0;
+  border-radius: 12px;
+  padding: 8px 4px;
+}
+
+.cell-216.selected, .cell-108.selected, .cell-54.selected {
+  background: #EFF6FF;
+  border-color: #3B82F6;
+  box-shadow: 0 0 0 2px rgba(59,130,246,0.2);
+}
+
+.cell-216.playing, .cell-108.playing, .cell-54.playing {
+  background: #E6F7EC;
+  border-color: #10B981;
+  animation: pulse 0.2s ease;
+}
+
+.cell-216.current-play, .cell-108.current-play, .cell-54.current-play {
+  background: #FEF3C7;
+  border-color: #F59E0B;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+.time-label {
+  font-size: 9px;
+  background: #F1F5F9;
+  padding: 2px 8px;
+  border-radius: 20px;
+  color: #475569;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.grid-input {
   width: 100%;
-  outline: none;
-  transition: 0.18s ease;
-  font-weight: 460;
-  color: #1C1C1A;
-  resize: vertical;
-  cursor: text;
-  box-sizing: border-box;
-  min-height: 50px;
+  text-align: center;
+  background: #FAFCFF;
+  border: 1px solid #E2E8F0;
+  border-radius: 10px;
+  font-family: 'Noto Sans Devanagari', monospace;
+  font-weight: 500;
 }
 
-.edit-text:focus {
-  border-color: #2C6E49;
-  box-shadow: 0 0 0 2px rgba(44,110,73,0.2);
+.cell-54 .grid-input { font-size: 0.9rem; padding: 6px 2px; }
+.cell-108 .grid-input { font-size: 1rem; padding: 8px 4px; }
+.cell-216 .grid-input { font-size: 1.1rem; padding: 10px 6px; }
+
+.grid-input:focus {
+  outline: none;
+  border-color: #3B82F6;
+  background: white;
+  box-shadow: 0 0 0 2px rgba(59,130,246,0.1);
 }
 
 /* Multi-select toolbar */
@@ -468,11 +425,7 @@ audio {
 }
 
 .multi-bar-btn:hover { background: rgba(255,255,255,0.28); }
-
-.multi-bar-btn.play {
-  background: #FFFFFF;
-  color: #1A4D3A;
-}
+.multi-bar-btn.play { background: #FFFFFF; color: #1A4D3A; }
 
 .akshar-set-section {
   margin: 8px 0 20px;
@@ -571,13 +524,47 @@ button {
 
 .completion-box { text-align: center; padding: 36px 16px; }
 
-.completion-box h2 { font-size: 1.9rem; font-weight: 560; color: #2C6E49; margin-bottom: 12px; }
+.completion-box h2 {
+  font-size: 1.9rem;
+  font-weight: 560;
+  letter-spacing: -0.3px;
+  color: #2C6E49;
+  margin-bottom: 12px;
+}
+
 .completion-box p { font-size: 1rem; margin: 18px 0; color: #3C3C38; }
 .completion-box button { background: #2C6E49; color: white; max-width: 220px; margin: 16px auto 0; }
 
-.frames-grid::-webkit-scrollbar { width: 4px; }
-.frames-grid::-webkit-scrollbar-track { background: #EFEFE9; border-radius: 8px; }
-.frames-grid::-webkit-scrollbar-thumb { background: #BDBDB3; border-radius: 8px; }
+.empty-hint {
+  font-size: 0.7rem;
+  color: #8E8E88;
+  text-align: right;
+  margin-top: 6px;
+  padding-right: 4px;
+}
+
+.play-full-btn {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background: #3B82F6;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 8px 18px rgba(59,130,246,0.4);
+  z-index: 1050;
+  border: none;
+}
+
+.play-full-btn svg {
+  width: 32px;
+  height: 32px;
+  fill: white;
+}
 
 @media (max-width: 560px) {
   body { padding: 12px 0px; }
@@ -592,16 +579,10 @@ button {
   .volume-value { min-width: 48px; font-size: 0.75rem; }
   .header-right { gap: 8px; }
   .stats-btn, .self-record-btn, .live-stream-btn { padding: 6px 10px; font-size: 0.7rem; }
-  .tier-tab { font-size: 0.7rem; padding: 8px 4px; }
-  .tier-tab span { font-size: 0.6rem; }
-}
-
-.empty-hint {
-  font-size: 0.7rem;
-  color: #8E8E88;
-  text-align: right;
-  margin-top: 6px;
-  padding-right: 4px;
+  .cell-216 { width: 220px; }
+  .cell-108 { width: 104px; }
+  .cell-54 { width: 48px; }
+  .tier-label { min-width: 55px; font-size: 0.65rem; }
 }
 </style>
 </head>
@@ -613,8 +594,8 @@ button {
       <h2>3-Tier Annotation</h2>
     </div>
     <div class="header-right">
-      <button class="self-record-btn" onclick="window.location.href='{{ url_for_path('self-record') }}'">Self</button>
-      <button class="live-stream-btn" onclick="window.location.href='{{ url_for_path('live-stream') }}'">Live</button>
+      <button class="self-record-btn" onclick="window.location.href='{{ url_for_path('self-record') }}'">🎙️ Self</button>
+      <button class="live-stream-btn" onclick="window.location.href='{{ url_for_path('live-stream') }}'">📺 Live</button>
       <button class="stats-btn" onclick="window.location.href='{{ url_for_path('stats') }}'">Stats</button>
       <button class="stats-btn" onclick="window.location.href='{{ url_for_path('verify') }}'">Verify</button>
       <div class="user-info">
@@ -651,14 +632,6 @@ button {
 
 <script>
 const BASE_PATH = "{{ base_path }}";
-
-// Tier configurations - 3 different frame sizes
-const TIERS = {
-  tier_54: { name: "आकाश (54ms)", speed: "1x", frameMs: 54, color: "#2C6E49" },
-  tier_108: { name: "अग्नि (108ms)", speed: "2x", frameMs: 108, color: "#4A6FA5" },
-  tier_216: { name: "वायु (216ms)", speed: "4x", frameMs: 216, color: "#B13E3A" }
-};
-
 const AKSHAR_SET = [
   "अ", "आ", "इ", "उ", "ए", "ओ",
   "क", "ख", "ग", "घ", "च", "छ", "ज", "झ",
@@ -669,43 +642,67 @@ const AKSHAR_SET = [
   "स", "ह", "०"
 ];
 
+// Tier frame sizes
+const TIER_FRAME_MS = {
+  tier_216: 216,
+  tier_108: 108,
+  tier_54: 54
+};
+
+const TIER_SPAN = {
+  tier_216: 4,  // 1 cell = 4 cells of 54ms
+  tier_108: 2,  // 1 cell = 2 cells of 54ms
+  tier_54: 1    // 1 cell = 1 cell
+};
+
 let currentData = null;
 let currentAudio = null;
 let currentPlayTimeout = null;
 let currentUsername = '';
 let audioContext = null;
 let gainNode = null;
+let sourceNode = null;
 let currentVolume = 1.0;
 const MAX_VOLUME = 6.0;
 let audioUnlocked = false;
 
-// Store frames for each tier separately
-let framesData = {
-  tier_54: [],
-  tier_108: [],
-  tier_216: []
-};
-
 // Multi-select state per tier
 let selectedSegments = {
-  tier_54: new Set(),
+  tier_216: new Set(),
   tier_108: new Set(),
-  tier_216: new Set()
+  tier_54: new Set()
 };
-let currentTier = 'tier_54';
 let multiPlayQueue = [];
 let multiPlayIndex = 0;
 let multiPlayTimeout = null;
+let currentTier = 'tier_216';
+
+// Frame data per tier
+let framesData = {
+  tier_216: [],
+  tier_108: [],
+  tier_54: []
+};
+
+// DOM elements for cells
+let cells = {
+  tier_216: [],
+  tier_108: [],
+  tier_54: []
+};
+let inputs = {
+  tier_216: [],
+  tier_108: [],
+  tier_54: []
+};
 
 // Drag state
 let dragState = {
   active: false, akshar: null, sourceElement: null,
   targetFrameIndex: null, targetTier: null
 };
-
-// Playback speed
-let playbackSpeed = 1.0;
-let originalPlaybackRate = 1.0;
+let isSpacePressed = false;
+let activeInputElement = null;
 
 function unlockAudio() {
   if (audioUnlocked) return;
@@ -756,7 +753,7 @@ function handleDragStart(e) {
 function handleDragEnd(e) {
   e.target.classList.remove('dragging');
   dragState.akshar = null;
-  document.querySelectorAll('.frame-card').forEach(c => c.classList.remove('drag-over'));
+  document.querySelectorAll('.cell-216, .cell-108, .cell-54').forEach(c => c.classList.remove('drag-over'));
 }
 
 function handleTouchStart(e) {
@@ -764,7 +761,9 @@ function handleTouchStart(e) {
   const touch = e.touches[0];
   const akshar = e.target.getAttribute('data-akshar');
   if (!akshar) return;
-  dragState.active = true; dragState.akshar = akshar; dragState.sourceElement = e.target;
+  dragState.active = true;
+  dragState.akshar = akshar;
+  dragState.sourceElement = e.target;
   dragState.targetTier = currentTier;
   e.target.classList.add('drag-source');
   const fb = document.createElement('div');
@@ -782,14 +781,17 @@ function handleTouchMove(e) {
   const fb = document.getElementById('dragFeedback');
   if (fb) { fb.style.left = (touch.clientX-25)+'px'; fb.style.top = (touch.clientY-25)+'px'; }
   const el = document.elementFromPoint(touch.clientX, touch.clientY);
-  const targetCard = el?.closest('.frame-card');
-  document.querySelectorAll('.frame-card').forEach(c => { if (c !== targetCard) c.classList.remove('drag-over'); });
-  if (targetCard) { 
-    targetCard.classList.add('drag-over'); 
-    dragState.targetFrameIndex = parseInt(targetCard.getAttribute('data-frame-index'));
-    dragState.targetTier = targetCard.getAttribute('data-tier');
+  let targetCell = el?.closest('.cell-216, .cell-108, .cell-54');
+  document.querySelectorAll('.cell-216, .cell-108, .cell-54').forEach(c => {
+    if (c !== targetCell) c.classList.remove('drag-over');
+  });
+  if (targetCell) {
+    targetCell.classList.add('drag-over');
+    dragState.targetFrameIndex = parseInt(targetCell.getAttribute('data-idx'));
+    dragState.targetTier = targetCell.getAttribute('data-tier');
+  } else {
+    dragState.targetFrameIndex = null;
   }
-  else { dragState.targetFrameIndex = null; }
 }
 
 function handleTouchEnd(e) {
@@ -798,21 +800,19 @@ function handleTouchEnd(e) {
   const fb = document.getElementById('dragFeedback');
   if (fb) fb.remove();
   if (dragState.sourceElement) dragState.sourceElement.classList.remove('drag-source');
-  document.querySelectorAll('.frame-card').forEach(c => c.classList.remove('drag-over'));
+  document.querySelectorAll('.cell-216, .cell-108, .cell-54').forEach(c => c.classList.remove('drag-over'));
   if (dragState.targetFrameIndex !== null && dragState.akshar && dragState.targetTier && framesData[dragState.targetTier]) {
     const fi = dragState.targetFrameIndex;
-    const targetEditDiv = document.querySelector(`.frame-card[data-tier="${dragState.targetTier}"][data-frame-index="${fi}"] .edit-text`);
-    if (targetEditDiv && framesData[dragState.targetTier][fi]) {
-      const newText = (framesData[dragState.targetTier][fi].text || '') + dragState.akshar;
-      const aksharCount = newText.split('').filter(c => AKSHAR_SET.includes(c)).length;
+    const targetInput = inputs[dragState.targetTier][fi];
+    if (targetInput && framesData[dragState.targetTier][fi]) {
+      let currentText = framesData[dragState.targetTier][fi].text || '';
+      let newText = currentText + dragState.akshar;
+      let aksharCount = newText.split('').filter(c => AKSHAR_SET.includes(c)).length;
       if (aksharCount <= 2) {
-        targetEditDiv.innerText = newText;
+        targetInput.value = newText;
         framesData[dragState.targetTier][fi].text = newText;
-        showMessage(`Added "${dragState.akshar}" to segment ${fi+1} (${TIERS[dragState.targetTier].name})`, 'success');
-        targetEditDiv.focus();
-        const range = document.createRange(); const sel = window.getSelection();
-        range.selectNodeContents(targetEditDiv); range.collapse(false);
-        sel.removeAllRanges(); sel.addRange(range);
+        showMessage(`Added "${dragState.akshar}" to segment ${fi+1}`, 'success');
+        targetInput.focus();
       } else {
         showMessage('Maximum 2 akshars per frame!', 'warning');
       }
@@ -821,26 +821,27 @@ function handleTouchEnd(e) {
   dragState.active = false; dragState.akshar = null; dragState.sourceElement = null; dragState.targetFrameIndex = null;
 }
 
-function setupDesktopDropZone(editDiv, frameIndex, tier) {
-  editDiv.addEventListener('dragover', (e) => {
-    e.preventDefault(); e.dataTransfer.dropEffect = 'copy';
-    editDiv.closest('.frame-card')?.classList.add('drag-over');
-  });
-  editDiv.addEventListener('dragleave', () => editDiv.closest('.frame-card')?.classList.remove('drag-over'));
-  editDiv.addEventListener('drop', (e) => {
+function setupDesktopDropZone(input, frameIndex, tier) {
+  input.addEventListener('dragover', (e) => {
     e.preventDefault();
-    editDiv.closest('.frame-card')?.classList.remove('drag-over');
+    e.dataTransfer.dropEffect = 'copy';
+    input.closest(`.cell-${tier}`)?.classList.add('drag-over');
+  });
+  input.addEventListener('dragleave', () => {
+    input.closest(`.cell-${tier}`)?.classList.remove('drag-over');
+  });
+  input.addEventListener('drop', (e) => {
+    e.preventDefault();
+    input.closest(`.cell-${tier}`)?.classList.remove('drag-over');
     const akshar = e.dataTransfer.getData('text/plain');
     if (akshar && framesData[tier] && framesData[tier][frameIndex]) {
-      const newText = (framesData[tier][frameIndex].text || '') + akshar;
-      const aksharCount = newText.split('').filter(c => AKSHAR_SET.includes(c)).length;
+      let currentText = framesData[tier][frameIndex].text || '';
+      let newText = currentText + akshar;
+      let aksharCount = newText.split('').filter(c => AKSHAR_SET.includes(c)).length;
       if (aksharCount <= 2) {
-        editDiv.innerText = newText;
+        input.value = newText;
         framesData[tier][frameIndex].text = newText;
         showMessage(`Added "${akshar}" to segment ${frameIndex+1}`, 'success');
-        const range = document.createRange(); const sel = window.getSelection();
-        range.selectNodeContents(editDiv); range.collapse(false);
-        sel.removeAllRanges(); sel.addRange(range);
       } else {
         showMessage('Maximum 2 akshars per frame!', 'warning');
       }
@@ -897,6 +898,7 @@ function initAudioContext() {
       source.connect(gainNode);
       gainNode.connect(audioContext.destination);
       gainNode.gain.value = currentVolume;
+      sourceNode = source;
       if (audioContext.state === 'suspended') {
         const rh = () => { audioContext.resume(); document.removeEventListener('touchstart', rh); document.removeEventListener('click', rh); };
         document.addEventListener('touchstart', rh);
@@ -912,14 +914,6 @@ function updateVolume(value) {
   if (volumeSpan) volumeSpan.innerText = Math.round(value * 100) + '%';
   if (gainNode) gainNode.gain.value = value;
   if (currentAudio && !gainNode) currentAudio.volume = Math.min(value, 1.0);
-}
-
-function setPlaybackSpeed(speed) {
-  playbackSpeed = speed;
-  if (currentAudio) {
-    currentAudio.playbackRate = speed;
-  }
-  showMessage(`Playback speed: ${speed}x`, 'info');
 }
 
 function playSegmentAudio(startMs, endMs) {
@@ -942,32 +936,14 @@ function playAudioSegment(startSec, durationSec) {
       currentPlayTimeout = setTimeout(() => {
         if (currentAudio && !currentAudio.paused) currentAudio.pause();
         currentPlayTimeout = null;
-      }, durationSec * 1000 / playbackSpeed);
+      }, durationSec * 1000);
     }).catch(err => { console.warn('Playback error:', err); showMessage('Tap the play button first to enable audio', 'info'); });
   }
-}
-
-function switchTier(tier) {
-  currentTier = tier;
-  document.querySelectorAll('.tier-tab').forEach(tab => {
-    if (tab.dataset.tier === tier) {
-      tab.classList.add('active');
-    } else {
-      tab.classList.remove('active');
-    }
-  });
-  document.querySelectorAll('.tier-panel').forEach(panel => {
-    if (panel.id === `tier-panel-${tier}`) {
-      panel.classList.add('active');
-    } else {
-      panel.classList.remove('active');
-    }
-  });
-  updateMultiBar();
+  currentAudio.onended = () => { if (currentPlayTimeout) { clearTimeout(currentPlayTimeout); currentPlayTimeout = null; } };
 }
 
 function toggleSegmentSelection(tier, frameIndex) {
-  const card = document.querySelector(`.frame-card[data-tier="${tier}"][data-frame-index="${frameIndex}"]`);
+  const card = cells[tier][frameIndex];
   if (!card) return;
   if (selectedSegments[tier].has(frameIndex)) {
     selectedSegments[tier].delete(frameIndex);
@@ -993,7 +969,7 @@ function updateMultiBar() {
 
 function clearSelection() {
   selectedSegments[currentTier].clear();
-  document.querySelectorAll(`.frame-card[data-tier="${currentTier}"].selected`).forEach(c => c.classList.remove('selected'));
+  cells[currentTier].forEach(cell => cell.classList.remove('selected'));
   updateMultiBar();
 }
 
@@ -1002,7 +978,7 @@ function playSelectedSegments() {
   if (currentSelected.size === 0 || !currentData || !currentAudio) return;
   if (currentPlayTimeout) { clearTimeout(currentPlayTimeout); currentPlayTimeout = null; }
   if (multiPlayTimeout) { clearTimeout(multiPlayTimeout); multiPlayTimeout = null; }
-  document.querySelectorAll(`.frame-card[data-tier="${currentTier}"].playing`).forEach(c => c.classList.remove('playing'));
+  cells[currentTier].forEach(cell => cell.classList.remove('playing'));
   
   multiPlayQueue = Array.from(currentSelected).sort((a, b) => a - b);
   multiPlayIndex = 0;
@@ -1011,15 +987,15 @@ function playSelectedSegments() {
 
 function playNextInQueue() {
   if (multiPlayIndex >= multiPlayQueue.length) {
-    document.querySelectorAll(`.frame-card[data-tier="${currentTier}"].playing`).forEach(c => c.classList.remove('playing'));
+    cells[currentTier].forEach(cell => cell.classList.remove('playing'));
     return;
   }
   const frameIndex = multiPlayQueue[multiPlayIndex];
   const frame = framesData[currentTier][frameIndex];
   if (!frame) { multiPlayIndex++; playNextInQueue(); return; }
 
-  document.querySelectorAll(`.frame-card[data-tier="${currentTier}"].playing`).forEach(c => c.classList.remove('playing'));
-  const card = document.querySelector(`.frame-card[data-tier="${currentTier}"][data-frame-index="${frameIndex}"]`);
+  cells[currentTier].forEach(cell => cell.classList.remove('playing'));
+  const card = cells[currentTier][frameIndex];
   if (card) { card.classList.add('playing'); card.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }
 
   const startSec = frame.start_ms / 1000;
@@ -1037,7 +1013,7 @@ function playNextInQueue() {
           if (currentAudio && !currentAudio.paused) currentAudio.pause();
           multiPlayIndex++;
           playNextInQueue();
-        }, durationSec * 1000 / playbackSpeed);
+        }, durationSec * 1000);
       }).catch(err => console.warn('multi-play error:', err));
     }
   };
@@ -1051,41 +1027,30 @@ function playSegmentByIndex(tier, frameIndex) {
   const frame = framesData[tier][frameIndex];
   if (!frame) return;
   if (multiPlayTimeout) { clearTimeout(multiPlayTimeout); multiPlayTimeout = null; }
-  document.querySelectorAll(`.frame-card[data-tier="${tier}"].playing`).forEach(c => c.classList.remove('playing'));
-  document.querySelectorAll(`.frame-card[data-tier="${tier}"]`).forEach(c => c.classList.remove('active'));
-  const card = document.querySelector(`.frame-card[data-tier="${tier}"][data-frame-index="${frameIndex}"]`);
+  cells[tier].forEach(cell => cell.classList.remove('playing', 'active'));
+  const card = cells[tier][frameIndex];
   if (card) card.classList.add('active');
   unlockAudio();
   playSegmentAudio(frame.start_ms, frame.end_ms);
-}
-
-function generateFramesForTier(durationMs, frameSizeMs) {
-  const numFrames = Math.ceil(durationMs / frameSizeMs);
-  const frames = [];
-  for (let i = 0; i < numFrames; i++) {
-    frames.push({
-      index: i,
-      start_ms: i * frameSizeMs,
-      end_ms: Math.min((i + 1) * frameSizeMs, durationMs),
-      text: ""
-    });
+  if (card) {
+    card.classList.add('playing');
+    setTimeout(() => card.classList.remove('playing'), (frame.end_ms - frame.start_ms));
   }
-  return frames;
 }
 
 async function loadNextFile() {
   const contentDiv = document.getElementById('content');
   contentDiv.innerHTML = '<div class="loading">Loading next sample...</div>';
-  if (audioContext) { await audioContext.close(); audioContext = null; gainNode = null; }
+  if (audioContext) { await audioContext.close(); audioContext = null; gainNode = null; sourceNode = null; }
   audioUnlocked = false;
-  selectedSegments = { tier_54: new Set(), tier_108: new Set(), tier_216: new Set() };
+  selectedSegments = { tier_216: new Set(), tier_108: new Set(), tier_54: new Set() };
   try {
     const r = await fetch(`${BASE_PATH}/get-next-file`);
     if (r.status === 401) { window.location.href = `${BASE_PATH}/login`; return; }
     const d = await r.json();
     if (d.completed) { showCompletionScreen(); return; }
     if (d.error) { showErrorScreen(d.error); return; }
-    renderThreeTierInterface(d);
+    renderHierarchicalInterface(d);
     loadProgress();
   } catch (err) { showErrorScreen('Connection issue: ' + err); }
 }
@@ -1107,11 +1072,25 @@ function showErrorScreen(message) {
     </div>`;
 }
 
-function renderThreeTierInterface(data) {
+function generateFramesForTier(durationMs, frameSizeMs) {
+  const numFrames = Math.ceil(durationMs / frameSizeMs);
+  const frames = [];
+  for (let i = 0; i < numFrames; i++) {
+    frames.push({
+      index: i,
+      start_ms: i * frameSizeMs,
+      end_ms: Math.min((i + 1) * frameSizeMs, durationMs),
+      text: ""
+    });
+  }
+  return frames;
+}
+
+function renderHierarchicalInterface(data) {
   currentData = data;
   const durationMs = data.duration_ms || 5000;
   
-  // Generate frames for ALL 3 tiers independently
+  // Generate frames for all 3 tiers with hierarchical relationship
   framesData.tier_54 = generateFramesForTier(durationMs, 54);
   framesData.tier_108 = generateFramesForTier(durationMs, 108);
   framesData.tier_216 = generateFramesForTier(durationMs, 216);
@@ -1126,18 +1105,13 @@ function renderThreeTierInterface(data) {
         <input type="range" id="volumeSlider" class="volume-slider" min="0" max="${MAX_VOLUME}" step="0.05" value="1.0">
         <span class="volume-value" id="volumeValue">100%</span>
       </div>
-      <div style="display: flex; gap: 8px; margin-top: 12px;">
-        <button class="stats-btn" onclick="setPlaybackSpeed(1.0)" style="flex:1; padding:8px;">1x</button>
-        <button class="stats-btn" onclick="setPlaybackSpeed(2.0)" style="flex:1; padding:8px;">2x</button>
-        <button class="stats-btn" onclick="setPlaybackSpeed(4.0)" style="flex:1; padding:8px;">4x</button>
-      </div>
     </div>
     <div class="current-file-card">
       <div><strong>File:</strong> ${data.json_file}</div>
       <div><strong>Word:</strong> ${data.word || '—'}</div>
       <div><strong>Sentence:</strong> ${data.sentence || ''}</div>
       <div style="margin-top:8px;font-size:0.8rem;color:#6E6E68;"><strong>Annotator:</strong> ${currentUsername}</div>
-      <div style="margin-top:4px;font-size:0.7rem;color:#2C6E49;"><strong>Duration:</strong> ${(durationMs/1000).toFixed(2)}s | <strong>3 Tiers:</strong> 54ms | 108ms | 216ms</div>
+      <div style="margin-top:4px;font-size:0.7rem;color:#2C6E49;"><strong>Duration:</strong> ${(durationMs/1000).toFixed(2)}s | <strong>Hierarchy:</strong> 216ms → 108ms → 54ms</div>
     </div>
     
     <div class="akshar-set-section">
@@ -1145,32 +1119,30 @@ function renderThreeTierInterface(data) {
       <div class="akshar-grid" id="aksharGridTop"></div>
     </div>
     
-    <div class="tier-tabs">
-      <button class="tier-tab active" data-tier="tier_54" onclick="switchTier('tier_54')">आकाश (54ms)<span>Normal Speed</span></button>
-      <button class="tier-tab" data-tier="tier_108" onclick="switchTier('tier_108')">अग्नि (108ms)<span>2x Slow</span></button>
-      <button class="tier-tab" data-tier="tier_216" onclick="switchTier('tier_216')">वायु (216ms)<span>4x Slow</span></button>
-    </div>
-    
     <div class="multi-bar" id="multiBar">
       <span class="multi-bar-label">0 segments selected</span>
       <button class="multi-bar-btn play" onclick="playSelectedSegments()">▶ Play selected</button>
       <button class="multi-bar-btn" onclick="clearSelection()">✕ Clear</button>
     </div>
-  `;
-  
-  for (const [tier, tierInfo] of Object.entries(TIERS)) {
-    const frames = framesData[tier];
-    html += `
-      <div id="tier-panel-${tier}" class="tier-panel ${tier === 'tier_54' ? 'active' : ''}">
-        <div class="tier-header">
-          ${tierInfo.name} - ${frames.length} frames (${tierInfo.frameMs}ms each) - ${tierInfo.speed} playback
-        </div>
-        <div class="frames-grid" id="frames-grid-${tier}"></div>
+    
+    <div class="three-tier-container">
+      <!-- 216ms Tier (Top) - 4x slow -->
+      <div class="tier-row">
+        <div class="tier-label">वायु (216ms)<br>4x Slow</div>
+        <div class="tier-cells" id="tier-216-cells"></div>
       </div>
-    `;
-  }
-  
-  html += `
+      <!-- 108ms Tier (Middle) - 2x slow -->
+      <div class="tier-row">
+        <div class="tier-label">अग्नि (108ms)<br>2x Slow</div>
+        <div class="tier-cells" id="tier-108-cells"></div>
+      </div>
+      <!-- 54ms Tier (Bottom) - Normal -->
+      <div class="tier-row">
+        <div class="tier-label">आकाश (54ms)<br>Normal</div>
+        <div class="tier-cells" id="tier-54-cells"></div>
+      </div>
+    </div>
+    
     <div class="button-group">
       <button class="btn-submit" id="submitBtn">Submit All 3 Tiers</button>
       <button class="btn-skip" id="skipBtn">Skip (keep later)</button>
@@ -1186,7 +1158,6 @@ function renderThreeTierInterface(data) {
   if (currentAudio) {
     currentAudio.onerror = () => showMessage('Audio could not be loaded', 'error');
     currentAudio.setAttribute('playsinline', '');
-    currentAudio.playbackRate = playbackSpeed;
     document.getElementById('volumeSlider').addEventListener('input', e => updateVolume(parseFloat(e.target.value)));
     currentAudio.addEventListener('play', () => {
       if (!audioContext) initAudioContext();
@@ -1195,98 +1166,132 @@ function renderThreeTierInterface(data) {
     currentAudio.addEventListener('touchstart', () => unlockAudio(), { once: true });
   }
   
-  // Render frames for each tier
-  for (const [tier, frames] of Object.entries(framesData)) {
-    const framesGrid = document.getElementById(`frames-grid-${tier}`);
-    if (!framesGrid) continue;
-    framesGrid.innerHTML = '';
-    
-    frames.forEach((frame, idx) => {
-      const frameCard = document.createElement('div');
-      frameCard.className = 'frame-card';
-      frameCard.setAttribute('data-tier', tier);
-      frameCard.setAttribute('data-frame-index', idx);
-      frameCard.setAttribute('data-start-ms', frame.start_ms);
-      frameCard.setAttribute('data-end-ms', frame.end_ms);
+  // Render 216ms tier
+  const tier216Container = document.getElementById('tier-216-cells');
+  cells.tier_216 = [];
+  inputs.tier_216 = [];
+  framesData.tier_216.forEach((frame, idx) => {
+    const cell = createCell(frame, idx, '216', tier216Container);
+    cells.tier_216.push(cell);
+  });
   
-      const headerDiv = document.createElement('div');
-      headerDiv.className = 'frame-header';
-      headerDiv.innerHTML = `
-        <span class="frame-label"><span class="sel-dot"></span> Segment ${idx+1}</span>
-        <span class="frame-time">${frame.start_ms}–${frame.end_ms} ms</span>
-      `;
+  // Render 108ms tier
+  const tier108Container = document.getElementById('tier-108-cells');
+  cells.tier_108 = [];
+  inputs.tier_108 = [];
+  framesData.tier_108.forEach((frame, idx) => {
+    const cell = createCell(frame, idx, '108', tier108Container);
+    cells.tier_108.push(cell);
+  });
   
-      const editDiv = document.createElement('div');
-      editDiv.setAttribute('contenteditable', 'true');
-      editDiv.className = 'edit-text';
-      editDiv.innerText = frame.text || '';
-      editDiv.setAttribute('data-frame-idx', idx);
-      editDiv.setAttribute('data-tier', tier);
+  // Render 54ms tier
+  const tier54Container = document.getElementById('tier-54-cells');
+  cells.tier_54 = [];
+  inputs.tier_54 = [];
+  framesData.tier_54.forEach((frame, idx) => {
+    const cell = createCell(frame, idx, '54', tier54Container);
+    cells.tier_54.push(cell);
+  });
   
-      setupDesktopDropZone(editDiv, idx, tier);
-  
-      editDiv.addEventListener('input', e => {
-        let newText = e.target.innerText || '';
-        const aksharCount = newText.split('').filter(c => AKSHAR_SET.includes(c)).length;
-        if (aksharCount > 2) {
-          let kept = '';
-          let count = 0;
-          for (let char of newText) {
-            if (AKSHAR_SET.includes(char)) {
-              if (count < 2) {
-                kept += char;
-                count++;
-              }
-            } else {
-              kept += char;
-            }
-          }
-          e.target.innerText = kept;
-          newText = kept;
-          showMessage('Maximum 2 akshars per frame!', 'warning');
-        }
-        if (framesData[tier] && framesData[tier][idx]) {
-          framesData[tier][idx].text = newText;
-        }
-      });
-  
-      editDiv.addEventListener('click', e => { 
-        e.stopPropagation(); 
-        playSegmentByIndex(tier, idx); 
-      });
-  
-      frameCard.addEventListener('click', e => {
-        if (e.target === editDiv || editDiv.contains(e.target)) return;
-        toggleSegmentSelection(tier, idx);
-      });
-  
-      frameCard.appendChild(headerDiv);
-      frameCard.appendChild(editDiv);
-      framesGrid.appendChild(frameCard);
-    });
-    
-    const hint = document.createElement('div');
-    hint.className = 'empty-hint';
-    hint.innerText = `💡 ${frames.length} frames of ${TIERS[tier].frameMs}ms each. Tap text field to play. Tap dot to select.`;
-    framesGrid.appendChild(hint);
+  // Add play full audio button
+  if (!document.querySelector('.play-full-btn')) {
+    const playFullBtn = document.createElement('button');
+    playFullBtn.className = 'play-full-btn';
+    playFullBtn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z" fill="white"/></svg>';
+    playFullBtn.onclick = () => {
+      if (!currentAudio) { showMessage('Audio not ready', 'error'); return; }
+      stopPlayback();
+      currentAudio.currentTime = 0;
+      currentAudio.play().catch(err => showMessage('Click the play button first', 'info'));
+    };
+    document.body.appendChild(playFullBtn);
   }
   
   document.getElementById('submitBtn').addEventListener('click', () => submitThreeTierAnnotation());
   document.getElementById('skipBtn').addEventListener('click', () => skipFile());
+}
+
+function createCell(frame, idx, tier, container) {
+  const cellDiv = document.createElement('div');
+  cellDiv.className = `cell-${tier}`;
+  cellDiv.setAttribute('data-idx', idx);
+  cellDiv.setAttribute('data-tier', tier);
   
-  // Make functions global for onclick
-  window.switchTier = switchTier;
-  window.playSelectedSegments = playSelectedSegments;
-  window.clearSelection = clearSelection;
-  window.setPlaybackSpeed = setPlaybackSpeed;
+  const timeLabel = document.createElement('div');
+  timeLabel.className = 'time-label';
+  timeLabel.textContent = `${(frame.start_ms / 1000).toFixed(2)}s`;
+  
+  const input = document.createElement('input');
+  input.type = 'text';
+  input.className = 'grid-input';
+  input.value = frame.text || '';
+  input.placeholder = '';
+  input.setAttribute('data-idx', idx);
+  input.setAttribute('data-tier', tier);
+  
+  setupDesktopDropZone(input, idx, tier);
+  
+  input.addEventListener('input', (e) => {
+    let value = e.target.value;
+    let aksharCount = value.split('').filter(c => AKSHAR_SET.includes(c)).length;
+    if (aksharCount > 2) {
+      let kept = '';
+      let count = 0;
+      for (let char of value) {
+        if (AKSHAR_SET.includes(char)) {
+          if (count < 2) {
+            kept += char;
+            count++;
+          }
+        } else {
+          kept += char;
+        }
+      }
+      e.target.value = kept;
+      value = kept;
+      showMessage('Maximum 2 akshars per frame!', 'warning');
+    }
+    framesData[tier][idx].text = value;
+  });
+  
+  input.addEventListener('focus', () => { activeInputElement = input; });
+  input.addEventListener('blur', () => { activeInputElement = null; });
+  input.addEventListener('click', (e) => {
+    e.stopPropagation();
+    playSegmentByIndex(tier, idx);
+  });
+  
+  cellDiv.addEventListener('click', (e) => {
+    if (e.target === input) return;
+    if (e.ctrlKey || e.metaKey) {
+      toggleSegmentSelection(tier, idx);
+    } else {
+      playSegmentByIndex(tier, idx);
+    }
+  });
+  
+  cellDiv.appendChild(timeLabel);
+  cellDiv.appendChild(input);
+  container.appendChild(cellDiv);
+  inputs[tier].push(input);
+  
+  return cellDiv;
+}
+
+function stopPlayback() {
+  if (currentPlayTimeout) { clearTimeout(currentPlayTimeout); currentPlayTimeout = null; }
+  if (multiPlayTimeout) { clearTimeout(multiPlayTimeout); multiPlayTimeout = null; }
+  if (currentAudio && !currentAudio.paused) currentAudio.pause();
+  for (const tier of ['tier_216', 'tier_108', 'tier_54']) {
+    cells[tier]?.forEach(cell => cell.classList.remove('playing', 'current-play', 'active'));
+  }
 }
 
 async function submitThreeTierAnnotation() {
   if (!currentData) { showMessage('No data to submit', 'error'); return; }
   
-  // Calculate akshar count from all 3 tiers
   let totalAkshars = 0;
-  for (const tier of ['tier_54', 'tier_108', 'tier_216']) {
+  for (const tier of ['tier_216', 'tier_108', 'tier_54']) {
     totalAkshars += framesData[tier].filter(f => f.text && f.text.trim()).length;
   }
   
@@ -1297,11 +1302,10 @@ async function submitThreeTierAnnotation() {
     sentence: currentData.sentence,
     sentence_devanagari: currentData.sentence_devanagari,
     full_sequence: currentData.full_sequence,
-    frames_54: framesData.tier_54,
-    frames_108: framesData.tier_108,
     frames_216: framesData.tier_216,
-    duration_ms: currentData.duration_ms || 0,
-    language: currentData.language || 'unknown'
+    frames_108: framesData.tier_108,
+    frames_54: framesData.tier_54,
+    duration_ms: currentData.duration_ms || 0
   };
   
   showMessage(`Submitting 3-tier annotation (${totalAkshars} akshars)...`, 'info');
@@ -1326,7 +1330,7 @@ function skipFile() {
   if (currentAudio) currentAudio.pause();
   if (currentPlayTimeout) { clearTimeout(currentPlayTimeout); currentPlayTimeout = null; }
   if (multiPlayTimeout) { clearTimeout(multiPlayTimeout); multiPlayTimeout = null; }
-  if (audioContext) { audioContext.close(); audioContext = null; gainNode = null; }
+  if (audioContext) { audioContext.close(); audioContext = null; gainNode = null; sourceNode = null; }
   fetch(`${BASE_PATH}/skip-file`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -1348,6 +1352,29 @@ async function init() {
   const authed = await checkAuth();
   if (authed) { loadProgress(); loadNextFile(); setInterval(loadProgress, 10000); }
 }
+
+// Make functions global for onclick
+window.playSelectedSegments = playSelectedSegments;
+window.clearSelection = clearSelection;
+
+document.addEventListener('keydown', (e) => {
+  if (e.code === 'Space') {
+    e.preventDefault();
+    isSpacePressed = true;
+    showMessage('Space pressed', 'info');
+  }
+  if (e.code === 'Escape') {
+    clearSelection();
+    stopPlayback();
+    if (activeInputElement) activeInputElement.blur();
+  }
+});
+
+document.addEventListener('keyup', (e) => {
+  if (e.code === 'Space') {
+    isSpacePressed = false;
+  }
+});
 
 init();
 </script>
