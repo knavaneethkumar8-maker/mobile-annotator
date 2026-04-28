@@ -559,50 +559,58 @@ audio {
   margin-top: 6px;
 }
 
-/* ========== MOBILE RESPONSIVE - SAME 3-ROW LAYOUT ========== */
+/* ========== MOBILE RESPONSIVE - REDUCED WIDTH FOR MORE CELLS ========== */
 @media (max-width: 560px) {
-  .container { padding: 12px; }
+  .container { padding: 10px; }
   
-  /* Keep horizontal scroll, make cells smaller for mobile */
   .tier-row {
-    gap: 8px;
-    padding: 12px;
+    gap: 6px;
+    padding: 10px;
   }
   
   .tier-header {
-    min-width: 55px;
-    font-size: 0.65rem;
-    padding: 6px 6px;
-    margin-right: 8px;
+    min-width: 45px;
+    font-size: 0.6rem;
+    padding: 5px 4px;
+    margin-right: 6px;
   }
   
-  /* Smaller cells for mobile but SAME LAYOUT */
+  /* REDUCED CELL WIDTHS - fits more cells on screen */
   .cell-216 {
-    flex: 0 0 260px;
-    min-width: 260px;
-    padding: 12px 8px;
-  }
-  
-  .cell-108 {
-    flex: 0 0 130px;
-    min-width: 130px;
+    flex: 0 0 180px;
+    min-width: 180px;
     padding: 10px 6px;
   }
   
-  .cell-54 {
-    flex: 0 0 65px;
-    min-width: 65px;
+  .cell-108 {
+    flex: 0 0 90px;
+    min-width: 90px;
     padding: 8px 4px;
   }
   
-  /* Adjust fonts for mobile */
-  .cell-54 .grid-input { font-size: 0.8rem; padding: 6px 2px; }
-  .cell-108 .grid-input { font-size: 0.85rem; padding: 8px 4px; }
-  .cell-216 .grid-input { font-size: 0.95rem; padding: 10px 6px; }
+  .cell-54 {
+    flex: 0 0 50px;
+    min-width: 50px;
+    padding: 6px 3px;
+  }
+  
+  /* Smaller fonts for reduced cells */
+  .cell-54 .grid-input { 
+    font-size: 0.7rem; 
+    padding: 4px 1px; 
+  }
+  .cell-108 .grid-input { 
+    font-size: 0.75rem; 
+    padding: 6px 2px; 
+  }
+  .cell-216 .grid-input { 
+    font-size: 0.8rem; 
+    padding: 8px 3px; 
+  }
   
   .time-label {
-    font-size: 8px;
-    padding: 2px 6px;
+    font-size: 7px;
+    padding: 2px 4px;
   }
   
   /* Touch feedback */
@@ -623,36 +631,54 @@ audio {
   }
   
   .stats-cards {
-    gap: 8px;
+    gap: 6px;
   }
   
   .stat-card {
-    padding: 8px;
+    padding: 6px;
   }
   
   .stat-card-value {
-    font-size: 1.1rem;
+    font-size: 1rem;
+  }
+  
+  .stat-card-label {
+    font-size: 0.6rem;
   }
   
   .speed-btn {
-    padding: 5px 12px;
-    font-size: 11px;
+    padding: 4px 10px;
+    font-size: 10px;
   }
   
   .akshar-item {
-    padding: 6px 10px;
-    font-size: 0.85rem;
-    min-width: 36px;
+    padding: 5px 8px;
+    font-size: 0.8rem;
+    min-width: 32px;
   }
   
   .btn {
-    padding: 12px 8px;
-    font-size: 0.85rem;
+    padding: 10px 6px;
+    font-size: 0.8rem;
   }
   
   .stats-btn, .self-record-btn, .live-stream-btn {
-    padding: 4px 8px;
-    font-size: 0.65rem;
+    padding: 3px 6px;
+    font-size: 0.6rem;
+  }
+  
+  .current-file-card {
+    padding: 8px 12px;
+    font-size: 0.75rem;
+  }
+  
+  .volume-control {
+    padding: 6px 10px;
+  }
+  
+  .volume-value {
+    min-width: 40px;
+    font-size: 0.7rem;
   }
 }
 
@@ -664,9 +690,8 @@ audio {
     border-width: 2px;
   }
   
-  /* Better touch targets */
   .grid-input {
-    min-height: 36px;
+    min-height: 32px;
   }
 }
 
@@ -737,7 +762,7 @@ const AKSHAR_SET = [
   "ट", "ठ", "ड", "ढ", "त", "थ", "द", "ध",
   "प", "फ", "ब", "भ",
   "न", "म",
-  "य", "ر", "ल", "व",
+  "य", "र", "ल", "व",
   "स", "ह", "०"
 ];
 
