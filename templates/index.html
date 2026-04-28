@@ -261,175 +261,173 @@ audio {
   color: #1A4D3A;
 }
 
-/* ========== 3-TIER TABS (Like Desktop) ========== */
-.tier-tabs {
-  display: flex;
-  gap: 8px;
+/* ========== 3-TIER GRID (Like Desktop - 3 Horizontal Rows) ========== */
+.three-tier-section {
   margin: 16px 0;
-  background: #F8F8F4;
-  padding: 6px;
-  border-radius: 60px;
-  border: 1px solid #E9E9E2;
+  border: 1px solid #eef2f8;
+  border-radius: 20px;
+  background: #ffffff;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
 }
 
-.tier-tab {
-  flex: 1;
-  padding: 10px 8px;
-  text-align: center;
-  background: transparent;
-  border: none;
-  border-radius: 40px;
-  font-size: 0.8rem;
-  font-weight: 550;
-  color: #6E6E68;
-  cursor: pointer;
-  transition: all 0.2s ease;
+.tier-row {
+  display: flex;
+  gap: 10px;
+  padding: 16px 20px;
+  border-bottom: 1px solid #ecf3fa;
+  background: white;
+  min-width: min-content;
 }
 
-.tier-tab.active {
-  background: #2C6E49;
-  color: white;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-}
+.tier-row:last-child { border-bottom: none; }
 
-.tier-tab span {
-  display: block;
-  font-size: 0.7rem;
-  font-weight: normal;
-  opacity: 0.8;
-}
-
-.tier-panel {
-  display: none;
-}
-
-.tier-panel.active {
-  display: block;
-}
-
+/* Row headers - Tier names */
 .tier-header {
+  writing-mode: horizontal-tb;
+  white-space: nowrap;
+  padding: 10px 12px;
   background: #EBF2EA;
   border-radius: 16px;
-  padding: 10px 12px;
-  margin-bottom: 12px;
   font-size: 0.75rem;
   font-weight: 550;
   color: #2C6E49;
   text-align: center;
+  min-width: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 10px;
 }
 
-/* ========== FRAMES GRID (Like Desktop) ========== */
-.frames-grid {
+/* 216ms cells (वायु) */
+.tier-row-216 .cell-216 {
+  flex: 0 0 370px;
+  min-width: 370px;
+  border: 2px solid #d1e0f0;
+  border-radius: 16px;
+  padding: 16px 10px;
+}
+
+/* 108ms cells (अग्नि) */
+.tier-row-108 .cell-108 {
+  flex: 0 0 180px;
+  min-width: 180px;
+  border: 2px solid #e2edf7;
+  border-radius: 14px;
+  padding: 14px 8px;
+}
+
+/* 54ms cells (आकाश) */
+.tier-row-54 .cell-54 {
+  flex: 0 0 85px;
+  min-width: 85px;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 12px 4px;
+}
+
+/* Common cell styles */
+.cell-216, .cell-108, .cell-54 {
+  cursor: pointer;
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  max-height: 450px;
-  overflow-y: auto;
-  padding: 4px 2px 8px 2px;
-  margin-top: 8px;
-  margin-bottom: 16px;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.1s;
+  background: white;
 }
 
-.frame-card {
-  background: #FEFEFC;
-  border: 1px solid #E5E5DE;
-  border-radius: 20px;
-  padding: 12px 14px;
-  transition: all 0.2s ease;
-  cursor: pointer;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+.cell-216.selected, .cell-108.selected, .cell-54.selected {
+  background: #eff6ff;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59,130,246,0.2);
 }
 
-.frame-card.active {
-  background: #EBF2EA;
-  border-color: #2C6E49;
-  box-shadow: 0 2px 8px rgba(44,110,73,0.08);
-}
-
-.frame-card.selected {
-  background: #F0FAF3;
-  border: 2px solid #2C6E49;
-  box-shadow: 0 0 0 3px rgba(44,110,73,0.08);
-}
-
-.frame-card.playing {
-  background: #D6EFE0;
-  border: 2px solid #1A4D3A;
-  box-shadow: 0 2px 10px rgba(44,110,73,0.15);
-}
-
-.frame-card.drag-over {
-  background: #E8F0FE;
-  border-color: #2C6E49;
-  border-width: 2px;
+.cell-216:hover, .cell-108:hover, .cell-54:hover {
+  border-color: #cbd5e1;
+  background: #f8fafc;
   transform: scale(1.01);
 }
 
-.frame-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  margin-bottom: 10px;
-  font-size: 0.7rem;
-  font-weight: 480;
-  letter-spacing: 0.3px;
-  color: #6E6E68;
+.cell-216.playing, .cell-108.playing, .cell-54.playing {
+  background: #e6f7ec;
+  border-color: #10b981;
+  animation: pulse 0.2s ease;
 }
 
-.frame-time {
-  background: #EEEEE8;
-  padding: 2px 10px;
+.cell-216.current-play, .cell-108.current-play, .cell-54.current-play {
+  background: #fffbeb;
+  border-color: #f59e0b;
+  transform: scale(1.01);
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+.time-label {
+  font-size: 10px;
+  background: #f1f5f9;
+  padding: 3px 10px;
   border-radius: 30px;
-  font-size: 0.65rem;
-  font-family: monospace;
-}
-
-.frame-label {
+  color: #334155;
   font-weight: 500;
-  text-transform: uppercase;
-  font-size: 0.7rem;
-  display: flex;
-  align-items: center;
-  gap: 6px;
+  white-space: nowrap;
 }
 
-.sel-dot {
-  width: 9px;
-  height: 9px;
-  border-radius: 50%;
-  border: 2px solid #2C6E49;
-  background: transparent;
-  display: inline-block;
-  transition: background 0.15s;
-  flex-shrink: 0;
-}
-
-.frame-card.selected .sel-dot,
-.frame-card.playing .sel-dot {
-  background: #2C6E49;
-}
-
-.edit-text {
-  border: 1px solid #DCDCD4;
-  border-radius: 18px;
-  padding: 12px 14px;
-  background: #FFFFFF;
-  font-size: 1rem;
-  font-family: monospace;
+.grid-input {
   width: 100%;
-  outline: none;
-  transition: 0.18s ease;
-  font-weight: 460;
-  color: #1C1C1A;
-  resize: vertical;
-  cursor: text;
-  box-sizing: border-box;
-  min-height: 50px;
+  text-align: center;
+  background: #fafcff;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 10px;
+  font-weight: 600;
+  font-family: 'Noto Sans Devanagari', monospace;
+  transition: border-color 0.15s, background 0.15s;
 }
 
-.edit-text:focus {
+.cell-54 .grid-input { font-size: 0.9rem; padding: 8px 2px; }
+.cell-108 .grid-input { font-size: 1rem; padding: 10px 4px; }
+.cell-216 .grid-input { font-size: 1.2rem; padding: 12px 6px; }
+
+.grid-input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  background: white;
+  box-shadow: 0 0 0 2px rgba(59,130,246,0.1);
+}
+
+.grid-input.saved {
+  border-color: #10b981;
+  background: #f0fdf4;
+}
+
+/* Speed Control */
+.speed-control {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+  justify-content: center;
+}
+
+.speed-btn {
+  padding: 6px 16px;
+  border-radius: 30px;
+  border: 1.5px solid #cbd5e1;
+  background: white;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.speed-btn.active {
+  background: #2C6E49;
   border-color: #2C6E49;
-  box-shadow: 0 0 0 2px rgba(44,110,73,0.2);
+  color: white;
 }
 
 /* Multi-select toolbar */
@@ -441,7 +439,7 @@ audio {
   color: #fff;
   border-radius: 40px;
   padding: 10px 16px;
-  margin-bottom: 10px;
+  margin: 16px 0;
   gap: 10px;
   font-size: 0.82rem;
   font-weight: 540;
@@ -449,24 +447,17 @@ audio {
 
 .multi-bar.visible { display: flex; }
 
-.multi-bar-label { flex: 1; font-size: 0.82rem; }
+.multi-bar-label { flex: 1; }
 
 .multi-bar-btn {
   background: rgba(255,255,255,0.15);
   border: none;
   color: #fff;
   font-size: 0.78rem;
-  font-weight: 560;
   padding: 6px 14px;
   border-radius: 30px;
   cursor: pointer;
-  transition: 0.15s;
-  white-space: nowrap;
-  flex: none;
-  width: auto;
 }
-
-.multi-bar-btn:hover { background: rgba(255,255,255,0.28); }
 
 .multi-bar-btn.play {
   background: #FFFFFF;
@@ -486,7 +477,6 @@ audio {
   font-size: 0.75rem;
   color: #2C6E49;
   margin-bottom: 10px;
-  letter-spacing: 0.3px;
 }
 
 .akshar-grid {
@@ -500,10 +490,10 @@ audio {
   border: 1px solid #E5E5DE;
   border-radius: 12px;
   padding: 8px 12px;
-  font-size: 1.1rem;
+  font-size: 1rem;
   font-weight: 500;
   color: #1C1C1A;
-  min-width: 48px;
+  min-width: 42px;
   text-align: center;
   font-family: monospace;
   cursor: grab;
@@ -513,24 +503,21 @@ audio {
 }
 
 .akshar-item:active { cursor: grabbing; transform: scale(0.95); }
-.akshar-item.dragging { opacity: 0.5; cursor: grabbing; }
 
 .button-group {
   display: flex;
   gap: 14px;
-  margin: 0 0 16px;
+  margin: 16px 0;
 }
 
-button {
+.btn {
   flex: 1;
   padding: 14px 8px;
   border: none;
   border-radius: 44px;
   font-size: 1rem;
   font-weight: 520;
-  font-family: inherit;
   cursor: pointer;
-  transition: all 0.2s ease;
   background: #F2F2EC;
   color: #2C2C2A;
 }
@@ -538,21 +525,20 @@ button {
 .btn-submit {
   background: #2C6E49;
   color: white;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
 }
 
-.btn-submit:active { background: #215A3A; transform: scale(0.97); }
-.btn-skip { background: #E8E8E3; color: #3A3A36; }
-.btn-skip:active { background: #DCDCD4; transform: scale(0.97); }
+.btn-skip {
+  background: #E8E8E3;
+  color: #3A3A36;
+}
 
 .message-area { margin-top: 12px; }
 
 .message {
-  padding: 12px 16px;
-  border-radius: 28px;
+  padding: 12px;
+  border-radius: 20px;
   text-align: center;
   font-size: 0.85rem;
-  font-weight: 470;
 }
 
 .message.success { background: #E0F0E6; color: #1E5631; }
@@ -564,34 +550,6 @@ button {
   padding: 48px 20px;
   font-size: 1rem;
   color: #6E6E68;
-  font-weight: 460;
-}
-
-.completion-box { text-align: center; padding: 36px 16px; }
-
-.completion-box h2 { font-size: 1.9rem; font-weight: 560; color: #2C6E49; margin-bottom: 12px; }
-.completion-box p { font-size: 1rem; margin: 18px 0; color: #3C3C38; }
-.completion-box button { background: #2C6E49; color: white; max-width: 220px; margin: 16px auto 0; }
-
-.frames-grid::-webkit-scrollbar { width: 4px; }
-.frames-grid::-webkit-scrollbar-track { background: #EFEFE9; border-radius: 8px; }
-.frames-grid::-webkit-scrollbar-thumb { background: #BDBDB3; border-radius: 8px; }
-
-@media (max-width: 560px) {
-  body { padding: 12px 0px; }
-  .container { padding: 18px 14px 24px; border-radius: 24px; }
-  .button-group { gap: 12px; }
-  button { padding: 12px 8px; font-size: 0.95rem; }
-  .edit-text { font-size: 0.9rem; padding: 10px 12px; }
-  .current-file-card { font-size: 0.85rem; padding: 12px 14px; }
-  .akshar-item { padding: 6px 10px; font-size: 1rem; min-width: 42px; }
-  .stat-card-value { font-size: 1rem; }
-  .volume-control { gap: 8px; padding: 6px 10px; }
-  .volume-value { min-width: 48px; font-size: 0.75rem; }
-  .header-right { gap: 8px; }
-  .stats-btn, .self-record-btn, .live-stream-btn { padding: 6px 10px; font-size: 0.7rem; }
-  .tier-tab { font-size: 0.7rem; padding: 8px 4px; }
-  .tier-tab span { font-size: 0.6rem; }
 }
 
 .empty-hint {
@@ -599,7 +557,31 @@ button {
   color: #8E8E88;
   text-align: right;
   margin-top: 6px;
-  padding-right: 4px;
+}
+
+/* Responsive */
+@media (max-width: 560px) {
+  .container { padding: 16px; }
+  .cell-216 { flex: 0 0 320px; min-width: 320px; }
+  .cell-108 { flex: 0 0 155px; min-width: 155px; }
+  .cell-54 { flex: 0 0 72px; min-width: 72px; }
+  .tier-row { gap: 8px; padding: 12px; }
+  .tier-header { min-width: 60px; font-size: 0.7rem; padding: 6px 8px; }
+  .akshar-item { padding: 6px 10px; font-size: 0.9rem; min-width: 38px; }
+  .stats-btn, .self-record-btn, .live-stream-btn { padding: 4px 8px; font-size: 0.65rem; }
+}
+
+/* Scrollbar styling */
+.three-tier-section::-webkit-scrollbar {
+  height: 6px;
+}
+.three-tier-section::-webkit-scrollbar-track {
+  background: #EFEFE9;
+  border-radius: 8px;
+}
+.three-tier-section::-webkit-scrollbar-thumb {
+  background: #BDBDB3;
+  border-radius: 8px;
 }
 </style>
 </head>
@@ -650,12 +632,6 @@ button {
 <script>
 const BASE_PATH = "{{ base_path }}";
 
-const TIERS = {
-  tier_54: { name: "आकाश (54ms)", speed: "1x", frameMs: 54 },
-  tier_108: { name: "अग्नि (108ms)", speed: "2x", frameMs: 108 },
-  tier_216: { name: "वायु (216ms)", speed: "4x", frameMs: 216 }
-};
-
 const AKSHAR_SET = [
   "अ", "आ", "इ", "उ", "ए", "ओ",
   "क", "ख", "ग", "घ", "च", "छ", "ज", "झ",
@@ -675,16 +651,25 @@ let gainNode = null;
 let currentVolume = 1.0;
 const MAX_VOLUME = 6.0;
 let audioUnlocked = false;
+let playbackSpeed = 1.0;
 
-let framesData = { tier_54: [], tier_108: [], tier_216: [] };
-let selectedSegments = { tier_54: new Set(), tier_108: new Set(), tier_216: new Set() };
-let currentTier = 'tier_54';
+// Store frames for each tier
+let framesData = {
+  tier_216: [],
+  tier_108: [],
+  tier_54: []
+};
+
+let selectedSegments = {
+  tier_216: new Set(),
+  tier_108: new Set(),
+  tier_54: new Set()
+};
+
+let currentTier = 'tier_216';
 let multiPlayQueue = [];
 let multiPlayIndex = 0;
 let multiPlayTimeout = null;
-let playbackSpeed = 1.0;
-
-let dragState = { active: false, akshar: null, sourceElement: null, targetFrameIndex: null, targetTier: null };
 
 function unlockAudio() {
   if (audioUnlocked) return;
@@ -692,10 +677,7 @@ function unlockAudio() {
     audioContext.resume().then(() => { audioUnlocked = true; }).catch(() => {});
   }
   if (currentAudio) {
-    const p = currentAudio.play();
-    if (p !== undefined) {
-      p.then(() => { currentAudio.pause(); currentAudio.currentTime = 0; audioUnlocked = true; }).catch(() => {});
-    }
+    currentAudio.play().then(() => { currentAudio.pause(); currentAudio.currentTime = 0; }).catch(() => {});
   }
 }
 
@@ -705,122 +687,315 @@ function setupAudioUnlock() {
   document.addEventListener('click', h);
 }
 
-function renderAksharSet(containerId) {
-  const container = document.getElementById(containerId);
-  if (!container) return;
-  container.innerHTML = '';
-  AKSHAR_SET.forEach(akshar => {
-    const span = document.createElement('span');
-    span.className = 'akshar-item';
-    span.textContent = akshar;
-    span.setAttribute('draggable', 'true');
-    span.setAttribute('data-akshar', akshar);
-    span.addEventListener('dragstart', handleDragStart);
-    span.addEventListener('dragend', handleDragEnd);
-    span.addEventListener('touchstart', handleTouchStart);
-    span.addEventListener('touchmove', handleTouchMove);
-    span.addEventListener('touchend', handleTouchEnd);
-    container.appendChild(span);
-  });
-}
-
-function handleDragStart(e) {
-  const akshar = e.target.getAttribute('data-akshar');
-  e.dataTransfer.setData('text/plain', akshar);
-  e.dataTransfer.effectAllowed = 'copy';
-  e.target.classList.add('dragging');
-  dragState.akshar = akshar;
-}
-
-function handleDragEnd(e) {
-  e.target.classList.remove('dragging');
-  dragState.akshar = null;
-  document.querySelectorAll('.frame-card').forEach(c => c.classList.remove('drag-over'));
-}
-
-function handleTouchStart(e) {
-  e.preventDefault();
-  const touch = e.touches[0];
-  const akshar = e.target.getAttribute('data-akshar');
-  if (!akshar) return;
-  dragState.active = true; dragState.akshar = akshar; dragState.sourceElement = e.target;
-  dragState.targetTier = currentTier;
-  e.target.classList.add('drag-source');
-  const fb = document.createElement('div');
-  fb.textContent = akshar;
-  fb.style.cssText = `position:fixed;left:${touch.clientX-20}px;top:${touch.clientY-20}px;background:#2C6E49;color:white;padding:12px 16px;border-radius:24px;font-size:1.3rem;font-family:monospace;font-weight:bold;z-index:9999;pointer-events:none;box-shadow:0 4px 12px rgba(0,0,0,0.2);transform:scale(1.1)`;
-  fb.id = 'dragFeedback';
-  document.body.appendChild(fb);
-  showMessage('Drag to any segment field', 'info');
-}
-
-function handleTouchMove(e) {
-  if (!dragState.active) return;
-  e.preventDefault();
-  const touch = e.touches[0];
-  const fb = document.getElementById('dragFeedback');
-  if (fb) { fb.style.left = (touch.clientX-25)+'px'; fb.style.top = (touch.clientY-25)+'px'; }
-  const el = document.elementFromPoint(touch.clientX, touch.clientY);
-  const targetCard = el?.closest('.frame-card');
-  document.querySelectorAll('.frame-card').forEach(c => { if (c !== targetCard) c.classList.remove('drag-over'); });
-  if (targetCard) { 
-    targetCard.classList.add('drag-over'); 
-    dragState.targetFrameIndex = parseInt(targetCard.getAttribute('data-frame-index'));
-    dragState.targetTier = targetCard.getAttribute('data-tier');
+function initAudioContext() {
+  if (!audioContext && currentAudio) {
+    try {
+      audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      const source = audioContext.createMediaElementSource(currentAudio);
+      gainNode = audioContext.createGain();
+      source.connect(gainNode);
+      gainNode.connect(audioContext.destination);
+      gainNode.gain.value = currentVolume;
+    } catch (e) { console.warn('Web Audio init failed:', e); }
   }
-  else { dragState.targetFrameIndex = null; }
 }
 
-function handleTouchEnd(e) {
-  if (!dragState.active) return;
-  e.preventDefault();
-  const fb = document.getElementById('dragFeedback');
-  if (fb) fb.remove();
-  if (dragState.sourceElement) dragState.sourceElement.classList.remove('drag-source');
-  document.querySelectorAll('.frame-card').forEach(c => c.classList.remove('drag-over'));
-  if (dragState.targetFrameIndex !== null && dragState.akshar && dragState.targetTier && framesData[dragState.targetTier]) {
-    const fi = dragState.targetFrameIndex;
-    const targetEditDiv = document.querySelector(`.frame-card[data-tier="${dragState.targetTier}"][data-frame-index="${fi}"] .edit-text`);
-    if (targetEditDiv && framesData[dragState.targetTier][fi]) {
-      const newText = (framesData[dragState.targetTier][fi].text || '') + dragState.akshar;
-      const aksharCount = newText.split('').filter(c => AKSHAR_SET.includes(c)).length;
-      if (aksharCount <= 2) {
-        targetEditDiv.innerText = newText;
-        framesData[dragState.targetTier][fi].text = newText;
-        showMessage(`Added "${dragState.akshar}" to segment ${fi+1}`, 'success');
-        targetEditDiv.focus();
-      } else {
-        showMessage('Maximum 2 akshars per frame!', 'warning');
-      }
+function updateVolume(value) {
+  currentVolume = value;
+  const volumeSpan = document.getElementById('volumeValue');
+  if (volumeSpan) volumeSpan.innerText = Math.round(value * 100) + '%';
+  if (gainNode) gainNode.gain.value = value;
+  if (currentAudio && !gainNode) currentAudio.volume = Math.min(value, 1.0);
+}
+
+function setPlaybackSpeed(speed) {
+  playbackSpeed = speed;
+  if (currentAudio) currentAudio.playbackRate = speed;
+  document.querySelectorAll('.speed-btn').forEach(btn => {
+    if (parseFloat(btn.dataset.speed) === speed) btn.classList.add('active');
+    else btn.classList.remove('active');
+  });
+  showMessage(`Speed: ${speed}x`, 'info');
+}
+
+function playSegmentAudio(startMs, endMs) {
+  if (!currentAudio) return;
+  const startSec = startMs / 1000;
+  const durationSec = (endMs - startMs) / 1000;
+  if (currentPlayTimeout) clearTimeout(currentPlayTimeout);
+  
+  const doPlay = () => {
+    currentAudio.pause();
+    currentAudio.currentTime = startSec;
+    currentAudio.play().then(() => {
+      currentPlayTimeout = setTimeout(() => {
+        if (currentAudio && !currentAudio.paused) currentAudio.pause();
+      }, durationSec * 1000 / playbackSpeed);
+    }).catch(() => {});
+  };
+  
+  if (audioContext && audioContext.state === 'suspended') audioContext.resume().then(doPlay);
+  else doPlay();
+}
+
+function stopPlayback() {
+  if (currentPlayTimeout) clearTimeout(currentPlayTimeout);
+  if (multiPlayTimeout) clearTimeout(multiPlayTimeout);
+  if (currentAudio && !currentAudio.paused) currentAudio.pause();
+  document.querySelectorAll('.cell-216.playing, .cell-108.playing, .cell-54.playing').forEach(c => c.classList.remove('playing'));
+}
+
+function playCellAudio(tier, index) {
+  const frame = framesData[tier][index];
+  if (!frame) return;
+  playSegmentAudio(frame.start_ms, frame.end_ms);
+  
+  const cellClass = tier === 'tier_216' ? 'cell-216' : (tier === 'tier_108' ? 'cell-108' : 'cell-54');
+  const cell = document.querySelector(`.${cellClass}[data-idx="${index}"]`);
+  if (cell) {
+    cell.classList.add('playing');
+    setTimeout(() => cell.classList.remove('playing'), 300);
+  }
+}
+
+function toggleSegmentSelection(tier, index) {
+  const cellClass = tier === 'tier_216' ? 'cell-216' : (tier === 'tier_108' ? 'cell-108' : 'cell-54');
+  const cell = document.querySelector(`.${cellClass}[data-idx="${index}"]`);
+  if (!cell) return;
+  
+  if (selectedSegments[tier].has(index)) {
+    selectedSegments[tier].delete(index);
+    cell.classList.remove('selected');
+  } else {
+    selectedSegments[tier].add(index);
+    cell.classList.add('selected');
+  }
+  updateMultiBar();
+}
+
+function updateMultiBar() {
+  const bar = document.getElementById('multiBar');
+  if (!bar) return;
+  // For desktop style, we show selected count for the row being clicked
+  // But since we have 3 rows visible, we'll show total selected across all tiers or per tier?
+  // Desktop UI shows per-tier selection. Let's track per tier but show when clicking on cells
+  let totalSelected = selectedSegments.tier_216.size + selectedSegments.tier_108.size + selectedSegments.tier_54.size;
+  if (totalSelected === 0) {
+    bar.classList.remove('visible');
+  } else {
+    bar.classList.add('visible');
+    bar.querySelector('.multi-bar-label').textContent = `${totalSelected} segment${totalSelected > 1 ? 's' : ''} selected across all tiers`;
+  }
+}
+
+function clearSelection() {
+  selectedSegments.tier_216.clear();
+  selectedSegments.tier_108.clear();
+  selectedSegments.tier_54.clear();
+  document.querySelectorAll('.cell-216.selected, .cell-108.selected, .cell-54.selected').forEach(c => c.classList.remove('selected'));
+  updateMultiBar();
+}
+
+function playSelectedSegments() {
+  // Collect all selected frames across all tiers
+  let allSelected = [];
+  for (let tier of ['tier_216', 'tier_108', 'tier_54']) {
+    for (let idx of selectedSegments[tier]) {
+      allSelected.push({ tier, index: idx });
     }
   }
-  dragState.active = false; dragState.akshar = null; dragState.sourceElement = null; dragState.targetFrameIndex = null;
+  if (allSelected.length === 0 || !currentAudio) return;
+  
+  stopPlayback();
+  
+  // Sort by start time (all tiers are time-aligned)
+  allSelected.sort((a, b) => framesData[a.tier][a.index].start_ms - framesData[b.tier][b.index].start_ms);
+  
+  multiPlayQueue = allSelected;
+  multiPlayIndex = 0;
+  playNextInQueueDesktop();
 }
 
-function setupDesktopDropZone(editDiv, frameIndex, tier) {
-  editDiv.addEventListener('dragover', (e) => {
-    e.preventDefault(); e.dataTransfer.dropEffect = 'copy';
-    editDiv.closest('.frame-card')?.classList.add('drag-over');
+function playNextInQueueDesktop() {
+  if (multiPlayIndex >= multiPlayQueue.length) {
+    document.querySelectorAll('.cell-216.playing, .cell-108.playing, .cell-54.playing').forEach(c => c.classList.remove('playing'));
+    return;
+  }
+  const item = multiPlayQueue[multiPlayIndex];
+  const frame = framesData[item.tier][item.index];
+  if (!frame) { multiPlayIndex++; playNextInQueueDesktop(); return; }
+
+  const cellClass = item.tier === 'tier_216' ? 'cell-216' : (item.tier === 'tier_108' ? 'cell-108' : 'cell-54');
+  document.querySelectorAll(`.${cellClass}.playing`).forEach(c => c.classList.remove('playing'));
+  const cell = document.querySelector(`.${cellClass}[data-idx="${item.index}"]`);
+  if (cell) cell.classList.add('playing');
+
+  playSegmentAudio(frame.start_ms, frame.end_ms);
+  
+  multiPlayTimeout = setTimeout(() => {
+    multiPlayIndex++;
+    playNextInQueueDesktop();
+  }, (frame.end_ms - frame.start_ms) / playbackSpeed);
+}
+
+// ========== GENERATE FRAMES ==========
+function generateFramesForTier(durationMs, frameSizeMs) {
+  const numFrames = Math.ceil(durationMs / frameSizeMs);
+  const frames = [];
+  for (let i = 0; i < numFrames; i++) {
+    frames.push({
+      index: i,
+      start_ms: i * frameSizeMs,
+      end_ms: Math.min((i + 1) * frameSizeMs, durationMs),
+      text: ""
+    });
+  }
+  return frames;
+}
+
+// Generate 3 tiers from original 108ms frames
+function generateAllTiers(originalFrames, durationMs) {
+  let sourceFrames = originalFrames;
+  if (!sourceFrames || sourceFrames.length === 0) {
+    sourceFrames = generateFramesForTier(durationMs, 108);
+  }
+  
+  // tier_216: merge every 2 frames (108+108=216)
+  const tier216 = [];
+  for (let i = 0; i < sourceFrames.length; i += 2) {
+    const start = sourceFrames[i].start_ms;
+    const end = i + 1 < sourceFrames.length ? sourceFrames[i + 1].end_ms : sourceFrames[i].end_ms;
+    const text1 = sourceFrames[i].text || "";
+    const text2 = i + 1 < sourceFrames.length ? (sourceFrames[i + 1].text || "") : "";
+    tier216.push({
+      index: tier216.length,
+      start_ms: start,
+      end_ms: end,
+      text: (text1 + text2).slice(0, 4)
+    });
+  }
+  
+  // tier_108: same as source
+  const tier108 = sourceFrames.map((f, idx) => ({ ...f, index: idx }));
+  
+  // tier_54: split each 108ms frame into 2
+  const tier54 = [];
+  for (let i = 0; i < sourceFrames.length; i++) {
+    const f = sourceFrames[i];
+    const half = (f.end_ms - f.start_ms) / 2;
+    tier54.push({
+      index: tier54.length,
+      start_ms: f.start_ms,
+      end_ms: f.start_ms + half,
+      text: f.text || ""
+    });
+    tier54.push({
+      index: tier54.length,
+      start_ms: f.start_ms + half,
+      end_ms: f.end_ms,
+      text: ""
+    });
+  }
+  
+  return { tier_216: tier216, tier_108: tier108, tier_54: tier54 };
+}
+
+// ========== RENDER 3-TIER GRID (Horizontal rows like desktop) ==========
+function renderThreeTierGrid() {
+  const tier216Row = document.getElementById('tier216Row');
+  const tier108Row = document.getElementById('tier108Row');
+  const tier54Row = document.getElementById('tier54Row');
+  
+  if (!tier216Row) return;
+  
+  tier216Row.innerHTML = '';
+  tier108Row.innerHTML = '';
+  tier54Row.innerHTML = '';
+  
+  // Add header labels
+  const header216 = document.createElement('div');
+  header216.className = 'tier-header';
+  header216.innerText = 'वायु (216ms)';
+  tier216Row.appendChild(header216);
+  
+  const header108 = document.createElement('div');
+  header108.className = 'tier-header';
+  header108.innerText = 'अग्नि (108ms)';
+  tier108Row.appendChild(header108);
+  
+  const header54 = document.createElement('div');
+  header54.className = 'tier-header';
+  header54.innerText = 'आकाश (54ms)';
+  tier54Row.appendChild(header54);
+  
+  // Render 216ms cells
+  framesData.tier_216.forEach((frame, idx) => {
+    const div = createCell(frame, idx, '216');
+    tier216Row.appendChild(div);
   });
-  editDiv.addEventListener('dragleave', () => editDiv.closest('.frame-card')?.classList.remove('drag-over'));
-  editDiv.addEventListener('drop', (e) => {
-    e.preventDefault();
-    editDiv.closest('.frame-card')?.classList.remove('drag-over');
-    const akshar = e.dataTransfer.getData('text/plain');
-    if (akshar && framesData[tier] && framesData[tier][frameIndex]) {
-      const newText = (framesData[tier][frameIndex].text || '') + akshar;
-      const aksharCount = newText.split('').filter(c => AKSHAR_SET.includes(c)).length;
-      if (aksharCount <= 2) {
-        editDiv.innerText = newText;
-        framesData[tier][frameIndex].text = newText;
-        showMessage(`Added "${akshar}" to segment ${frameIndex+1}`, 'success');
-      } else {
-        showMessage('Maximum 2 akshars per frame!', 'warning');
-      }
-    }
+  
+  // Render 108ms cells
+  framesData.tier_108.forEach((frame, idx) => {
+    const div = createCell(frame, idx, '108');
+    tier108Row.appendChild(div);
+  });
+  
+  // Render 54ms cells
+  framesData.tier_54.forEach((frame, idx) => {
+    const div = createCell(frame, idx, '54');
+    tier54Row.appendChild(div);
   });
 }
 
+function createCell(frame, idx, tier) {
+  const div = document.createElement('div');
+  div.className = `cell-${tier}`;
+  div.setAttribute('data-idx', idx);
+  div.setAttribute('data-tier', `tier_${tier}`);
+  
+  const timeSpan = document.createElement('div');
+  timeSpan.className = 'time-label';
+  timeSpan.innerText = `${(frame.start_ms / 1000).toFixed(2)}s`;
+  
+  const input = document.createElement('input');
+  input.type = 'text';
+  input.className = 'grid-input';
+  input.value = frame.text || '';
+  input.placeholder = '';
+  input.setAttribute('data-idx', idx);
+  input.setAttribute('data-tier', `tier_${tier}`);
+  
+  input.addEventListener('focus', () => {});
+  input.addEventListener('input', (e) => {
+    let val = e.target.value;
+    if (val.length > 4) val = val.slice(0, 4);
+    e.target.value = val;
+    framesData[`tier_${tier}`][idx].text = val;
+  });
+  
+  div.appendChild(timeSpan);
+  div.appendChild(input);
+  
+  div.addEventListener('click', (e) => {
+    if (e.target === input) return;
+    playCellAudio(`tier_${tier}`, idx);
+  });
+  
+  input.addEventListener('click', (e) => {
+    e.stopPropagation();
+    playCellAudio(`tier_${tier}`, idx);
+  });
+  
+  // Selection on clicking the cell area (not input)
+  div.addEventListener('mousedown', (e) => {
+    if (e.target === input) return;
+    toggleSegmentSelection(`tier_${tier}`, idx);
+  });
+  
+  return div;
+}
+
+// ========== API FUNCTIONS ==========
 async function checkAuth() {
   try {
     const r = await fetch(`${BASE_PATH}/api/current-user`);
@@ -847,527 +1022,3 @@ async function loadProgress() {
     document.getElementById('remainingBadge').innerHTML = `${d.remaining} remaining`;
     if (d.user_stats) {
       document.getElementById('totalFiles').innerText = d.user_stats.total_files_completed || 0;
-      document.getElementById('totalDuration').innerText = d.user_stats.total_duration_formatted || '0s';
-    }
-    if (d.user_daily_stats && d.user_daily_stats.daily) {
-      const today = new Date().toISOString().split('T')[0];
-      const ts = d.user_daily_stats.daily[today];
-      document.getElementById('todayFiles').innerText = ts ? ts.files_completed || 0 : '0';
-      document.getElementById('todayDuration').innerText = ts ? ts.duration_formatted || '0s' : '0s';
-    } else {
-      document.getElementById('todayFiles').innerText = '0';
-      document.getElementById('todayDuration').innerText = '0s';
-    }
-  } catch (err) { console.warn('Progress error:', err); }
-}
-
-function initAudioContext() {
-  if (!audioContext && currentAudio) {
-    try {
-      audioContext = new (window.AudioContext || window.webkitAudioContext)();
-      const source = audioContext.createMediaElementSource(currentAudio);
-      gainNode = audioContext.createGain();
-      source.connect(gainNode);
-      gainNode.connect(audioContext.destination);
-      gainNode.gain.value = currentVolume;
-      if (audioContext.state === 'suspended') {
-        const rh = () => { audioContext.resume(); document.removeEventListener('touchstart', rh); document.removeEventListener('click', rh); };
-        document.addEventListener('touchstart', rh);
-        document.addEventListener('click', rh);
-      }
-    } catch (e) { console.warn('Web Audio init failed:', e); }
-  }
-}
-
-function updateVolume(value) {
-  currentVolume = value;
-  const volumeSpan = document.getElementById('volumeValue');
-  if (volumeSpan) volumeSpan.innerText = Math.round(value * 100) + '%';
-  if (gainNode) gainNode.gain.value = value;
-  if (currentAudio && !gainNode) currentAudio.volume = Math.min(value, 1.0);
-}
-
-function setPlaybackSpeed(speed) {
-  playbackSpeed = speed;
-  if (currentAudio) {
-    currentAudio.playbackRate = speed;
-  }
-  showMessage(`Playback speed: ${speed}x`, 'info');
-}
-
-function playSegmentAudio(startMs, endMs) {
-  if (!currentAudio) { showMessage('Audio not ready', 'error'); return; }
-  const startSec = startMs / 1000;
-  const durationSec = (endMs - startMs) / 1000;
-  if (currentPlayTimeout) { clearTimeout(currentPlayTimeout); currentPlayTimeout = null; }
-  const doPlay = () => {
-    currentAudio.pause();
-    currentAudio.currentTime = startSec;
-    const p = currentAudio.play();
-    if (p !== undefined) {
-      p.then(() => {
-        currentPlayTimeout = setTimeout(() => {
-          if (currentAudio && !currentAudio.paused) currentAudio.pause();
-          currentPlayTimeout = null;
-        }, durationSec * 1000 / playbackSpeed);
-      }).catch(err => { console.warn('Playback error:', err); });
-    }
-  };
-  if (audioContext && audioContext.state === 'suspended') audioContext.resume().then(doPlay).catch(doPlay);
-  else doPlay();
-}
-
-function switchTier(tier) {
-  currentTier = tier;
-  document.querySelectorAll('.tier-tab').forEach(tab => {
-    if (tab.dataset.tier === tier) tab.classList.add('active');
-    else tab.classList.remove('active');
-  });
-  document.querySelectorAll('.tier-panel').forEach(panel => {
-    if (panel.id === `tier-panel-${tier}`) panel.classList.add('active');
-    else panel.classList.remove('active');
-  });
-  updateMultiBar();
-}
-
-function toggleSegmentSelection(tier, frameIndex) {
-  const card = document.querySelector(`.frame-card[data-tier="${tier}"][data-frame-index="${frameIndex}"]`);
-  if (!card) return;
-  if (selectedSegments[tier].has(frameIndex)) {
-    selectedSegments[tier].delete(frameIndex);
-    card.classList.remove('selected');
-  } else {
-    selectedSegments[tier].add(frameIndex);
-    card.classList.add('selected');
-  }
-  updateMultiBar();
-}
-
-function updateMultiBar() {
-  const bar = document.getElementById('multiBar');
-  if (!bar) return;
-  const currentSelected = selectedSegments[currentTier];
-  if (currentSelected.size === 0) {
-    bar.classList.remove('visible');
-  } else {
-    bar.classList.add('visible');
-    bar.querySelector('.multi-bar-label').textContent = `${currentSelected.size} segment${currentSelected.size > 1 ? 's' : ''} selected`;
-  }
-}
-
-function clearSelection() {
-  selectedSegments[currentTier].clear();
-  document.querySelectorAll(`.frame-card[data-tier="${currentTier}"].selected`).forEach(c => c.classList.remove('selected'));
-  updateMultiBar();
-}
-
-function playSelectedSegments() {
-  const currentSelected = selectedSegments[currentTier];
-  if (currentSelected.size === 0 || !currentData || !currentAudio) return;
-  if (currentPlayTimeout) { clearTimeout(currentPlayTimeout); currentPlayTimeout = null; }
-  if (multiPlayTimeout) { clearTimeout(multiPlayTimeout); multiPlayTimeout = null; }
-  document.querySelectorAll(`.frame-card[data-tier="${currentTier}"].playing`).forEach(c => c.classList.remove('playing'));
-  
-  multiPlayQueue = Array.from(currentSelected).sort((a, b) => a - b);
-  multiPlayIndex = 0;
-  playNextInQueue();
-}
-
-function playNextInQueue() {
-  if (multiPlayIndex >= multiPlayQueue.length) {
-    document.querySelectorAll(`.frame-card[data-tier="${currentTier}"].playing`).forEach(c => c.classList.remove('playing'));
-    return;
-  }
-  const frameIndex = multiPlayQueue[multiPlayIndex];
-  const frame = framesData[currentTier][frameIndex];
-  if (!frame) { multiPlayIndex++; playNextInQueue(); return; }
-
-  document.querySelectorAll(`.frame-card[data-tier="${currentTier}"].playing`).forEach(c => c.classList.remove('playing'));
-  const card = document.querySelector(`.frame-card[data-tier="${currentTier}"][data-frame-index="${frameIndex}"]`);
-  if (card) { card.classList.add('playing'); card.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }
-
-  const startSec = frame.start_ms / 1000;
-  const durationSec = (frame.end_ms - frame.start_ms) / 1000;
-
-  unlockAudio();
-  currentAudio.pause();
-  currentAudio.currentTime = startSec;
-
-  const doPlay = () => {
-    const p = currentAudio.play();
-    if (p !== undefined) {
-      p.then(() => {
-        multiPlayTimeout = setTimeout(() => {
-          if (currentAudio && !currentAudio.paused) currentAudio.pause();
-          multiPlayIndex++;
-          playNextInQueue();
-        }, durationSec * 1000 / playbackSpeed);
-      }).catch(err => console.warn('multi-play error:', err));
-    }
-  };
-
-  if (audioContext && audioContext.state === 'suspended') audioContext.resume().then(doPlay).catch(doPlay);
-  else doPlay();
-}
-
-function playSegmentByIndex(tier, frameIndex) {
-  if (!framesData[tier] || !currentAudio) { showMessage('Audio not ready', 'error'); return; }
-  const frame = framesData[tier][frameIndex];
-  if (!frame) return;
-  if (multiPlayTimeout) { clearTimeout(multiPlayTimeout); multiPlayTimeout = null; }
-  document.querySelectorAll(`.frame-card[data-tier="${tier}"].playing`).forEach(c => c.classList.remove('playing'));
-  const card = document.querySelector(`.frame-card[data-tier="${tier}"][data-frame-index="${frameIndex}"]`);
-  unlockAudio();
-  playSegmentAudio(frame.start_ms, frame.end_ms);
-  if (card) {
-    card.classList.add('playing');
-    setTimeout(() => card.classList.remove('playing'), (frame.end_ms - frame.start_ms) / playbackSpeed);
-  }
-}
-
-function generateFramesFromOriginal(originalFrames, targetFrameMs) {
-  if (!originalFrames || originalFrames.length === 0) return [];
-  
-  const originalFrameMs = 108;
-  const scaleFactor = targetFrameMs / originalFrameMs;
-  
-  if (scaleFactor === 1) {
-    return originalFrames.map(f => ({ ...f }));
-  } else if (scaleFactor < 1) {
-    const newFrames = [];
-    for (let i = 0; i < originalFrames.length; i++) {
-      const originalStart = originalFrames[i].start_ms;
-      const originalEnd = originalFrames[i].end_ms;
-      const originalText = originalFrames[i].text || "";
-      
-      const numSubframes = Math.round(1 / scaleFactor);
-      const subframeMs = targetFrameMs;
-      
-      for (let j = 0; j < numSubframes; j++) {
-        const subStart = originalStart + (j * subframeMs);
-        const subEnd = Math.min(originalStart + ((j + 1) * subframeMs), originalEnd);
-        if (subStart < originalEnd) {
-          newFrames.push({
-            index: newFrames.length,
-            start_ms: subStart,
-            end_ms: subEnd,
-            text: j === 0 ? originalText : ""
-          });
-        }
-      }
-    }
-    return newFrames;
-  } else {
-    const newFrames = [];
-    for (let i = 0; i < originalFrames.length; i += scaleFactor) {
-      const start = originalFrames[i].start_ms;
-      const end = originalFrames[Math.min(i + scaleFactor - 1, originalFrames.length - 1)].end_ms;
-      let mergedText = "";
-      for (let j = 0; j < scaleFactor && i + j < originalFrames.length; j++) {
-        mergedText += (originalFrames[i + j].text || "");
-      }
-      mergedText = mergedText.slice(0, 4);
-      newFrames.push({
-        index: newFrames.length,
-        start_ms: start,
-        end_ms: end,
-        text: mergedText
-      });
-    }
-    return newFrames;
-  }
-}
-
-async function loadNextFile() {
-  const contentDiv = document.getElementById('content');
-  contentDiv.innerHTML = '<div class="loading">Loading next sample...</div>';
-  if (audioContext) { await audioContext.close(); audioContext = null; gainNode = null; }
-  audioUnlocked = false;
-  selectedSegments = { tier_54: new Set(), tier_108: new Set(), tier_216: new Set() };
-  try {
-    const r = await fetch(`${BASE_PATH}/get-next-file`);
-    if (r.status === 401) { window.location.href = `${BASE_PATH}/login`; return; }
-    const d = await r.json();
-    if (d.completed) { showCompletionScreen(); return; }
-    if (d.error) { showErrorScreen(d.error); return; }
-    
-    currentData = d;
-    const durationMs = d.duration_ms || 5000;
-    
-    const originalFrames = d.frames || [];
-    
-    if (originalFrames.length === 0) {
-      const numFrames108 = Math.ceil(durationMs / 108);
-      for (let i = 0; i < numFrames108; i++) {
-        originalFrames.push({
-          index: i,
-          start_ms: i * 108,
-          end_ms: Math.min((i + 1) * 108, durationMs),
-          text: ""
-        });
-      }
-    }
-    
-    framesData.tier_54 = generateFramesFromOriginal(originalFrames, 54);
-    framesData.tier_108 = generateFramesFromOriginal(originalFrames, 108);
-    framesData.tier_216 = generateFramesFromOriginal(originalFrames, 216);
-    
-    renderThreeTierInterface(d);
-    loadProgress();
-  } catch (err) { 
-    console.error('Load error:', err);
-    showErrorScreen('Connection issue: ' + err); 
-  }
-}
-
-function showCompletionScreen() {
-  document.getElementById('content').innerHTML = `
-    <div class="completion-box">
-      <h2>All done</h2>
-      <p>You have successfully annotated all files.</p>
-      <button class="btn-submit" onclick="location.reload()">Reload page</button>
-    </div>`;
-}
-
-function showErrorScreen(message) {
-  document.getElementById('content').innerHTML = `
-    <div class="message error" style="margin-top:20px;">Error: ${message}</div>
-    <div class="button-group" style="margin-top:20px;">
-      <button class="btn-submit" onclick="loadNextFile()">Try again</button>
-    </div>`;
-}
-
-function renderThreeTierInterface(data) {
-  const durationMs = data.duration_ms || 5000;
-  
-  let html = `
-    <div class="audio-wrapper">
-      <audio id="audioPlayer" controls preload="auto" playsinline>
-        <source src="${BASE_PATH}/audio/${data.wav_file}" type="audio/wav">
-      </audio>
-      <div class="volume-control">
-        <span class="volume-icon">🔊</span>
-        <input type="range" id="volumeSlider" class="volume-slider" min="0" max="${MAX_VOLUME}" step="0.05" value="1.0">
-        <span class="volume-value" id="volumeValue">100%</span>
-      </div>
-      <div style="display: flex; gap: 8px; margin-top: 12px;">
-        <button class="stats-btn" onclick="setPlaybackSpeed(1.0)" style="flex:1; padding:8px;">1x</button>
-        <button class="stats-btn" onclick="setPlaybackSpeed(2.0)" style="flex:1; padding:8px;">2x</button>
-        <button class="stats-btn" onclick="setPlaybackSpeed(4.0)" style="flex:1; padding:8px;">4x</button>
-      </div>
-    </div>
-    <div class="current-file-card">
-      <div><strong>File:</strong> ${data.json_file}</div>
-      <div><strong>Word:</strong> ${data.word || '—'}</div>
-      <div><strong>Sentence:</strong> ${data.sentence || ''}</div>
-      <div style="margin-top:8px;font-size:0.8rem;color:#6E6E68;"><strong>Annotator:</strong> ${currentUsername}</div>
-      <div style="margin-top:4px;font-size:0.7rem;color:#2C6E49;"><strong>Duration:</strong> ${(durationMs/1000).toFixed(2)}s | <strong>3 Tiers:</strong> 54ms | 108ms | 216ms</div>
-    </div>
-    
-    <div class="akshar-set-section">
-      <div class="akshar-title">Allowed Akshar Set (Drag & Drop) - Max 2 per frame</div>
-      <div class="akshar-grid" id="aksharGridTop"></div>
-    </div>
-    
-    <div class="tier-tabs">
-      <button class="tier-tab active" data-tier="tier_54" onclick="switchTier('tier_54')">आकाश (54ms)<span>Normal Speed</span></button>
-      <button class="tier-tab" data-tier="tier_108" onclick="switchTier('tier_108')">अग्नि (108ms)<span>2x Slow</span></button>
-      <button class="tier-tab" data-tier="tier_216" onclick="switchTier('tier_216')">वायु (216ms)<span>4x Slow</span></button>
-    </div>
-    
-    <div class="multi-bar" id="multiBar">
-      <span class="multi-bar-label">0 segments selected</span>
-      <button class="multi-bar-btn play" onclick="playSelectedSegments()">▶ Play selected</button>
-      <button class="multi-bar-btn" onclick="clearSelection()">✕ Clear</button>
-    </div>
-  `;
-  
-  for (const [tier, tierInfo] of Object.entries(TIERS)) {
-    const frames = framesData[tier];
-    html += `
-      <div id="tier-panel-${tier}" class="tier-panel ${tier === 'tier_54' ? 'active' : ''}">
-        <div class="tier-header">
-          ${tierInfo.name} - ${frames.length} frames (${tierInfo.frameMs}ms each) - ${tierInfo.speed} playback
-        </div>
-        <div class="frames-grid" id="frames-grid-${tier}"></div>
-      </div>
-    `;
-  }
-  
-  html += `
-    <div class="button-group">
-      <button class="btn-submit" id="submitBtn">Submit All 3 Tiers</button>
-      <button class="btn-skip" id="skipBtn">Skip (keep later)</button>
-    </div>
-    <div id="messageArea" class="message-area"></div>
-  `;
-  
-  document.getElementById('content').innerHTML = html;
-  
-  renderAksharSet('aksharGridTop');
-  
-  currentAudio = document.getElementById('audioPlayer');
-  if (currentAudio) {
-    currentAudio.onerror = () => showMessage('Audio could not be loaded', 'error');
-    currentAudio.setAttribute('playsinline', '');
-    currentAudio.playbackRate = playbackSpeed;
-    document.getElementById('volumeSlider').addEventListener('input', e => updateVolume(parseFloat(e.target.value)));
-    currentAudio.addEventListener('play', () => {
-      if (!audioContext) initAudioContext();
-      if (audioContext && audioContext.state === 'suspended') audioContext.resume();
-    });
-    currentAudio.addEventListener('touchstart', () => unlockAudio(), { once: true });
-  }
-  
-  for (const [tier, frames] of Object.entries(framesData)) {
-    const framesGrid = document.getElementById(`frames-grid-${tier}`);
-    if (!framesGrid) continue;
-    framesGrid.innerHTML = '';
-    
-    frames.forEach((frame, idx) => {
-      const frameCard = document.createElement('div');
-      frameCard.className = 'frame-card';
-      frameCard.setAttribute('data-tier', tier);
-      frameCard.setAttribute('data-frame-index', idx);
-  
-      const headerDiv = document.createElement('div');
-      headerDiv.className = 'frame-header';
-      headerDiv.innerHTML = `
-        <span class="frame-label"><span class="sel-dot"></span> Segment ${idx+1}</span>
-        <span class="frame-time">${frame.start_ms}–${frame.end_ms} ms</span>
-      `;
-  
-      const editDiv = document.createElement('div');
-      editDiv.setAttribute('contenteditable', 'true');
-      editDiv.className = 'edit-text';
-      editDiv.innerText = frame.text || '';
-      editDiv.setAttribute('data-frame-idx', idx);
-      editDiv.setAttribute('data-tier', tier);
-  
-      setupDesktopDropZone(editDiv, idx, tier);
-  
-      editDiv.addEventListener('input', e => {
-        let newText = e.target.innerText || '';
-        const aksharCount = newText.split('').filter(c => AKSHAR_SET.includes(c)).length;
-        if (aksharCount > 2) {
-          let kept = '';
-          let count = 0;
-          for (let char of newText) {
-            if (AKSHAR_SET.includes(char)) {
-              if (count < 2) {
-                kept += char;
-                count++;
-              }
-            } else {
-              kept += char;
-            }
-          }
-          e.target.innerText = kept;
-          showMessage('Maximum 2 akshars per frame!', 'warning');
-        }
-        if (framesData[tier] && framesData[tier][idx]) {
-          framesData[tier][idx].text = e.target.innerText;
-        }
-      });
-  
-      editDiv.addEventListener('click', e => { 
-        e.stopPropagation(); 
-        playSegmentByIndex(tier, idx); 
-      });
-  
-      frameCard.addEventListener('click', e => {
-        if (e.target === editDiv || editDiv.contains(e.target)) return;
-        toggleSegmentSelection(tier, idx);
-      });
-  
-      frameCard.appendChild(headerDiv);
-      frameCard.appendChild(editDiv);
-      framesGrid.appendChild(frameCard);
-    });
-    
-    const hint = document.createElement('div');
-    hint.className = 'empty-hint';
-    hint.innerText = `💡 ${frames.length} frames of ${TIERS[tier].frameMs}ms each. Tap text field to play. Tap dot to select.`;
-    framesGrid.appendChild(hint);
-  }
-  
-  document.getElementById('submitBtn').addEventListener('click', () => submitThreeTierAnnotation());
-  document.getElementById('skipBtn').addEventListener('click', () => skipFile());
-  
-  window.switchTier = switchTier;
-  window.playSelectedSegments = playSelectedSegments;
-  window.clearSelection = clearSelection;
-  window.setPlaybackSpeed = setPlaybackSpeed;
-}
-
-async function submitThreeTierAnnotation() {
-  if (!currentData) { showMessage('No data to submit', 'error'); return; }
-  
-  let totalAkshars = 0;
-  for (const tier of ['tier_54', 'tier_108', 'tier_216']) {
-    totalAkshars += framesData[tier].filter(f => f.text && f.text.trim()).length;
-  }
-  
-  const payload = {
-    json_file: currentData.json_file,
-    wav_file: currentData.wav_file,
-    word: currentData.word,
-    sentence: currentData.sentence,
-    sentence_devanagari: currentData.sentence_devanagari,
-    full_sequence: currentData.full_sequence,
-    frames_54: framesData.tier_54,
-    frames_108: framesData.tier_108,
-    frames_216: framesData.tier_216,
-    duration_ms: currentData.duration_ms || 0,
-    language: currentData.language || 'unknown'
-  };
-  
-  showMessage(`Submitting 3-tier annotation (${totalAkshars} akshars)...`, 'info');
-  try {
-    const r = await fetch(`${BASE_PATH}/submit-3-tier`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    });
-    if (r.status === 401) { window.location.href = `${BASE_PATH}/login`; return; }
-    const d = await r.json();
-    showMessage(d.has_more ? `Submitted! ${d.remaining} files remaining.` : 'All files completed! Well done.', 'success');
-    setTimeout(() => loadNextFile(), d.has_more ? 1200 : 1500);
-    loadProgress();
-  } catch (err) { 
-    showMessage('Error during submission: ' + err.message, 'error'); 
-  }
-}
-
-function skipFile() {
-  if (!currentData) return;
-  if (currentAudio) currentAudio.pause();
-  if (currentPlayTimeout) { clearTimeout(currentPlayTimeout); currentPlayTimeout = null; }
-  if (multiPlayTimeout) { clearTimeout(multiPlayTimeout); multiPlayTimeout = null; }
-  if (audioContext) { audioContext.close(); audioContext = null; gainNode = null; }
-  fetch(`${BASE_PATH}/skip-file`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ json_file: currentData.json_file })
-  }).catch(err => console.warn('Skip error:', err));
-  showMessage('Skipping to next file...', 'info');
-  setTimeout(() => loadNextFile(), 300);
-}
-
-function showMessage(text, type) {
-  const msgDiv = document.getElementById('messageArea');
-  if (!msgDiv) return;
-  msgDiv.innerHTML = `<div class="message ${type}">${text}</div>`;
-  setTimeout(() => { if (msgDiv.firstChild && msgDiv.firstChild.innerText === text) msgDiv.innerHTML = ''; }, 2800);
-}
-
-async function init() {
-  setupAudioUnlock();
-  const authed = await checkAuth();
-  if (authed) { loadProgress(); loadNextFile(); setInterval(loadProgress, 10000); }
-}
-
-init();
-</script>
-</body>
-</html>
