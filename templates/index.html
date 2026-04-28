@@ -776,9 +776,6 @@ function toggleSegmentSelection(tier, index) {
 function updateMultiBar() {
   const bar = document.getElementById('multiBar');
   if (!bar) return;
-  // For desktop style, we show selected count for the row being clicked
-  // But since we have 3 rows visible, we'll show total selected across all tiers or per tier?
-  // Desktop UI shows per-tier selection. Let's track per tier but show when clicking on cells
   let totalSelected = selectedSegments.tier_216.size + selectedSegments.tier_108.size + selectedSegments.tier_54.size;
   if (totalSelected === 0) {
     bar.classList.remove('visible');
@@ -797,7 +794,6 @@ function clearSelection() {
 }
 
 function playSelectedSegments() {
-  // Collect all selected frames across all tiers
   let allSelected = [];
   for (let tier of ['tier_216', 'tier_108', 'tier_54']) {
     for (let idx of selectedSegments[tier]) {
@@ -808,7 +804,6 @@ function playSelectedSegments() {
   
   stopPlayback();
   
-  // Sort by start time (all tiers are time-aligned)
   allSelected.sort((a, b) => framesData[a.tier][a.index].start_ms - framesData[b.tier][b.index].start_ms);
   
   multiPlayQueue = allSelected;
@@ -900,7 +895,36 @@ function generateAllTiers(originalFrames, durationMs) {
   return { tier_216: tier216, tier_108: tier108, tier_54: tier54 };
 }
 
-// ========== RENDER 3-TIER GRID (Horizontal rows like desktop) ==========
+// ========== NEW FUNCTION: Load data into tiers ==========
+function loadDataIntoTiers(audioData) {
+    // Get frames_108 from the loaded data (or frames as fallback)
+    let sourceFrames = audioData.frames_108 || audioData.frames || [];
+    
+    if (sourceFrames.length === 0) {
+        // If no frames, generate from duration
+        const durationMs = audioData.duration_ms || 5000;
+        sourceFrames = generateFramesForTier(durationMs, 108);
+    }
+    
+    // Generate all 3 tiers from source frames
+    const allTiers = generateAllTiers(sourceFrames, audioData.duration_ms || 5000);
+    framesData = allTiers;
+    
+    // Render the grid
+    renderThreeTierGrid();
+    
+    // Setup audio
+    if (currentAudio) {
+        currentAudio.pause();
+        currentAudio.src = `${BASE_PATH}/audio/${audioData.wav_file}`;
+        currentAudio.load();
+        initAudioContext();
+        updateVolume(currentVolume);
+        setPlaybackSpeed(playbackSpeed);
+    }
+}
+
+// ========== RENDER 3-TIER GRID ==========
 function renderThreeTierGrid() {
   const tier216Row = document.getElementById('tier216Row');
   const tier108Row = document.getElementById('tier108Row');
@@ -1022,3 +1046,275 @@ async function loadProgress() {
     document.getElementById('remainingBadge').innerHTML = `${d.remaining} remaining`;
     if (d.user_stats) {
       document.getElementById('totalFiles').innerText = d.user_stats.total_files_completed || 0;
+      let totalSecs = d.user_stats.total_duration_seconds || 0;
+      if (totalSecs < 60) {
+        document.getElementById('totalDuration').innerText = `${totalSecs.toFixed(1)}s`;
+      } else if (totalSecs < 3600) {
+        let mins = Math.floor(totalSecs / 60);
+        let secs = Math.floor(totalSecs % 60);
+        document.getElementById('totalDuration').innerText = `${mins}m ${secs}s`;
+      } else {
+        let hours = Math.floor(totalSecs / 3600);
+        let mins = Math.floor((totalSecs % 3600) / 60);
+        document.getElementById('totalDuration').innerText = `${hours}h ${mins}m`;
+      }
+    }
+    if (d.user_daily_stats && d.user_daily_stats.daily) {
+      const today = new Date().toISOString().split('T')[0];
+      const todayStats = d.user_daily_stats.daily[today] || { files_completed: 0, duration_seconds: 0 };
+      document.getElementById('todayFiles').innerText = todayStats.files_completed || 0;
+      let todaySecs = todayStats.duration_seconds || 0;
+      if (todaySecs < 60) {
+        document.getElementById('todayDuration').innerText = `${todaySecs.toFixed(1)}s`;
+      } else if (todaySecs < 3600) {
+        let mins = Math.floor(todaySecs / 60);
+        let secs = Math.floor(todaySecs % 60);
+        document.getElementById('todayDuration').innerText = `${mins}m ${secs}s`;
+      } else {
+        let hours = Math.floor(todaySecs / 3600);
+        let mins = Math.floor((todaySecs % 3600) / 60);
+        document.getElementById('todayDuration').innerText = `${hours}h ${mins}m`;
+      }
+    }
+  } catch(e) { console.error('Progress load error:', e); }
+}
+
+function showMessage(msg, type) {
+  let msgDiv = document.getElementById('messageArea');
+  if (!msgDiv) {
+    msgDiv = document.createElement('div');
+    msgDiv.id = 'messageArea';
+    msgDiv.className = 'message-area';
+    document.getElementById('content').appendChild(msgDiv);
+  }
+  msgDiv.innerHTML = `<div class="message ${type}">${msg}</div>`;
+  setTimeout(() => {
+    if (msgDiv.innerHTML.includes(msg)) msgDiv.innerHTML = '';
+  }, 3000);
+}
+
+async function loadNextSample() {
+  try {
+    const response = await fetch(`${BASE_PATH}/get-next-file`);
+    if (!response.ok) throw new Error('Failed to load');
+    const data = await response.json();
+    if (data.completed) {
+      document.getElementById('content').innerHTML = `<div class="message success">${data.message || 'All files completed!'}</div>`;
+      return;
+    }
+    if (data.error) {
+      document.getElementById('content').innerHTML = `<div class="message error">${data.error}</div>`;
+      return;
+    }
+    
+    currentData = data;
+    
+    // Create audio element
+    const audioUrl = `${BASE_PATH}/audio/${data.wav_file}`;
+    if (currentAudio) {
+      currentAudio.pause();
+      currentAudio.src = audioUrl;
+    } else {
+      currentAudio = new Audio(audioUrl);
+      currentAudio.crossOrigin = "anonymous";
+      setupAudioUnlock();
+    }
+    currentAudio.load();
+    
+    // Load data into tiers (THIS IS THE FIX)
+    loadDataIntoTiers(data);
+    
+    // Update file info display
+    const fileCard = document.querySelector('.current-file-card');
+    if (fileCard) {
+      const durationSec = (data.duration_ms / 1000).toFixed(1);
+      fileCard.innerHTML = `<strong>${data.json_file || 'Current File'}</strong> — ${durationSec} seconds`;
+    }
+    
+    initAudioContext();
+    updateVolume(currentVolume);
+    setPlaybackSpeed(playbackSpeed);
+    
+  } catch (error) {
+    console.error('Error loading sample:', error);
+    document.getElementById('content').innerHTML = `<div class="message error">Error loading sample. Please refresh.</div>`;
+  }
+}
+
+async function submitAnnotation() {
+  // Collect all texts from all tiers
+  const frames_54 = framesData.tier_54.map(f => ({ text: f.text, start_ms: f.start_ms, end_ms: f.end_ms }));
+  const frames_108 = framesData.tier_108.map(f => ({ text: f.text, start_ms: f.start_ms, end_ms: f.end_ms }));
+  const frames_216 = framesData.tier_216.map(f => ({ text: f.text, start_ms: f.start_ms, end_ms: f.end_ms }));
+  
+  const fullSequence = frames_108.map(f => f.text).filter(t => t).join(' ');
+  
+  const submitData = {
+    json_file: currentData.json_file,
+    wav_file: currentData.wav_file,
+    duration_ms: currentData.duration_ms,
+    frames_54: frames_54,
+    frames_108: frames_108,
+    frames_216: frames_216,
+    full_sequence: fullSequence,
+    sentence: currentData.sentence || ''
+  };
+  
+  try {
+    const response = await fetch(`${BASE_PATH}/submit-3-tier`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(submitData)
+    });
+    const result = await response.json();
+    if (result.message) {
+      showMessage(result.message, 'success');
+      await loadProgress();
+      await loadNextSample();
+      clearSelection();
+    } else {
+      showMessage(result.error || 'Submission failed', 'error');
+    }
+  } catch (error) {
+    showMessage('Error submitting annotation', 'error');
+  }
+}
+
+async function skipFile() {
+  if (!currentData || !currentData.json_file) {
+    showMessage('No file to skip', 'error');
+    return;
+  }
+  try {
+    const response = await fetch(`${BASE_PATH}/skip-file`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ json_file: currentData.json_file })
+    });
+    const result = await response.json();
+    if (result.message) {
+      showMessage(result.message, 'info');
+      await loadNextSample();
+      clearSelection();
+    }
+  } catch (error) {
+    showMessage('Error skipping file', 'error');
+  }
+}
+
+// Initialize the page
+async function init() {
+  const authSuccess = await checkAuth();
+  if (!authSuccess) return;
+  
+  await loadProgress();
+  
+  // Build the UI structure
+  const contentDiv = document.getElementById('content');
+  contentDiv.innerHTML = `
+    <div class="audio-wrapper">
+      <div class="volume-control">
+        <span class="volume-icon">🔊</span>
+        <input type="range" id="volumeSlider" class="volume-slider" min="0" max="1" step="0.01" value="1">
+        <span id="volumeValue" class="volume-value">100%</span>
+      </div>
+      <div class="speed-control">
+        <button class="speed-btn" data-speed="0.5">0.5x</button>
+        <button class="speed-btn active" data-speed="1">1x</button>
+        <button class="speed-btn" data-speed="1.5">1.5x</button>
+        <button class="speed-btn" data-speed="2">2x</button>
+      </div>
+      <div class="current-file-card">
+        <strong>Loading...</strong>
+      </div>
+    </div>
+    
+    <div class="three-tier-section">
+      <div class="tier-row tier-row-216" id="tier216Row"></div>
+      <div class="tier-row tier-row-108" id="tier108Row"></div>
+      <div class="tier-row tier-row-54" id="tier54Row"></div>
+    </div>
+    
+    <div id="multiBar" class="multi-bar">
+      <span class="multi-bar-label">0 segments selected</span>
+      <button class="multi-bar-btn play" onclick="playSelectedSegments()">▶ Play Selected</button>
+      <button class="multi-bar-btn" onclick="clearSelection()">Clear</button>
+    </div>
+    
+    <div class="akshar-set-section">
+      <div class="akshar-title">Drag to copy or tap to insert</div>
+      <div class="akshar-grid" id="aksharGrid"></div>
+    </div>
+    
+    <div class="button-group">
+      <button class="btn btn-submit" onclick="submitAnnotation()">✓ Submit</button>
+      <button class="btn btn-skip" onclick="skipFile()">⏭ Skip</button>
+    </div>
+  `;
+  
+  // Setup volume slider
+  const volumeSlider = document.getElementById('volumeSlider');
+  if (volumeSlider) {
+    volumeSlider.addEventListener('input', (e) => updateVolume(parseFloat(e.target.value)));
+  }
+  
+  // Setup speed buttons
+  document.querySelectorAll('.speed-btn').forEach(btn => {
+    btn.addEventListener('click', () => setPlaybackSpeed(parseFloat(btn.dataset.speed)));
+  });
+  
+  // Setup akshar grid with drag-and-drop and click-to-insert
+  const aksharGrid = document.getElementById('aksharGrid');
+  AKSHAR_SET.forEach(akshar => {
+    const span = document.createElement('span');
+    span.className = 'akshar-item';
+    span.textContent = akshar;
+    span.setAttribute('draggable', 'true');
+    span.setAttribute('data-akshar', akshar);
+    
+    span.addEventListener('dragstart', (e) => {
+      e.dataTransfer.setData('text/plain', akshar);
+      e.dataTransfer.effectAllowed = 'copy';
+    });
+    
+    span.addEventListener('click', (e) => {
+      const activeElement = document.activeElement;
+      if (activeElement && activeElement.tagName === 'INPUT' && activeElement.classList.contains('grid-input')) {
+        const start = activeElement.selectionStart;
+        const end = activeElement.selectionEnd;
+        const value = activeElement.value;
+        activeElement.value = value.substring(0, start) + akshar + value.substring(end);
+        activeElement.dispatchEvent(new Event('input', { bubbles: true }));
+        activeElement.focus();
+      }
+    });
+    
+    aksharGrid.appendChild(span);
+  });
+  
+  // Setup drag and drop for inputs
+  document.addEventListener('dragover', (e) => e.preventDefault());
+  document.addEventListener('drop', (e) => {
+    e.preventDefault();
+    const target = e.target;
+    if (target && target.tagName === 'INPUT' && target.classList.contains('grid-input')) {
+      const akshar = e.dataTransfer.getData('text/plain');
+      if (akshar) {
+        const start = target.selectionStart;
+        const end = target.selectionEnd;
+        const value = target.value;
+        target.value = value.substring(0, start) + akshar + value.substring(end);
+        target.dispatchEvent(new Event('input', { bubbles: true }));
+        target.focus();
+      }
+    }
+  });
+  
+  await loadNextSample();
+}
+
+// Start the app
+init();
+</script>
+</body>
+</html>
