@@ -22,7 +22,7 @@ body {
 }
 
 .container {
-  max-width: 680px;
+  max-width: 100%;
   margin: 0 auto;
   background: #FFFFFF;
   border-radius: 28px;
@@ -261,7 +261,7 @@ audio {
   color: #1A4D3A;
 }
 
-/* ========== 3-TIER TABS ========== */
+/* ========== 3-TIER TABS (Like Desktop) ========== */
 .tier-tabs {
   display: flex;
   gap: 8px;
@@ -318,7 +318,7 @@ audio {
   text-align: center;
 }
 
-/* ========== FRAMES GRID ========== */
+/* ========== FRAMES GRID (Like Desktop) ========== */
 .frames-grid {
   display: flex;
   flex-direction: column;
@@ -432,6 +432,7 @@ audio {
   box-shadow: 0 0 0 2px rgba(44,110,73,0.2);
 }
 
+/* Multi-select toolbar */
 .multi-bar {
   display: none;
   align-items: center;
@@ -459,6 +460,17 @@ audio {
   padding: 6px 14px;
   border-radius: 30px;
   cursor: pointer;
+  transition: 0.15s;
+  white-space: nowrap;
+  flex: none;
+  width: auto;
+}
+
+.multi-bar-btn:hover { background: rgba(255,255,255,0.28); }
+
+.multi-bar-btn.play {
+  background: #FFFFFF;
+  color: #1A4D3A;
 }
 
 .akshar-set-section {
@@ -1016,13 +1028,12 @@ function playSegmentByIndex(tier, frameIndex) {
 function generateFramesFromOriginal(originalFrames, targetFrameMs) {
   if (!originalFrames || originalFrames.length === 0) return [];
   
-  const originalFrameMs = 108; // Assuming original is 108ms
+  const originalFrameMs = 108;
   const scaleFactor = targetFrameMs / originalFrameMs;
   
   if (scaleFactor === 1) {
     return originalFrames.map(f => ({ ...f }));
   } else if (scaleFactor < 1) {
-    // Need more frames (e.g., 108ms -> 54ms)
     const newFrames = [];
     for (let i = 0; i < originalFrames.length; i++) {
       const originalStart = originalFrames[i].start_ms;
@@ -1040,21 +1051,22 @@ function generateFramesFromOriginal(originalFrames, targetFrameMs) {
             index: newFrames.length,
             start_ms: subStart,
             end_ms: subEnd,
-            text: j === 0 ? originalText : ""  // Only first subframe gets original text
+            text: j === 0 ? originalText : ""
           });
         }
       }
     }
     return newFrames;
   } else {
-    // Need fewer frames (e.g., 108ms -> 216ms) - merge every 2 frames
     const newFrames = [];
-    for (let i = 0; i < originalFrames.length; i += 2) {
+    for (let i = 0; i < originalFrames.length; i += scaleFactor) {
       const start = originalFrames[i].start_ms;
-      const end = i + 1 < originalFrames.length ? originalFrames[i + 1].end_ms : originalFrames[i].end_ms;
-      const text1 = originalFrames[i].text || "";
-      const text2 = i + 1 < originalFrames.length ? (originalFrames[i + 1].text || "") : "";
-      const mergedText = (text1 + text2).slice(0, 4);
+      const end = originalFrames[Math.min(i + scaleFactor - 1, originalFrames.length - 1)].end_ms;
+      let mergedText = "";
+      for (let j = 0; j < scaleFactor && i + j < originalFrames.length; j++) {
+        mergedText += (originalFrames[i + j].text || "");
+      }
+      mergedText = mergedText.slice(0, 4);
       newFrames.push({
         index: newFrames.length,
         start_ms: start,
@@ -1082,11 +1094,9 @@ async function loadNextFile() {
     currentData = d;
     const durationMs = d.duration_ms || 5000;
     
-    // Get original frames from server (108ms standard)
     const originalFrames = d.frames || [];
     
     if (originalFrames.length === 0) {
-      // Generate default frames if none exist
       const numFrames108 = Math.ceil(durationMs / 108);
       for (let i = 0; i < numFrames108; i++) {
         originalFrames.push({
@@ -1098,7 +1108,6 @@ async function loadNextFile() {
       }
     }
     
-    // Generate frames for all 3 tiers based on original
     framesData.tier_54 = generateFramesFromOriginal(originalFrames, 54);
     framesData.tier_108 = generateFramesFromOriginal(originalFrames, 108);
     framesData.tier_216 = generateFramesFromOriginal(originalFrames, 216);
