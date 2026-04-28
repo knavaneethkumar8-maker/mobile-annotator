@@ -559,16 +559,115 @@ audio {
   margin-top: 6px;
 }
 
-/* Responsive */
+/* ========== MOBILE RESPONSIVE - SAME 3-ROW LAYOUT ========== */
 @media (max-width: 560px) {
-  .container { padding: 16px; }
-  .cell-216 { flex: 0 0 320px; min-width: 320px; }
-  .cell-108 { flex: 0 0 155px; min-width: 155px; }
-  .cell-54 { flex: 0 0 72px; min-width: 72px; }
-  .tier-row { gap: 8px; padding: 12px; }
-  .tier-header { min-width: 60px; font-size: 0.7rem; padding: 6px 8px; }
-  .akshar-item { padding: 6px 10px; font-size: 0.9rem; min-width: 38px; }
-  .stats-btn, .self-record-btn, .live-stream-btn { padding: 4px 8px; font-size: 0.65rem; }
+  .container { padding: 12px; }
+  
+  /* Keep horizontal scroll, make cells smaller for mobile */
+  .tier-row {
+    gap: 8px;
+    padding: 12px;
+  }
+  
+  .tier-header {
+    min-width: 55px;
+    font-size: 0.65rem;
+    padding: 6px 6px;
+    margin-right: 8px;
+  }
+  
+  /* Smaller cells for mobile but SAME LAYOUT */
+  .cell-216 {
+    flex: 0 0 260px;
+    min-width: 260px;
+    padding: 12px 8px;
+  }
+  
+  .cell-108 {
+    flex: 0 0 130px;
+    min-width: 130px;
+    padding: 10px 6px;
+  }
+  
+  .cell-54 {
+    flex: 0 0 65px;
+    min-width: 65px;
+    padding: 8px 4px;
+  }
+  
+  /* Adjust fonts for mobile */
+  .cell-54 .grid-input { font-size: 0.8rem; padding: 6px 2px; }
+  .cell-108 .grid-input { font-size: 0.85rem; padding: 8px 4px; }
+  .cell-216 .grid-input { font-size: 0.95rem; padding: 10px 6px; }
+  
+  .time-label {
+    font-size: 8px;
+    padding: 2px 6px;
+  }
+  
+  /* Touch feedback */
+  .cell-216:active, .cell-108:active, .cell-54:active {
+    transform: scale(0.98);
+    background: #f0f0f0;
+  }
+  
+  /* Stack header on mobile */
+  .header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .header-right {
+    flex-wrap: wrap;
+    justify-content: space-between;
+  }
+  
+  .stats-cards {
+    gap: 8px;
+  }
+  
+  .stat-card {
+    padding: 8px;
+  }
+  
+  .stat-card-value {
+    font-size: 1.1rem;
+  }
+  
+  .speed-btn {
+    padding: 5px 12px;
+    font-size: 11px;
+  }
+  
+  .akshar-item {
+    padding: 6px 10px;
+    font-size: 0.85rem;
+    min-width: 36px;
+  }
+  
+  .btn {
+    padding: 12px 8px;
+    font-size: 0.85rem;
+  }
+  
+  .stats-btn, .self-record-btn, .live-stream-btn {
+    padding: 4px 8px;
+    font-size: 0.65rem;
+  }
+}
+
+/* Touch device optimizations */
+@media (hover: none) and (pointer: coarse) {
+  .cell-216.selected, .cell-108.selected, .cell-54.selected {
+    background: #dbeafe;
+    border-color: #2563eb;
+    border-width: 2px;
+  }
+  
+  /* Better touch targets */
+  .grid-input {
+    min-height: 36px;
+  }
 }
 
 /* Scrollbar styling */
@@ -638,7 +737,7 @@ const AKSHAR_SET = [
   "ट", "ठ", "ड", "ढ", "त", "थ", "द", "ध",
   "प", "फ", "ब", "भ",
   "न", "म",
-  "य", "र", "ल", "व",
+  "य", "ر", "ल", "व",
   "स", "ह", "०"
 ];
 
@@ -895,25 +994,20 @@ function generateAllTiers(originalFrames, durationMs) {
   return { tier_216: tier216, tier_108: tier108, tier_54: tier54 };
 }
 
-// ========== NEW FUNCTION: Load data into tiers ==========
+// ========== Load data into tiers ==========
 function loadDataIntoTiers(audioData) {
-    // Get frames_108 from the loaded data (or frames as fallback)
     let sourceFrames = audioData.frames_108 || audioData.frames || [];
     
     if (sourceFrames.length === 0) {
-        // If no frames, generate from duration
         const durationMs = audioData.duration_ms || 5000;
         sourceFrames = generateFramesForTier(durationMs, 108);
     }
     
-    // Generate all 3 tiers from source frames
     const allTiers = generateAllTiers(sourceFrames, audioData.duration_ms || 5000);
     framesData = allTiers;
     
-    // Render the grid
     renderThreeTierGrid();
     
-    // Setup audio
     if (currentAudio) {
         currentAudio.pause();
         currentAudio.src = `${BASE_PATH}/audio/${audioData.wav_file}`;
@@ -1000,6 +1094,7 @@ function createCell(frame, idx, tier) {
   div.appendChild(timeSpan);
   div.appendChild(input);
   
+  // Click to play (works on both desktop and mobile)
   div.addEventListener('click', (e) => {
     if (e.target === input) return;
     playCellAudio(`tier_${tier}`, idx);
@@ -1010,10 +1105,44 @@ function createCell(frame, idx, tier) {
     playCellAudio(`tier_${tier}`, idx);
   });
   
-  // Selection on clicking the cell area (not input)
+  // Selection via long-press on mobile, click on desktop
+  let pressTimer = null;
+  
+  div.addEventListener('touchstart', (e) => {
+    if (e.target === input) return;
+    pressTimer = setTimeout(() => {
+      toggleSegmentSelection(`tier_${tier}`, idx);
+      if (window.navigator && window.navigator.vibrate) {
+        window.navigator.vibrate(50);
+      }
+      pressTimer = null;
+    }, 500);
+  });
+  
+  div.addEventListener('touchend', () => {
+    if (pressTimer) {
+      clearTimeout(pressTimer);
+      pressTimer = null;
+    }
+  });
+  
+  div.addEventListener('touchmove', () => {
+    if (pressTimer) {
+      clearTimeout(pressTimer);
+      pressTimer = null;
+    }
+  });
+  
+  // Desktop selection (mouse down)
   div.addEventListener('mousedown', (e) => {
     if (e.target === input) return;
     toggleSegmentSelection(`tier_${tier}`, idx);
+  });
+  
+  // Prevent context menu on long press
+  div.addEventListener('contextmenu', (e) => {
+    e.preventDefault();
+    return false;
   });
   
   return div;
@@ -1109,7 +1238,6 @@ async function loadNextSample() {
     
     currentData = data;
     
-    // Create audio element
     const audioUrl = `${BASE_PATH}/audio/${data.wav_file}`;
     if (currentAudio) {
       currentAudio.pause();
@@ -1121,10 +1249,8 @@ async function loadNextSample() {
     }
     currentAudio.load();
     
-    // Load data into tiers (THIS IS THE FIX)
     loadDataIntoTiers(data);
     
-    // Update file info display
     const fileCard = document.querySelector('.current-file-card');
     if (fileCard) {
       const durationSec = (data.duration_ms / 1000).toFixed(1);
@@ -1142,7 +1268,6 @@ async function loadNextSample() {
 }
 
 async function submitAnnotation() {
-  // Collect all texts from all tiers
   const frames_54 = framesData.tier_54.map(f => ({ text: f.text, start_ms: f.start_ms, end_ms: f.end_ms }));
   const frames_108 = framesData.tier_108.map(f => ({ text: f.text, start_ms: f.start_ms, end_ms: f.end_ms }));
   const frames_216 = framesData.tier_216.map(f => ({ text: f.text, start_ms: f.start_ms, end_ms: f.end_ms }));
@@ -1209,7 +1334,6 @@ async function init() {
   
   await loadProgress();
   
-  // Build the UI structure
   const contentDiv = document.getElementById('content');
   contentDiv.innerHTML = `
     <div class="audio-wrapper">
@@ -1242,7 +1366,7 @@ async function init() {
     </div>
     
     <div class="akshar-set-section">
-      <div class="akshar-title">Drag to copy or tap to insert</div>
+      <div class="akshar-title">Tap to insert | Long press cell to select</div>
       <div class="akshar-grid" id="aksharGrid"></div>
     </div>
     
@@ -1252,18 +1376,15 @@ async function init() {
     </div>
   `;
   
-  // Setup volume slider
   const volumeSlider = document.getElementById('volumeSlider');
   if (volumeSlider) {
     volumeSlider.addEventListener('input', (e) => updateVolume(parseFloat(e.target.value)));
   }
   
-  // Setup speed buttons
   document.querySelectorAll('.speed-btn').forEach(btn => {
     btn.addEventListener('click', () => setPlaybackSpeed(parseFloat(btn.dataset.speed)));
   });
   
-  // Setup akshar grid with drag-and-drop and click-to-insert
   const aksharGrid = document.getElementById('aksharGrid');
   AKSHAR_SET.forEach(akshar => {
     const span = document.createElement('span');
@@ -1292,7 +1413,6 @@ async function init() {
     aksharGrid.appendChild(span);
   });
   
-  // Setup drag and drop for inputs
   document.addEventListener('dragover', (e) => e.preventDefault());
   document.addEventListener('drop', (e) => {
     e.preventDefault();
@@ -1313,7 +1433,6 @@ async function init() {
   await loadNextSample();
 }
 
-// Start the app
 init();
 </script>
 </body>
