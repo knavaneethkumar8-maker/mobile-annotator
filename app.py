@@ -370,7 +370,6 @@ def create_enhanced_textgrid(frames, duration, sentence, annotator, full_sequenc
         tg.append(f'            text = "{text}"')
     
     # ========== 3. window_108ms tier (cleaned version) ==========
-    # For mobile, frames are already 108ms, so just clean the text
     cleaned_frames = []
     for f in frames:
         cleaned_text = clean_text(f.get("text", "")) if f.get("text") else ""
@@ -397,7 +396,7 @@ def create_enhanced_textgrid(frames, duration, sentence, annotator, full_sequenc
         tg.append(f"            xmax = {end}")
         tg.append(f'            text = "{text}"')
     
-    # ========== 4. swar tier (from cleaned frames) ==========
+    # ========== 4. swar tier ==========
     tg.append("    item [4]:")
     tg.append('        class = "IntervalTier"')
     tg.append('        name = "swar"')
@@ -415,7 +414,7 @@ def create_enhanced_textgrid(frames, duration, sentence, annotator, full_sequenc
         tg.append(f"            xmax = {end}")
         tg.append(f'            text = "{text}"')
     
-    # ========== 5. vyanjan tier (from cleaned frames) ==========
+    # ========== 5. vyanjan tier ==========
     tg.append("    item [5]:")
     tg.append('        class = "IntervalTier"')
     tg.append('        name = "vyanjan"')
@@ -433,7 +432,7 @@ def create_enhanced_textgrid(frames, duration, sentence, annotator, full_sequenc
         tg.append(f"            xmax = {end}")
         tg.append(f'            text = "{text}"')
     
-    # ========== 6. naasika tier (from cleaned frames) ==========
+    # ========== 6. naasika tier ==========
     tg.append("    item [6]:")
     tg.append('        class = "IntervalTier"')
     tg.append('        name = "naasika"')
@@ -465,6 +464,219 @@ def create_enhanced_textgrid(frames, duration, sentence, annotator, full_sequenc
     tg.append(f'            text = "{annotator}"')
     
     return "\n".join(tg)
+
+
+# ============= ADDED: 12-TIER TEXTGRID FUNCTION (matches desktop UI) =============
+def create_enhanced_textgrid_with_tiers(frames_216, frames_108, frames_54, duration, sentence, annotator, verified_by=None):
+    """
+    Create TextGrid with 12 tiers for VERIFIED files (matches desktop UI)
+    If verified_by is None, creates 11 tiers (for self-recorded)
+    """
+    tg = []
+    
+    tg.append('File type = "ooTextFile"')
+    tg.append('Object class = "TextGrid"\n')
+    
+    tg.append(f"xmin = 0")
+    tg.append(f"xmax = {duration}")
+    tg.append("tiers? <exists>")
+    
+    if verified_by:
+        tg.append("size = 12")
+    else:
+        tg.append("size = 11")
+    
+    tg.append("item []:")
+    
+    # ========== 1. sentence tier ==========
+    tg.append("    item [1]:")
+    tg.append('        class = "IntervalTier"')
+    tg.append('        name = "sentence"')
+    tg.append(f"        xmin = 0")
+    tg.append(f"        xmax = {duration}")
+    tg.append("        intervals: size = 1")
+    tg.append("        intervals [1]:")
+    tg.append(f"            xmin = 0")
+    tg.append(f"            xmax = {duration}")
+    tg.append(f'            text = "{sentence}"')
+    
+    # ========== 2. annotations tier (54ms frames) ==========
+    tg.append("    item [2]:")
+    tg.append('        class = "IntervalTier"')
+    tg.append('        name = "annotations"')
+    tg.append(f"        xmin = 0")
+    tg.append(f"        xmax = {duration}")
+    tg.append(f"        intervals: size = {len(frames_54)}")
+    
+    for i, f in enumerate(frames_54, 1):
+        start = f.get("start_ms", 0) / 1000.0
+        end = f.get("end_ms", 0) / 1000.0
+        text = f.get("text", "") if f.get("text") else ""
+        
+        tg.append(f"        intervals [{i}]:")
+        tg.append(f"            xmin = {start}")
+        tg.append(f"            xmax = {end}")
+        tg.append(f'            text = "{text}"')
+    
+    # ========== 3. EMPTY TIER (spacer) ==========
+    tg.append("    item [3]:")
+    tg.append('        class = "IntervalTier"')
+    tg.append('        name = "----------"')
+    tg.append(f"        xmin = 0")
+    tg.append(f"        xmax = {duration}")
+    tg.append("        intervals: size = 1")
+    tg.append("        intervals [1]:")
+    tg.append(f"            xmin = 0")
+    tg.append(f"            xmax = {duration}")
+    tg.append(f'            text = ""')
+    
+    # ========== 4. window_216ms tier ==========
+    tg.append("    item [4]:")
+    tg.append('        class = "IntervalTier"')
+    tg.append('        name = "window_216ms"')
+    tg.append(f"        xmin = 0")
+    tg.append(f"        xmax = {duration}")
+    tg.append(f"        intervals: size = {len(frames_216)}")
+    
+    for i, f in enumerate(frames_216, 1):
+        start = f.get("start_ms", 0) / 1000.0
+        end = f.get("end_ms", 0) / 1000.0
+        text = f.get("text", "") if f.get("text") else ""
+        
+        tg.append(f"        intervals [{i}]:")
+        tg.append(f"            xmin = {start}")
+        tg.append(f"            xmax = {end}")
+        tg.append(f'            text = "{text}"')
+    
+    # ========== 5. window_108ms tier ==========
+    tg.append("    item [5]:")
+    tg.append('        class = "IntervalTier"')
+    tg.append('        name = "window_108ms"')
+    tg.append(f"        xmin = 0")
+    tg.append(f"        xmax = {duration}")
+    tg.append(f"        intervals: size = {len(frames_108)}")
+    
+    for i, f in enumerate(frames_108, 1):
+        start = f.get("start_ms", 0) / 1000.0
+        end = f.get("end_ms", 0) / 1000.0
+        text = f.get("text", "") if f.get("text") else ""
+        
+        tg.append(f"        intervals [{i}]:")
+        tg.append(f"            xmin = {start}")
+        tg.append(f"            xmax = {end}")
+        tg.append(f'            text = "{text}"')
+    
+    # ========== 6. window_54ms tier ==========
+    tg.append("    item [6]:")
+    tg.append('        class = "IntervalTier"')
+    tg.append('        name = "window_54ms"')
+    tg.append(f"        xmin = 0")
+    tg.append(f"        xmax = {duration}")
+    tg.append(f"        intervals: size = {len(frames_54)}")
+    
+    for i, f in enumerate(frames_54, 1):
+        start = f.get("start_ms", 0) / 1000.0
+        end = f.get("end_ms", 0) / 1000.0
+        text = f.get("text", "") if f.get("text") else ""
+        
+        tg.append(f"        intervals [{i}]:")
+        tg.append(f"            xmin = {start}")
+        tg.append(f"            xmax = {end}")
+        tg.append(f'            text = "{text}"')
+    
+    # ========== 7. EMPTY TIER (spacer) ==========
+    tg.append("    item [7]:")
+    tg.append('        class = "IntervalTier"')
+    tg.append('        name = "----------"')
+    tg.append(f"        xmin = 0")
+    tg.append(f"        xmax = {duration}")
+    tg.append("        intervals: size = 1")
+    tg.append("        intervals [1]:")
+    tg.append(f"            xmin = 0")
+    tg.append(f"            xmax = {duration}")
+    tg.append(f'            text = ""')
+    
+    # ========== 8. swar tier ==========
+    tg.append("    item [8]:")
+    tg.append('        class = "IntervalTier"')
+    tg.append('        name = "swar"')
+    tg.append(f"        xmin = 0")
+    tg.append(f"        xmax = {duration}")
+    tg.append(f"        intervals: size = {len(frames_108)}")
+    
+    for i, f in enumerate(frames_108, 1):
+        start = f.get("start_ms", 0) / 1000.0
+        end = f.get("end_ms", 0) / 1000.0
+        text = get_swar(f.get("text", "")) if f.get("text") else ""
+        
+        tg.append(f"        intervals [{i}]:")
+        tg.append(f"            xmin = {start}")
+        tg.append(f"            xmax = {end}")
+        tg.append(f'            text = "{text}"')
+    
+    # ========== 9. vyanjan tier ==========
+    tg.append("    item [9]:")
+    tg.append('        class = "IntervalTier"')
+    tg.append('        name = "vyanjan"')
+    tg.append(f"        xmin = 0")
+    tg.append(f"        xmax = {duration}")
+    tg.append(f"        intervals: size = {len(frames_108)}")
+    
+    for i, f in enumerate(frames_108, 1):
+        start = f.get("start_ms", 0) / 1000.0
+        end = f.get("end_ms", 0) / 1000.0
+        text = get_vyanjan(f.get("text", "")) if f.get("text") else ""
+        
+        tg.append(f"        intervals [{i}]:")
+        tg.append(f"            xmin = {start}")
+        tg.append(f"            xmax = {end}")
+        tg.append(f'            text = "{text}"')
+    
+    # ========== 10. naasika tier ==========
+    tg.append("    item [10]:")
+    tg.append('        class = "IntervalTier"')
+    tg.append('        name = "naasika"')
+    tg.append(f"        xmin = 0")
+    tg.append(f"        xmax = {duration}")
+    tg.append(f"        intervals: size = {len(frames_108)}")
+    
+    for i, f in enumerate(frames_108, 1):
+        start = f.get("start_ms", 0) / 1000.0
+        end = f.get("end_ms", 0) / 1000.0
+        text = get_naasika(f.get("text", "")) if f.get("text") else ""
+        
+        tg.append(f"        intervals [{i}]:")
+        tg.append(f"            xmin = {start}")
+        tg.append(f"            xmax = {end}")
+        tg.append(f'            text = "{text}"')
+    
+    # ========== 11. annotator tier ==========
+    tg.append("    item [11]:")
+    tg.append('        class = "IntervalTier"')
+    tg.append('        name = "annotator"')
+    tg.append(f"        xmin = 0")
+    tg.append(f"        xmax = {duration}")
+    tg.append("        intervals: size = 1")
+    tg.append("        intervals [1]:")
+    tg.append(f"            xmin = 0")
+    tg.append(f"            xmax = {duration}")
+    tg.append(f'            text = "{annotator}"')
+    
+    # ========== 12. verified_by tier (only if provided) ==========
+    if verified_by:
+        tg.append("    item [12]:")
+        tg.append('        class = "IntervalTier"')
+        tg.append('        name = "verified_by"')
+        tg.append(f"        xmin = 0")
+        tg.append(f"        xmax = {duration}")
+        tg.append("        intervals: size = 1")
+        tg.append("        intervals [1]:")
+        tg.append(f"            xmin = 0")
+        tg.append(f"            xmax = {duration}")
+        tg.append(f'            text = "{verified_by}"')
+    
+    return "\n".join(tg)
+# ============= END OF ADDED 12-TIER FUNCTION =============
 
 # Load users
 def load_users():
@@ -780,7 +992,13 @@ def load_json_data(json_file):
         print(f"Error loading {json_file}: {e}")
         return None
 
-
+# ============= ADDED: get_user_annotation_dir FUNCTION =============
+def get_user_annotation_dir(username):
+    """Get or create user's annotation directory"""
+    user_dir = os.path.join(USER_SUBMISSIONS_FOLDER, username)
+    os.makedirs(user_dir, exist_ok=True)
+    return user_dir
+# ============= END OF ADDED FUNCTION =============
 
 def save_to_mobile_dataset(annotated_data, username, original_wav_path, json_filename, verified=False):
     try:
@@ -798,22 +1016,44 @@ def save_to_mobile_dataset(annotated_data, username, original_wav_path, json_fil
             wav_output_path = os.path.join(target_folder, wav_filename)
             shutil.copy2(original_wav_path, wav_output_path)
         
-        frames = annotated_data.get('frames', [])
-        duration = annotated_data.get('duration_ms', 0) / 1000.0
-        if duration == 0 and frames:
-            duration = frames[-1].get('end_ms', 0) / 1000.0
-        sentence = annotated_data.get('sentence', '')
-        full_sequence = annotated_data.get('full_sequence', '')
-        annotator = annotated_data.get('annotator', username)
+        # Check if data has frames_54 (3-tier) or frames (single tier)
+        if 'frames_54' in annotated_data:
+            frames_216 = annotated_data.get('frames_216', [])
+            frames_108 = annotated_data.get('frames_108', [])
+            frames_54 = annotated_data.get('frames_54', [])
+            duration = annotated_data.get('duration_ms', 0) / 1000.0
+            sentence = annotated_data.get('sentence', '')
+            annotator = annotated_data.get('annotator', username)
+            verified_by = annotated_data.get('verified_by', None)
+            
+            # Use 12-tier TextGrid for verified files
+            textgrid_content = create_enhanced_textgrid_with_tiers(
+                frames_216=frames_216,
+                frames_108=frames_108,
+                frames_54=frames_54,
+                duration=duration,
+                sentence=sentence,
+                annotator=annotator,
+                verified_by=verified_by
+            )
+        else:
+            frames = annotated_data.get('frames', [])
+            duration = annotated_data.get('duration_ms', 0) / 1000.0
+            if duration == 0 and frames:
+                duration = frames[-1].get('end_ms', 0) / 1000.0
+            sentence = annotated_data.get('sentence', '')
+            full_sequence = annotated_data.get('full_sequence', '')
+            annotator = annotated_data.get('annotator', username)
+            
+            # Use 7-tier TextGrid for single tier annotations
+            textgrid_content = create_enhanced_textgrid(
+                frames=frames,
+                duration=duration,
+                sentence=sentence,
+                annotator=annotator,
+                full_sequence=full_sequence
+            )
         
-        # Use enhanced TextGrid with 7 tiers
-        textgrid_content = create_enhanced_textgrid(
-            frames=frames,
-            duration=duration,
-            sentence=sentence,
-            annotator=annotator,
-            full_sequence=full_sequence
-        )
         textgrid_output_path = os.path.join(target_folder, f"{base_name}.TextGrid")
         with open(textgrid_output_path, 'w', encoding='utf-8') as f:
             f.write(textgrid_content)
@@ -1349,12 +1589,12 @@ def self_record_submit():
         traceback.print_exc()
         return jsonify({"success": False, "error": str(e)}), 500
 
-# ============= NEW 3-TIER SUBMIT ROUTE =============
+# ============= UPDATED 3-TIER SUBMIT ROUTE (uses 12-tier TextGrid) =============
 
 @app.route("/submit-3-tier", methods=["POST"])
 @login_required
 def submit_3_tier():
-    """Submit 3-tier annotation (54ms, 108ms, 216ms frames)"""
+    """Submit 3-tier annotation (54ms, 108ms, 216ms frames) - generates 12-tier TextGrid"""
     try:
         data = request.json
         json_file = data.get('json_file')
@@ -1401,22 +1641,25 @@ def submit_3_tier():
         with open(output_file, "w", encoding="utf-8") as f:
             json.dump(output_data, f, indent=2, ensure_ascii=False)
         
-        # Generate TextGrids for each tier
-        for tier_name, frames, window_ms in [('54', frames_54, 54), ('108', frames_108, 108), ('216', frames_216, 216)]:
-            if frames:
-                duration = frames[-1]['end_ms'] / 1000.0 if frames else 0
-                tg_content = create_enhanced_textgrid(
-                    frames=frames,
-                    duration=duration,
-                    sentence=data.get("full_sequence", ""),
-                    annotator=username,
-                    full_sequence=data.get("full_sequence", "")
-                )
-                tg_path = os.path.join(user_dir, f"{json_file.replace('.json', '')}_{tier_name}ms.TextGrid")
-                with open(tg_path, 'w', encoding='utf-8') as f:
-                    f.write(tg_content)
+        # Generate 12-tier TextGrid (matches desktop UI)
+        duration = duration_ms / 1000.0
+        sentence = data.get("full_sequence", "")
         
-        # Save to mobile dataset
+        tg_content = create_enhanced_textgrid_with_tiers(
+            frames_216=frames_216,
+            frames_108=frames_108,
+            frames_54=frames_54,
+            duration=duration,
+            sentence=sentence,
+            annotator=username,
+            verified_by=None  # No verifier for regular submissions
+        )
+        
+        tg_path = os.path.join(user_dir, f"{json_file.replace('.json', '')}.TextGrid")
+        with open(tg_path, 'w', encoding='utf-8') as f:
+            f.write(tg_content)
+        
+        # Save to mobile dataset (this will also save WAV and copy to training)
         save_to_mobile_dataset(output_data, username, original_wav_path, json_file)
         
         # Update user stats
@@ -1450,145 +1693,74 @@ def submit_3_tier():
 
 
 # ============= LIVE STREAMING API ROUTES =============
-#
-# All URLs below are real, publicly accessible HLS live streams
-# sourced from verified IPTV repositories (iptv2025, openiptvhub, etc.)
-# Each language has 4-6 URLs tried in order — first one that returns
-# real audio (>8KB) wins. If ALL fail, silent audio is returned so
-# the UI never crashes.
-# ─────────────────────────────────────────────────────────────────────────────
 
 NEWS_STREAMS = {
-
-    # ── Hindi ─────────────────────────────────────────────────────────────
     'hi': [
-        # Aaj Tak HD - Akamai CDN (very reliable)
         'https://aajtakhdlive-amd.akamaized.net/hls/live/2014415/aajtakhd/aajtakhdlive/live_720p/chunks.m3u8',
-        # ABP News Hindi - Akamai
         'https://abp-i.akamaihd.net/hls/live/765529/abphindi/masterhls_1564.m3u8',
-        # NDTV India - Akamai
         'https://ndtvindiaelemarchana.akamaized.net/hls/live/2003679/ndtvindia/master.m3u8',
-        # News Nation
         'https://d3qs3d2rkhfqrt.cloudfront.net/out/v1/6cd2f649739a45ca9de1daf81cc7d0f2/index.m3u8',
-        # 1st India News
         'https://live.wmncdn.net/firstindianewstv1/live.stream/tracks-v1a1/mono.m3u8',
     ],
-
-    # ── Telugu ────────────────────────────────────────────────────────────
     'te': [
-        # TV9 Telugu - CloudFront CDN (from iptv2025 repo, verified working)
         'https://dyjmyiv3bp2ez.cloudfront.net/pub-iotv9telcmjhcs/liveabr/playlist.m3u8',
-        # V6 News Telugu - Akamai/Yupp
         'https://yuppmedtaorire.akamaized.net/v1/master/a0d007312bfd99c47f76b77ae26b1ccdaae76cb1/v6news_nim_https/140622/v6news/playlist.m3u8',
-        # TV9 Telugu - 103.199 CDN
         'http://103.199.161.254/Content/tv9telungu/Live/Channel(TV9Telungu)/index.m3u8',
-        # TV9 Telugu stream 4
         'http://103.199.161.254/Content/tv9telungu/Live/Channel(TV9Telungu)/Stream(04)/index.m3u8',
-        # NTV Telugu via wmncdn
         'https://live.wmncdn.net/ntvtelugu/live.stream/tracks-v1a1/mono.m3u8',
     ],
-
-    # ── Tamil ─────────────────────────────────────────────────────────────
     'ta': [
-        # News Tamil 24x7 - CloudFront
         'https://d35j504z0x2vu2.cloudfront.net/v1/master/0bc8e8376bd8417a1b6761138aa41c26c7309312/news-tamil-24x7/index.m3u8',
-        # Puthiya Thalaimurai - 5centscdn
         'https://932y483pdjv8-hls-live.5centscdn.com/stream/deb10bae362f810630ec3abedcae5894.sdp/playlist.m3u8',
-        # Kalaignar Seithikal - 103.199 CDN
         'http://103.199.160.85/Content/kalaignarseithikal/Live/Channel(KalaignarSeithikal)/index.m3u8',
-        # Makkal TV - wmncdn
         'http://5k8q87azdy4v-hls-live.wmncdn.net/MAKKAL/271ddf829afeece44d8732757fba1a66.sdp/tracks-v1a1/mono.m3u8',
-        # Vaanavil TV
         'https://6n3yope4d9ok-hls-live.5centscdn.com/vaanavil/TV.stream/playlist.m3u8',
     ],
-
-    # ── Bengali ───────────────────────────────────────────────────────────
     'bn': [
-        # ABP Ananda - Akamai
         'https://abp-i.akamaihd.net/hls/live/765530/abpananda/masterhls_1564.m3u8',
-        # Real News Bengali - 5centscdn
         'https://bk7l298nyx53-hls-live.5centscdn.com/realnews/e7dee419f91aa9e65939d3677fb9c4f5.sdp/playlist.m3u8',
-        # News18 Bangla via wmncdn
         'https://live.wmncdn.net/news18bangla/live.stream/tracks-v1a1/mono.m3u8',
-        # Harvest TV Bengali
         'https://7mbd4ogkr3gx-hls-live.wmncdn.net/harvesttvlive1/bbb19eae240ec100af921d511efc86a0.sdp/index.m3u8',
     ],
-
-    # ── Gujarati ──────────────────────────────────────────────────────────
     'gu': [
-        # ABP Asmita - Akamai
         'https://abp-i.akamaihd.net/hls/live/765532/abpasmita/masterhls_1564.m3u8',
-        # Sandesh News via wmncdn
         'https://live.wmncdn.net/sandesh/live.stream/tracks-v1a1/mono.m3u8',
-        # VTV Gujarati via 103.199
         'http://103.199.161.254/Content/vtv/Live/Channel(VTV)/index.m3u8',
-        # TV9 Gujarati via airtel CDN fallback
         'http://cshms3.airtel.tv/wh7f454c46tw4163224253_611767333/PLTV/88888888/224/3221226113/index.m3u8',
     ],
-
-    # ── Marathi ───────────────────────────────────────────────────────────
     'mr': [
-        # ABP Majha - Akamai
         'https://abp-i.akamaihd.net/hls/live/765531/abpmajha/masterhls_1564.m3u8',
-        # TV9 Marathi via airtel CDN
         'http://mhms9.airtel.tv/wh7f454c46tw4163224253_611767333/PLTV/88888888/224/3221226370/index.m3u8',
-        # Zee 24 Taas via wmncdn
         'https://live.wmncdn.net/zee24taas/live.stream/tracks-v1a1/mono.m3u8',
     ],
 }
 
-
 def fetch_live_audio_chunk(stream_urls, duration_seconds=2, lang=None):
-    """
-    Try each URL in order. Accept the first one that gives >= MIN_BYTES of WAV.
-    Falls back to silent audio if everything fails.
-    """
     if isinstance(stream_urls, str):
         stream_urls = [stream_urls]
 
-    MIN_BYTES = 8_000   # ~0.25 sec of real 16kHz mono audio
-
-    # ffmpeg flags tuned for live HLS ingestion
+    MIN_BYTES = 8_000
     LIVE_FLAGS = [
-        '-reconnect',        '1',
-        '-reconnect_streamed','1',
-        '-reconnect_delay_max','3',
-        '-timeout',          '10000000',   # 10 s connection timeout (µs)
-        '-fflags',           '+discardcorrupt',
-        '-analyzeduration',  '2000000',    # 2 s analysis (faster than default)
-        '-probesize',        '1000000',
+        '-reconnect', '1',
+        '-reconnect_streamed', '1',
+        '-reconnect_delay_max', '3',
+        '-timeout', '10000000',
+        '-fflags', '+discardcorrupt',
+        '-analyzeduration', '2000000',
+        '-probesize', '1000000',
     ]
 
     for attempt, url in enumerate(stream_urls):
         tmp_path = None
         try:
             print(f"[live] attempt {attempt+1}/{len(stream_urls)}: {url[:90]}")
-
             import tempfile
             with tempfile.NamedTemporaryFile(suffix='.wav', delete=False) as tmp:
                 tmp_path = tmp.name
 
-            cmd = (
-                ['ffmpeg']
-                + LIVE_FLAGS
-                + [
-                    '-i',      url,
-                    '-t',      str(duration_seconds),
-                    '-vn',
-                    '-acodec', 'pcm_s16le',
-                    '-ar',     '16000',
-                    '-ac',     '1',
-                    '-y',
-                    tmp_path,
-                ]
-            )
+            cmd = (['ffmpeg'] + LIVE_FLAGS + ['-i', url, '-t', str(duration_seconds), '-vn', '-acodec', 'pcm_s16le', '-ar', '16000', '-ac', '1', '-y', tmp_path])
 
-            result = subprocess.run(
-                cmd,
-                capture_output=True,
-                text=True,
-                timeout=duration_seconds + 25,
-            )
+            result = subprocess.run(cmd, capture_output=True, text=True, timeout=duration_seconds + 25)
 
             if os.path.exists(tmp_path):
                 size = os.path.getsize(tmp_path)
@@ -1603,156 +1775,124 @@ def fetch_live_audio_chunk(stream_urls, duration_seconds=2, lang=None):
                     os.unlink(tmp_path)
             else:
                 print(f"[live] no output — rc={result.returncode}")
-                if result.stderr:
-                    # print last 200 chars of stderr for debugging
-                    print(f"[live] stderr tail: {result.stderr[-200:]}")
-
         except subprocess.TimeoutExpired:
             print(f"[live] timeout — stream {attempt+1}")
             try:
                 if tmp_path and os.path.exists(tmp_path):
                     os.unlink(tmp_path)
-            except Exception:
+            except:
                 pass
         except Exception as exc:
             print(f"[live] error — stream {attempt+1}: {exc}")
             try:
                 if tmp_path and os.path.exists(tmp_path):
                     os.unlink(tmp_path)
-            except Exception:
+            except:
                 pass
 
     print("[live] all streams failed — returning silent audio")
     return generate_silent_audio(duration_seconds)
 
-
 def generate_silent_audio(duration_seconds=2, sample_rate=16000):
-    """Return a valid silent WAV so the UI never crashes."""
     import struct
     num_samples = int(sample_rate * duration_seconds)
-    data_size   = num_samples * 2
-    riff_size   = 36 + data_size
-    header  = struct.pack('<4sI4s',     b'RIFF', riff_size, b'WAVE')
-    header += struct.pack('<4sIHHIIHH', b'fmt ', 16,
-                         1, 1, sample_rate, sample_rate * 2, 2, 16)
+    data_size = num_samples * 2
+    riff_size = 36 + data_size
+    header = struct.pack('<4sI4s', b'RIFF', riff_size, b'WAVE')
+    header += struct.pack('<4sIHHIIHH', b'fmt ', 16, 1, 1, sample_rate, sample_rate * 2, 2, 16)
     header += struct.pack('<4sI', b'data', data_size)
     return header + b'\x00\x00' * num_samples
-
 
 def get_stream_urls_for_lang(lang):
     return NEWS_STREAMS.get(lang, NEWS_STREAMS['hi'])
 
-
 @app.route("/api/live-stream/fetch", methods=["GET"])
 @login_required
 def live_stream_fetch():
-    """Fetch a 2-second live audio chunk from the selected language stream."""
     try:
-        lang     = request.args.get('lang', 'hi')
+        lang = request.args.get('lang', 'hi')
         duration = int(request.args.get('duration', 2))
         duration = max(1, min(duration, 5))
-
         stream_urls = get_stream_urls_for_lang(lang)
-        print(f"[live] lang={lang}  duration={duration}s  urls={len(stream_urls)}")
-
         audio_bytes = fetch_live_audio_chunk(stream_urls, duration, lang=lang)
-        is_real     = len(audio_bytes) > 8_000
-
+        is_real = len(audio_bytes) > 8_000
         return jsonify({
-            "success":    True,
-            "language":   lang,
-            "duration":   duration,
+            "success": True,
+            "language": lang,
+            "duration": duration,
             "audio_blob": base64.b64encode(audio_bytes).decode('utf-8'),
-            "mime_type":  "audio/wav",
-            "has_audio":  is_real,
-            "is_silent":  not is_real,
+            "mime_type": "audio/wav",
+            "has_audio": is_real,
+            "is_silent": not is_real,
         })
-
     except Exception as exc:
         print(f"[live] fetch error: {exc}")
-        import traceback; traceback.print_exc()
+        import traceback
+        traceback.print_exc()
         return jsonify({"success": False, "error": str(exc)}), 500
-
 
 @app.route("/api/live-stream/submit", methods=["POST"])
 @login_required
 def live_stream_submit():
-    """Submit annotation for a live stream clip."""
     try:
         username = session.get('username')
-
         if 'audio' not in request.files:
             return jsonify({"success": False, "error": "No audio file"}), 400
-
-        audio_file  = request.files['audio']
-        language    = request.form.get('language', 'unknown')
+        audio_file = request.files['audio']
+        language = request.form.get('language', 'unknown')
         frames_json = request.form.get('frames', '[]')
-        duration    = float(request.form.get('duration', 2))
-        frames      = json.loads(frames_json)
-
-        timestamp    = datetime.now().strftime("%Y%m%d_%H%M%S")
-        filename     = f"live_{language}_{username}_{timestamp}"
-
+        duration = float(request.form.get('duration', 2))
+        frames = json.loads(frames_json)
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        filename = f"live_{language}_{username}_{timestamp}"
         live_folder = os.path.join(SELF_RECORDINGS_FOLDER, "live_streams", username)
         os.makedirs(live_folder, exist_ok=True)
-
         wav_filename = f"{filename}.wav"
-        wav_path     = os.path.join(live_folder, wav_filename)
+        wav_path = os.path.join(live_folder, wav_filename)
         audio_file.save(wav_path)
-
         full_sequence = ' '.join(f.get('text', '') for f in frames if f.get('text'))
-
         annotation_data = {
-            "audio_file":          wav_filename,
-            "annotator":           username,
-            "timestamp":           datetime.now().isoformat(),
-            "language":            language,
-            "duration_ms":         int(duration * 1000),
-            "frames":              frames,
-            "type":                "live_stream",
-            "window_ms":           108,
-            "full_sequence":       full_sequence,
-            "sentence":            "",
-            "submitted_by":        username,
-            "submitted_at":        datetime.now().isoformat(),
+            "audio_file": wav_filename,
+            "annotator": username,
+            "timestamp": datetime.now().isoformat(),
+            "language": language,
+            "duration_ms": int(duration * 1000),
+            "frames": frames,
+            "type": "live_stream",
+            "window_ms": 108,
+            "full_sequence": full_sequence,
+            "sentence": "",
+            "submitted_by": username,
+            "submitted_at": datetime.now().isoformat(),
             "verification_status": "pending",
         }
-
         json_filename = f"{filename}.json"
-        json_path     = os.path.join(live_folder, json_filename)
+        json_path = os.path.join(live_folder, json_filename)
         with open(json_path, 'w', encoding='utf-8') as f:
             json.dump(annotation_data, f, indent=2, ensure_ascii=False)
-
         textgrid_content = create_enhanced_textgrid(
             frames=frames, duration=duration,
             sentence="", annotator=username, full_sequence=full_sequence,
         )
         with open(os.path.join(live_folder, f"{filename}.TextGrid"), 'w', encoding='utf-8') as f:
             f.write(textgrid_content)
-
         save_to_mobile_dataset(annotation_data, username, wav_path, json_filename)
-
         akshar_count = sum(1 for f in frames if f.get('text') and f['text'].strip())
         update_user_stats(username, json_filename, duration, increment=True)
         update_daily_stats(username, json_filename, duration, increment=True)
-
         completed_files.add(json_filename)
         save_completed_files(completed_files)
-
-        print(f"[live] submitted {filename}  akshars={akshar_count}")
-
         return jsonify({
-            "success":      True,
-            "message":      "Live stream annotation submitted successfully",
+            "success": True,
+            "message": "Live stream annotation submitted successfully",
             "akshar_count": akshar_count,
-            "filename":     filename,
+            "filename": filename,
         })
-
     except Exception as exc:
         print(f"[live] submit error: {exc}")
-        import traceback; traceback.print_exc()
+        import traceback
+        traceback.print_exc()
         return jsonify({"success": False, "error": str(exc)}), 500
-
 
 
 # ============= VERIFICATION ROUTES =============
@@ -1788,20 +1928,15 @@ def verify_page():
 @app.route("/verify/progress")
 @verifier_login_required
 def verify_progress():
-    """Get verification progress stats"""
     total_files = 0
     verified_files = 0
-    
     if os.path.exists(MOBILE_DATASET_FOLDER):
         json_files = glob.glob(os.path.join(MOBILE_DATASET_FOLDER, "*.json"))
         total_files = len(json_files)
-    
     if os.path.exists(MOBILE_VERIFIED_FOLDER):
         verified_json = glob.glob(os.path.join(MOBILE_VERIFIED_FOLDER, "*.json"))
         verified_files = len(verified_json)
-    
     remaining_files = total_files - verified_files
-    
     return jsonify({
         "total": total_files,
         "verified": verified_files,
@@ -1812,13 +1947,10 @@ def verify_progress():
 @app.route("/verify/api/annotators")
 @verifier_login_required
 def get_annotators_list():
-    """Get list of annotators who have submitted files for verification"""
     if not os.path.exists(MOBILE_DATASET_FOLDER):
         return jsonify({"annotators": [], "selected": None})
-    
     annotators = set()
     json_files = glob.glob(os.path.join(MOBILE_DATASET_FOLDER, "*.json"))
-    
     for json_path in json_files:
         try:
             with open(json_path, 'r', encoding='utf-8') as f:
@@ -1827,96 +1959,65 @@ def get_annotators_list():
                 annotators.add(submitted_by)
         except Exception as e:
             print(f"Error reading {json_path}: {e}")
-    
-    return jsonify({
-        "annotators": sorted(list(annotators)),
-        "selected": None
-    })
+    return jsonify({"annotators": sorted(list(annotators)), "selected": None})
 
 @app.route("/verify/api/annotator-files")
 @verifier_login_required
 def get_annotator_files():
-    """Get list of unverified files for a specific annotator"""
     annotator = request.args.get('annotator', '')
     if not annotator:
         return jsonify({"error": "No annotator specified", "files": []}), 400
-    
     if not os.path.exists(MOBILE_DATASET_FOLDER):
         return jsonify({"files": []})
-    
     unverified_files = []
     json_files = glob.glob(os.path.join(MOBILE_DATASET_FOLDER, "*.json"))
-    
     for json_path in json_files:
         json_file = os.path.basename(json_path)
-        
-        # Check if already verified (exists in MOBILE_VERIFIED_FOLDER)
         verified_json = os.path.join(MOBILE_VERIFIED_FOLDER, json_file)
         if os.path.exists(verified_json):
             continue
-        
         try:
             with open(json_path, 'r', encoding='utf-8') as f:
                 data = json.load(f)
                 submitted_by = data.get('submitted_by', 'unknown')
-                
                 if submitted_by == annotator:
-                    # Check if corresponding wav exists
                     wav_file = json_file.replace('.json', '.wav')
                     wav_path = os.path.join(MOBILE_DATASET_FOLDER, wav_file)
                     if os.path.exists(wav_path):
                         unverified_files.append(json_file)
         except Exception as e:
             print(f"Error reading {json_path}: {e}")
-    
-    return jsonify({
-        "files": unverified_files,
-        "annotator": annotator,
-        "count": len(unverified_files)
-    })
+    return jsonify({"files": unverified_files, "annotator": annotator, "count": len(unverified_files)})
 
 @app.route("/verify/api/get-file/<path:json_file>")
 @verifier_login_required
 def get_verification_file(json_file):
-    """Get a specific file for verification"""
     annotator = request.args.get('annotator', '')
-    
     json_path = os.path.join(MOBILE_DATASET_FOLDER, json_file)
     if not os.path.exists(json_path):
         return jsonify({"error": "File not found"}), 404
-    
     try:
         with open(json_path, 'r', encoding='utf-8') as f:
             data = json.load(f)
-            
-        # Verify this file belongs to the requested annotator
         if annotator and data.get('submitted_by') != annotator:
             return jsonify({"error": f"This file belongs to {data.get('submitted_by')}, not {annotator}"}), 403
-        
         data['json_file'] = json_file
         data['wav_file'] = json_file.replace('.json', '.wav')
-        
-        # Ensure duration_ms is present
         wav_path = os.path.join(MOBILE_DATASET_FOLDER, data['wav_file'])
         if 'duration_ms' not in data or data['duration_ms'] == 0:
             data['duration_ms'] = get_audio_length(wav_path)
-        
         return jsonify(data)
     except Exception as e:
         return jsonify({"error": f"Error loading file: {e}"}), 500
 
 def get_next_verification_file():
-    """Get next unverified file from MOBILE_DATASET that hasn't been verified yet"""
     if not os.path.exists(MOBILE_DATASET_FOLDER):
         return None
-    
     json_files = glob.glob(os.path.join(MOBILE_DATASET_FOLDER, "*.json"))
     for json_path in json_files:
         json_file = os.path.basename(json_path)
-        # Check if already verified (exists in MOBILE_VERIFIED_FOLDER)
         verified_json = os.path.join(MOBILE_VERIFIED_FOLDER, json_file)
         if not os.path.exists(verified_json):
-            # Also check if there's a corresponding wav
             wav_file = json_file.replace('.json', '.wav')
             wav_path = os.path.join(MOBILE_DATASET_FOLDER, wav_file)
             if os.path.exists(wav_path):
@@ -1936,10 +2037,7 @@ def load_mobile_json(json_file):
         return None
 
 def delete_from_mobile_dataset(json_file):
-    """Delete JSON, WAV, TextGrid from MOBILE_DATASET and from training folder"""
     base = json_file.replace('.json', '')
-    
-    # Delete from MOBILE_DATASET
     paths = [
         os.path.join(MOBILE_DATASET_FOLDER, json_file),
         os.path.join(MOBILE_DATASET_FOLDER, f"{base}.wav"),
@@ -1949,39 +2047,23 @@ def delete_from_mobile_dataset(json_file):
         if os.path.exists(p):
             os.remove(p)
             print(f"Deleted {p}")
-    
-    # =========================
-    # 🔥 DELETE FROM MOBILE TRAINING DATA FOLDER
-    # =========================
     try:
         delete_from_mobile_training_data(base)
     except Exception as e:
         print(f"Warning: Failed to delete from mobile training data: {e}")
 
 def revert_completion_status(json_file, original_submitter, duration_seconds):
-    """Remove file from completed sets and subtract from user stats"""
     global completed_files
-    # Remove from global completed set
     if json_file in completed_files:
         completed_files.remove(json_file)
         save_completed_files(completed_files)
-    
-    # Remove from user stats (decrement)
     update_user_stats(original_submitter, json_file, duration_seconds, increment=False)
     update_daily_stats(original_submitter, json_file, duration_seconds, increment=False)
-    
-    # Remove from file assignments if present
     release_file_assignment(json_file)
-    
-    # Remove from skipped files if present
     clear_skipped_file(original_submitter, json_file)
-    
-    # Also remove from user's submission folder if exists
     user_submit_path = os.path.join(USER_SUBMISSIONS_FOLDER, original_submitter, json_file)
     if os.path.exists(user_submit_path):
         os.remove(user_submit_path)
-    
-    # Remove from SUBMIT_FOLDER backup
     backup_path = os.path.join(SUBMIT_FOLDER, f"{original_submitter}_{json_file}")
     if os.path.exists(backup_path):
         os.remove(backup_path)
@@ -1992,16 +2074,12 @@ def verify_get_next_file():
     next_file = get_next_verification_file()
     if not next_file:
         return jsonify({"completed": True, "message": "All files have been verified!"})
-    
     json_data = load_mobile_json(next_file)
     if not json_data:
         return jsonify({"error": "Could not load file", "completed": False})
-    
-    # Ensure duration_ms is present
     wav_path = os.path.join(MOBILE_DATASET_FOLDER, json_data['wav_file'])
     if 'duration_ms' not in json_data or json_data['duration_ms'] == 0:
         json_data['duration_ms'] = get_audio_length(wav_path)
-    
     return jsonify(json_data)
 
 @app.route("/verify/submit", methods=["POST"])
@@ -2009,58 +2087,31 @@ def verify_get_next_file():
 def verify_submit():
     data = request.json
     json_file = data.get('json_file')
-    action = data.get('action')  # 'verify' or 'reject'
+    action = data.get('action')
     verifier_name = session.get('verifier_name', 'Verifier')
-    
     if not json_file:
         return jsonify({"error": "No file specified"}), 400
-    
     if action == 'verify':
-        # Get original submitter and duration from the data
         original_submitter = data.get('submitted_by', 'unknown')
         duration_ms = data.get('duration_ms', 0)
         duration_seconds = duration_ms / 1000.0
-        
-        # Update verification metadata
         data['verified_by'] = verifier_name
         data['verified_at'] = datetime.now().isoformat()
         data['verification_status'] = 'verified'
-        
-        # Save to MOBILE_VERIFIED_FOLDER (this uses enhanced TextGrid)
         wav_path = os.path.join(MOBILE_DATASET_FOLDER, data['wav_file'])
         save_to_mobile_dataset(data, original_submitter, wav_path, json_file, verified=True)
-        
-        # Also update/overwrite in MOBILE_DATASET with corrected version
         save_to_mobile_dataset(data, original_submitter, wav_path, json_file, verified=False)
-        
-        return jsonify({
-            "message": "File verified and saved to verified folder",
-            "has_more": True,
-            "verified": True
-        })
-    
+        return jsonify({"message": "File verified and saved to verified folder", "has_more": True, "verified": True})
     elif action == 'reject':
-        # Load original data to get submitter and duration
         original_data = load_mobile_json(json_file)
         if not original_data:
             return jsonify({"error": "Could not load file data"}), 400
-        
         original_submitter = original_data.get('submitted_by', 'unknown')
         duration_ms = original_data.get('duration_ms', 0)
         duration_seconds = duration_ms / 1000.0
-        
-        # Delete from MOBILE_DATASET
         delete_from_mobile_dataset(json_file)
-        
-        # Revert completion status (so file goes back to annotation pool)
         revert_completion_status(json_file, original_submitter, duration_seconds)
-        
-        return jsonify({
-            "message": "File rejected and removed from dataset. It will be re-annotated.",
-            "has_more": True,
-            "rejected": True
-        })
-    
+        return jsonify({"message": "File rejected and removed from dataset. It will be re-annotated.", "has_more": True, "rejected": True})
     else:
         return jsonify({"error": "Invalid action"}), 400
 

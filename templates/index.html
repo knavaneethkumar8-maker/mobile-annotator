@@ -198,6 +198,88 @@ body {
 
 .audio-wrapper { margin: 16px 0 18px; }
 
+/* Full audio play button styles */
+.full-audio-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+  padding: 10px 16px;
+  background: #2C6E49;
+  border-radius: 48px;
+  justify-content: space-between;
+}
+
+.play-full-btn {
+  background: white;
+  border: none;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+.play-full-btn:hover {
+  transform: scale(1.05);
+  background: #f0f0f0;
+}
+
+.play-full-btn:active {
+  transform: scale(0.95);
+}
+
+.play-full-btn svg {
+  width: 24px;
+  height: 24px;
+  fill: #2C6E49;
+}
+
+.play-full-btn.playing svg {
+  fill: #B13E3A;
+}
+
+.full-audio-info {
+  flex: 1;
+  color: white;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.full-audio-info span {
+  opacity: 0.8;
+  font-size: 0.7rem;
+}
+
+.progress-bar-full {
+  flex: 2;
+  height: 4px;
+  background: rgba(255,255,255,0.3);
+  border-radius: 4px;
+  cursor: pointer;
+  position: relative;
+}
+
+.progress-bar-full .progress-fill-full {
+  width: 0%;
+  height: 100%;
+  background: white;
+  border-radius: 4px;
+  transition: width 0.1s linear;
+}
+
+.time-display {
+  color: white;
+  font-size: 0.75rem;
+  font-family: monospace;
+  min-width: 80px;
+  text-align: center;
+}
+
 .volume-control {
   display: flex;
   align-items: center;
@@ -244,6 +326,7 @@ audio {
   border-radius: 44px;
   background: #F9F9F6;
   outline: none;
+  display: none;
 }
 
 .current-file-card {
@@ -680,6 +763,25 @@ audio {
     min-width: 40px;
     font-size: 0.7rem;
   }
+  
+  .full-audio-controls {
+    padding: 8px 12px;
+  }
+  
+  .play-full-btn {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .play-full-btn svg {
+    width: 20px;
+    height: 20px;
+  }
+  
+  .time-display {
+    font-size: 0.7rem;
+    min-width: 70px;
+  }
 }
 
 /* Touch device optimizations */
@@ -777,6 +879,10 @@ const MAX_VOLUME = 6.0;
 let audioUnlocked = false;
 let playbackSpeed = 1.0;
 
+// Full audio play tracking
+let isFullAudioPlaying = false;
+let fullAudioProgressInterval = null;
+
 // Store frames for each tier
 let framesData = {
   tier_216: [],
@@ -844,6 +950,10 @@ function setPlaybackSpeed(speed) {
 
 function playSegmentAudio(startMs, endMs) {
   if (!currentAudio) return;
+  
+  // Stop full audio if it's playing
+  stopFullAudioPlayback();
+  
   const startSec = startMs / 1000;
   const durationSec = (endMs - startMs) / 1000;
   if (currentPlayTimeout) clearTimeout(currentPlayTimeout);
@@ -868,6 +978,126 @@ function stopPlayback() {
   if (currentAudio && !currentAudio.paused) currentAudio.pause();
   document.querySelectorAll('.cell-216.playing, .cell-108.playing, .cell-54.playing').forEach(c => c.classList.remove('playing'));
 }
+
+// ========== FULL AUDIO PLAYBACK FUNCTIONS ==========
+function toggleFullAudioPlayback() {
+  if (!currentAudio) return;
+  
+  if (isFullAudioPlaying) {
+    stopFullAudioPlayback();
+  } else {
+    startFullAudioPlayback();
+  }
+}
+
+function startFullAudioPlayback() {
+  if (!currentAudio) return;
+  
+  // Stop any segment playback
+  if (currentPlayTimeout) clearTimeout(currentPlayTimeout);
+  if (multiPlayTimeout) clearTimeout(multiPlayTimeout);
+  
+  const doPlay = () => {
+    currentAudio.playbackRate = playbackSpeed;
+    currentAudio.play().then(() => {
+      isFullAudioPlaying = true;
+      updatePlayButtonUI(true);
+      startProgressTracking();
+    }).catch(err => {
+      console.log('Playback error:', err);
+    });
+  };
+  
+  if (audioContext && audioContext.state === 'suspended') {
+    audioContext.resume().then(doPlay);
+  } else {
+    doPlay();
+  }
+}
+
+function stopFullAudioPlayback() {
+  if (!currentAudio) return;
+  currentAudio.pause();
+  isFullAudioPlaying = false;
+  updatePlayButtonUI(false);
+  stopProgressTracking();
+}
+
+function updatePlayButtonUI(isPlaying) {
+  const playBtn = document.getElementById('playFullBtn');
+  if (!playBtn) return;
+  
+  if (isPlaying) {
+    playBtn.classList.add('playing');
+    playBtn.innerHTML = `<svg viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>`;
+  } else {
+    playBtn.classList.remove('playing');
+    playBtn.innerHTML = `<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>`;
+  }
+}
+
+function startProgressTracking() {
+  if (fullAudioProgressInterval) clearInterval(fullAudioProgressInterval);
+  
+  fullAudioProgressInterval = setInterval(() => {
+    if (!currentAudio || currentAudio.paused) {
+      if (isFullAudioPlaying) {
+        isFullAudioPlaying = false;
+        updatePlayButtonUI(false);
+      }
+      stopProgressTracking();
+      return;
+    }
+    
+    const currentTime = currentAudio.currentTime;
+    const duration = currentAudio.duration || 0;
+    const progressPercent = (currentTime / duration) * 100;
+    
+    const progressFill = document.getElementById('progressFillFull');
+    if (progressFill) progressFill.style.width = progressPercent + '%';
+    
+    const timeDisplay = document.getElementById('timeDisplay');
+    if (timeDisplay) {
+      const currentMin = Math.floor(currentTime / 60);
+      const currentSec = Math.floor(currentTime % 60);
+      const durationMin = Math.floor(duration / 60);
+      const durationSec = Math.floor(duration % 60);
+      timeDisplay.textContent = `${currentMin}:${currentSec.toString().padStart(2,'0')} / ${durationMin}:${durationSec.toString().padStart(2,'0')}`;
+    }
+    
+    if (currentTime >= duration) {
+      stopFullAudioPlayback();
+    }
+  }, 100);
+}
+
+function stopProgressTracking() {
+  if (fullAudioProgressInterval) {
+    clearInterval(fullAudioProgressInterval);
+    fullAudioProgressInterval = null;
+  }
+}
+
+function seekToPosition(e) {
+  if (!currentAudio) return;
+  const progressBar = document.getElementById('progressBarFull');
+  if (!progressBar) return;
+  
+  const rect = progressBar.getBoundingClientRect();
+  let clientX;
+  if (e.touches) {
+    clientX = e.touches[0].clientX;
+  } else {
+    clientX = e.clientX;
+  }
+  const clickX = clientX - rect.left;
+  const width = rect.width;
+  const clickPercent = clickX / width;
+  const duration = currentAudio.duration || 0;
+  const seekTime = clickPercent * duration;
+  currentAudio.currentTime = seekTime;
+}
+// ========== END FULL AUDIO PLAYBACK FUNCTIONS ==========
 
 function playCellAudio(tier, index) {
   const frame = framesData[tier][index];
@@ -927,6 +1157,7 @@ function playSelectedSegments() {
   if (allSelected.length === 0 || !currentAudio) return;
   
   stopPlayback();
+  stopFullAudioPlayback();
   
   allSelected.sort((a, b) => framesData[a.tier][a.index].start_ms - framesData[b.tier][b.index].start_ms);
   
@@ -1040,6 +1271,16 @@ function loadDataIntoTiers(audioData) {
         initAudioContext();
         updateVolume(currentVolume);
         setPlaybackSpeed(playbackSpeed);
+        
+        // Reset full audio UI
+        stopFullAudioPlayback();
+        const duration = currentAudio.duration || 0;
+        const durationMin = Math.floor(duration / 60);
+        const durationSec = Math.floor(duration % 60);
+        const timeDisplay = document.getElementById('timeDisplay');
+        if (timeDisplay) timeDisplay.textContent = `0:00 / ${durationMin}:${durationSec.toString().padStart(2,'0')}`;
+        const progressFill = document.getElementById('progressFillFull');
+        if (progressFill) progressFill.style.width = '0%';
     }
 }
 
@@ -1362,6 +1603,22 @@ async function init() {
   const contentDiv = document.getElementById('content');
   contentDiv.innerHTML = `
     <div class="audio-wrapper">
+      <!-- Full Audio Play Button Section -->
+      <div class="full-audio-controls">
+        <button id="playFullBtn" class="play-full-btn" onclick="toggleFullAudioPlayback()">
+          <svg viewBox="0 0 24 24">
+            <path d="M8 5v14l11-7z"/>
+          </svg>
+        </button>
+        <div class="full-audio-info">
+          <span>Full Audio</span>
+        </div>
+        <div id="progressBarFull" class="progress-bar-full" onclick="seekToPosition(event)" ontouchstart="seekToPosition(event)">
+          <div id="progressFillFull" class="progress-fill-full"></div>
+        </div>
+        <div id="timeDisplay" class="time-display">0:00 / 0:00</div>
+      </div>
+      
       <div class="volume-control">
         <span class="volume-icon">🔊</span>
         <input type="range" id="volumeSlider" class="volume-slider" min="0" max="1" step="0.01" value="1">
@@ -1409,6 +1666,14 @@ async function init() {
   document.querySelectorAll('.speed-btn').forEach(btn => {
     btn.addEventListener('click', () => setPlaybackSpeed(parseFloat(btn.dataset.speed)));
   });
+  
+  // Make functions globally available for onclick
+  window.toggleFullAudioPlayback = toggleFullAudioPlayback;
+  window.seekToPosition = seekToPosition;
+  window.playSelectedSegments = playSelectedSegments;
+  window.clearSelection = clearSelection;
+  window.submitAnnotation = submitAnnotation;
+  window.skipFile = skipFile;
   
   const aksharGrid = document.getElementById('aksharGrid');
   AKSHAR_SET.forEach(akshar => {
@@ -1458,6 +1723,7 @@ async function init() {
   await loadNextSample();
 }
 
+// Start the app
 init();
 </script>
 </body>
