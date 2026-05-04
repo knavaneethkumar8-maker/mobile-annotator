@@ -1895,6 +1895,99 @@ def live_stream_submit():
         return jsonify({"success": False, "error": str(exc)}), 500
 
 
+# ============= UPDATED: 3-TIER LIVE STREAM SUBMIT ROUTE (with sentence support) =============
+
+@app.route("/api/live-stream/submit-3-tier", methods=["POST"])
+@login_required
+def live_stream_submit_3_tier():
+    """Submit 3-tier annotation for live stream clips (54ms, 108ms, 216ms frames) with sentence"""
+    try:
+        username = session.get('username')
+        if 'audio' not in request.files:
+            return jsonify({"success": False, "error": "No audio file"}), 400
+        
+        audio_file = request.files['audio']
+        language = request.form.get('language', 'unknown')
+        duration = float(request.form.get('duration', 2))
+        
+        frames_54 = json.loads(request.form.get('frames_54', '[]'))
+        frames_108 = json.loads(request.form.get('frames_108', '[]'))
+        frames_216 = json.loads(request.form.get('frames_216', '[]'))
+        sentence = request.form.get('sentence', '')  # Get the sentence from form data
+        
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        base_filename = f"live_3tier_{language}_{username}_{timestamp}"
+        
+        live_folder = os.path.join(SELF_RECORDINGS_FOLDER, "live_streams", username)
+        os.makedirs(live_folder, exist_ok=True)
+        
+        wav_filename = f"{base_filename}.wav"
+        wav_path = os.path.join(live_folder, wav_filename)
+        audio_file.save(wav_path)
+        
+        full_sequence = ' '.join(f.get('text', '') for f in frames_108 if f.get('text'))
+        
+        annotation_data = {
+            "audio_file": wav_filename,
+            "annotator": username,
+            "timestamp": datetime.now().isoformat(),
+            "language": language,
+            "duration_ms": int(duration * 1000),
+            "frames_54": frames_54,
+            "frames_108": frames_108,
+            "frames_216": frames_216,
+            "sentence": sentence,  # Add sentence to the JSON
+            "type": "live_stream_3tier",
+            "full_sequence": full_sequence,
+            "submitted_by": username,
+            "submitted_at": datetime.now().isoformat(),
+            "verification_status": "pending",
+        }
+        
+        json_filename = f"{base_filename}.json"
+        json_path = os.path.join(live_folder, json_filename)
+        with open(json_path, 'w', encoding='utf-8') as f:
+            json.dump(annotation_data, f, indent=2, ensure_ascii=False)
+        
+        # Generate 12-tier TextGrid for 3-tier data with the sentence
+        textgrid_content = create_enhanced_textgrid_with_tiers(
+            frames_216=frames_216,
+            frames_108=frames_108,
+            frames_54=frames_54,
+            duration=duration,
+            sentence=sentence,  # Pass the sentence to TextGrid
+            annotator=username,
+            verified_by=None
+        )
+        
+        textgrid_path = os.path.join(live_folder, f"{base_filename}.TextGrid")
+        with open(textgrid_path, 'w', encoding='utf-8') as f:
+            f.write(textgrid_content)
+        
+        # Save to mobile dataset (this will also save to training data)
+        save_to_mobile_dataset(annotation_data, username, wav_path, json_filename)
+        
+        akshar_count = sum(1 for f in frames_54 if f.get('text') and f['text'].strip())
+        
+        update_user_stats(username, json_filename, duration, increment=True)
+        update_daily_stats(username, json_filename, duration, increment=True)
+        completed_files.add(json_filename)
+        save_completed_files(completed_files)
+        
+        return jsonify({
+            "success": True,
+            "message": "3-tier live stream annotation submitted successfully",
+            "akshar_count": akshar_count,
+            "filename": base_filename,
+        })
+        
+    except Exception as exc:
+        print(f"[live-3tier] submit error: {exc}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({"success": False, "error": str(exc)}), 500
+
+
 # ============= VERIFICATION ROUTES =============
 
 VERIFIER_PASSWORD = "verify123"
@@ -2114,6 +2207,120 @@ def verify_submit():
         return jsonify({"message": "File rejected and removed from dataset. It will be re-annotated.", "has_more": True, "rejected": True})
     else:
         return jsonify({"error": "Invalid action"}), 400
+
+
+# ==============================
+# MOBILE TRAINING MODULE ROUTES
+# ==============================
+
+MOBILE_TRAINING_PROGRESS_FOLDER = "mobile_training_progress"
+MOBILE_TRAINING_AUDIO_FOLDER = "mobile_training_audio"
+MOBILE_TRAINING_VIDEOS_FOLDER = "static/mobile_training/videos"
+
+# Create folders
+os.makedirs(MOBILE_TRAINING_PROGRESS_FOLDER, exist_ok=True)
+os.makedirs(MOBILE_TRAINING_AUDIO_FOLDER, exist_ok=True)
+os.makedirs(MOBILE_TRAINING_VIDEOS_FOLDER, exist_ok=True)
+
+def get_mobile_training_progress_path(username):
+    """Get path for user's mobile training progress"""
+    return os.path.join(MOBILE_TRAINING_PROGRESS_FOLDER, f"{username}.json")
+
+@app.route('/mobile-training')
+@login_required
+def mobile_training_page():
+    """Mobile training and certification page"""
+    return render_template("mobile_training.html", user=session["username"], base_path=BASE_PATH)
+
+@app.route('/api/mobile-training-progress', methods=['GET'])
+@login_required
+def get_mobile_training_progress():
+    """Get user's mobile training progress"""
+    username = session["username"]
+    progress_path = get_mobile_training_progress_path(username)
+    
+    if os.path.exists(progress_path):
+        with open(progress_path, 'r', encoding='utf-8') as f:
+            data = json.load(f)
+            return jsonify(data)
+    
+    return jsonify({
+        "completed_steps": [],
+        "step_data": {},
+        "current_module": 1,
+        "current_step": 0,
+        "certified": False
+    })
+
+@app.route('/api/mobile-training-progress', methods=['POST'])
+@login_required
+def save_mobile_training_progress():
+    """Save user's mobile training progress"""
+    username = session["username"]
+    data = request.json
+    progress_path = get_mobile_training_progress_path(username)
+    
+    # Load existing or create new
+    progress = {}
+    if os.path.exists(progress_path):
+        with open(progress_path, 'r', encoding='utf-8') as f:
+            progress = json.load(f)
+    
+    # Update with new data
+    progress.update(data)
+    progress["last_updated"] = datetime.now().isoformat()
+    
+    with open(progress_path, 'w', encoding='utf-8') as f:
+        json.dump(progress, f, indent=2)
+    
+    return jsonify({"success": True})
+
+@app.route('/mobile-training/audio/<filename>')
+@login_required
+def serve_mobile_training_audio(filename):
+    """Serve mobile training audio files"""
+    filepath = os.path.join(MOBILE_TRAINING_AUDIO_FOLDER, filename)
+    if os.path.exists(filepath):
+        return send_file(filepath, mimetype='audio/wav')
+    return jsonify({"error": "Audio not found"}), 404
+
+@app.route('/mobile-training/videos/<filename>')
+@login_required
+def serve_mobile_training_video(filename):
+    """Serve mobile training video files"""
+    filepath = os.path.join(MOBILE_TRAINING_VIDEOS_FOLDER, filename)
+    if os.path.exists(filepath):
+        return send_file(filepath, mimetype='video/mp4')
+    return jsonify({"error": "Video not found"}), 404
+
+@app.route('/api/mobile-training-certify', methods=['POST'])
+@login_required
+def mobile_training_certify():
+    """Mark user as certified after completing all requirements"""
+    username = session["username"]
+    progress_path = get_mobile_training_progress_path(username)
+    
+    if not os.path.exists(progress_path):
+        return jsonify({"success": False, "message": "Complete all training first"}), 400
+    
+    with open(progress_path, 'r', encoding='utf-8') as f:
+        progress = json.load(f)
+    
+    # Total steps = 35 (sum of all steps in modules)
+    total_steps_expected = 35
+    completed_steps = len(progress.get("completed_steps", []))
+    
+    if completed_steps >= total_steps_expected:
+        progress["certified"] = True
+        progress["certified_at"] = datetime.now().isoformat()
+        
+        with open(progress_path, 'w', encoding='utf-8') as f:
+            json.dump(progress, f, indent=2)
+        
+        return jsonify({"success": True, "certified": True})
+    
+    return jsonify({"success": False, "message": f"Complete {total_steps_expected - completed_steps} more steps first"}), 400
+
 
 if __name__ == "__main__":
     print("=" * 50)

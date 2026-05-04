@@ -1,0 +1,1589 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>Mobile Training · Akshar Certification</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+            background: #F5F5F0;
+            color: #1C1C1A;
+            line-height: 1.4;
+        }
+
+        /* Header */
+        .mobile-header {
+            background: #FFFFFF;
+            border-bottom: 1px solid #E8ECF0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            padding: 12px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .logo h1 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #2C6E49;
+        }
+
+        .logo p {
+            font-size: 0.65rem;
+            color: #8E8E88;
+            margin-top: 2px;
+        }
+
+        .user-controls {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .cert-badge {
+            font-size: 0.7rem;
+            padding: 4px 10px;
+            border-radius: 20px;
+            background: #2C6E49;
+            color: white;
+            font-weight: 500;
+        }
+
+        .cert-badge.pending {
+            background: #E8E8E3;
+            color: #6C7A89;
+        }
+
+        .cert-badge.in-progress {
+            background: #4A6FA5;
+            color: white;
+        }
+
+        .cert-badge.completed {
+            background: #2C6E49;
+            color: white;
+        }
+
+        .back-btn {
+            background: #F0F0EB;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 30px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            cursor: pointer;
+            text-decoration: none;
+            color: #2C6E49;
+        }
+
+        /* Main Content - Mobile Optimized */
+        .training-container {
+            padding: 16px;
+            max-width: 100%;
+            margin: 0 auto;
+        }
+
+        /* Progress Card */
+        .progress-card {
+            background: white;
+            border-radius: 20px;
+            padding: 16px;
+            margin-bottom: 16px;
+            border: 1px solid #E9E9E2;
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .progress-title {
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: #2C6E49;
+        }
+
+        .progress-percent {
+            font-size: 0.75rem;
+            color: #8E8E88;
+        }
+
+        .progress-bar-bg {
+            background: #EBEBE4;
+            height: 6px;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            background: #2C6E49;
+            height: 100%;
+            border-radius: 10px;
+            transition: width 0.3s ease;
+            width: 0%;
+        }
+
+        /* Module Accordion */
+        .module-accordion {
+            background: white;
+            border-radius: 20px;
+            border: 1px solid #E9E9E2;
+            overflow: hidden;
+            margin-bottom: 12px;
+        }
+
+        .module-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px;
+            cursor: pointer;
+            background: white;
+            transition: background 0.2s;
+        }
+
+        .module-header:active {
+            background: #F8F8F4;
+        }
+
+        .module-title {
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: #1C1C1A;
+        }
+
+        .module-meta {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .module-badge {
+            font-size: 0.7rem;
+            padding: 2px 8px;
+            border-radius: 12px;
+            background: #EBEBE4;
+            color: #6C7A89;
+        }
+
+        .module-badge.completed {
+            background: #E0F0E6;
+            color: #2C6E49;
+        }
+
+        .module-badge.active {
+            background: #E3F2FD;
+            color: #4A6FA5;
+        }
+
+        .module-arrow {
+            font-size: 1rem;
+            transition: transform 0.2s;
+        }
+
+        .module-accordion.open .module-arrow {
+            transform: rotate(180deg);
+        }
+
+        .module-steps {
+            display: none;
+            padding: 0 16px 16px 16px;
+            border-top: 1px solid #E9E9E2;
+            background: #FAFAF8;
+        }
+
+        .module-accordion.open .module-steps {
+            display: block;
+        }
+
+        .step-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 0;
+            border-bottom: 1px solid #EEEEE8;
+            cursor: pointer;
+        }
+
+        .step-item:last-child {
+            border-bottom: none;
+        }
+
+        .step-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 30px;
+            background: #F0F0EB;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            flex-shrink: 0;
+        }
+
+        .step-icon.completed {
+            background: #2C6E49;
+            color: white;
+        }
+
+        .step-icon.active {
+            background: #4A6FA5;
+            color: white;
+        }
+
+        .step-info {
+            flex: 1;
+        }
+
+        .step-title {
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: #1C1C1A;
+        }
+
+        .step-desc {
+            font-size: 0.7rem;
+            color: #8E8E88;
+        }
+
+        .step-status {
+            font-size: 0.7rem;
+            color: #2C6E49;
+        }
+
+        /* Content Card */
+        .content-card {
+            background: white;
+            border-radius: 24px;
+            border: 1px solid #E9E9E2;
+            overflow: hidden;
+            margin-bottom: 16px;
+        }
+
+        .content-header {
+            padding: 18px;
+            border-bottom: 1px solid #E9E9E2;
+            background: #FAFAF8;
+        }
+
+        .content-step-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #1C1C1A;
+            margin-bottom: 4px;
+        }
+
+        .content-step-meta {
+            font-size: 0.7rem;
+            color: #8E8E88;
+        }
+
+        .content-body {
+            padding: 18px;
+        }
+
+        /* Video Player */
+        .video-container {
+            background: #1a1a2e;
+            border-radius: 16px;
+            overflow: hidden;
+            margin-bottom: 16px;
+        }
+
+        .video-container video {
+            width: 100%;
+            display: block;
+        }
+
+        /* Exercise Area */
+        .exercise-area {
+            background: #F8F8F4;
+            border-radius: 20px;
+            padding: 20px;
+            margin: 16px 0;
+        }
+
+        .audio-player-card {
+            background: white;
+            border-radius: 60px;
+            padding: 10px 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+            border: 1px solid #E9E9E2;
+        }
+
+        .play-circle {
+            background: #2C6E49;
+            border: none;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .play-circle:active {
+            transform: scale(0.95);
+        }
+
+        .play-circle svg {
+            width: 22px;
+            height: 22px;
+            fill: white;
+        }
+
+        .speed-group {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .speed-chip {
+            padding: 6px 14px;
+            border-radius: 30px;
+            border: 1px solid #CBD5E1;
+            background: white;
+            font-size: 0.7rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .speed-chip.active {
+            background: #2C6E49;
+            border-color: #2C6E49;
+            color: white;
+        }
+
+        /* Cell Inputs */
+        .cell-single {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .cell-input-large {
+            width: 120px;
+            padding: 16px;
+            text-align: center;
+            font-family: 'Noto Sans Devanagari', monospace;
+            font-size: 1.5rem;
+            border: 2px solid #E9E9E2;
+            border-radius: 20px;
+            background: white;
+        }
+
+        .cell-input-large:focus {
+            outline: none;
+            border-color: #2C6E49;
+        }
+
+        .multi-cells {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin: 20px 0;
+        }
+
+        .cell-small {
+            text-align: center;
+        }
+
+        .cell-small .cell-label {
+            font-size: 0.65rem;
+            color: #8E8E88;
+            margin-bottom: 6px;
+        }
+
+        .cell-small input {
+            width: 80px;
+            padding: 10px;
+            text-align: center;
+            font-family: 'Noto Sans Devanagari', monospace;
+            font-size: 1rem;
+            border: 1.5px solid #E9E9E2;
+            border-radius: 12px;
+        }
+
+        /* Three Tier Grid - Mobile Optimized */
+        .three-tier-mobile {
+            margin: 16px 0;
+        }
+
+        .tier-mobile {
+            margin-bottom: 16px;
+            background: white;
+            border-radius: 16px;
+            border: 1px solid #E9E9E2;
+            overflow: hidden;
+        }
+
+        .tier-title {
+            background: #F8F8F4;
+            padding: 10px 14px;
+            font-weight: 600;
+            font-size: 0.75rem;
+            color: #2C6E49;
+            border-bottom: 1px solid #E9E9E2;
+        }
+
+        .tier-cells-scroll {
+            overflow-x: auto;
+            white-space: nowrap;
+            padding: 12px;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .tier-cells-container {
+            display: inline-flex;
+            gap: 8px;
+        }
+
+        .tier-cell {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            background: #FAFAF8;
+            border-radius: 12px;
+            padding: 8px;
+            min-width: 80px;
+            border: 1px solid #E9E9E2;
+        }
+
+        .tier-cell.tier-216 { min-width: 100px; }
+        .tier-cell.tier-108 { min-width: 75px; }
+        .tier-cell.tier-54 { min-width: 60px; }
+
+        .tier-time {
+            font-size: 0.6rem;
+            color: #8E8E88;
+        }
+
+        .tier-input {
+            width: 100%;
+            text-align: center;
+            font-family: 'Noto Sans Devanagari', monospace;
+            font-size: 0.85rem;
+            padding: 8px;
+            border: 1px solid #E9E9E2;
+            border-radius: 10px;
+            background: white;
+        }
+
+        .tier-input:focus {
+            outline: none;
+            border-color: #2C6E49;
+        }
+
+        /* Quiz */
+        .quiz-question {
+            margin-bottom: 24px;
+            padding: 16px;
+            background: #F8F8F4;
+            border-radius: 16px;
+        }
+
+        .quiz-question-text {
+            font-weight: 600;
+            margin-bottom: 12px;
+            font-size: 0.9rem;
+        }
+
+        .quiz-options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .quiz-option {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px;
+            border-radius: 12px;
+            background: white;
+            cursor: pointer;
+        }
+
+        .quiz-option input {
+            width: 18px;
+            height: 18px;
+        }
+
+        /* Game */
+        .game-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            justify-content: center;
+            margin: 20px 0;
+        }
+
+        .game-card {
+            width: 70px;
+            height: 70px;
+            background: white;
+            border: 2px solid #E9E9E2;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-family: 'Noto Sans Devanagari', monospace;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .game-card:active {
+            transform: scale(0.95);
+            background: #E0F0E6;
+            border-color: #2C6E49;
+        }
+
+        /* Tour */
+        .tour-items {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .tour-item {
+            padding: 14px;
+            background: #F8F8F4;
+            border-radius: 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: all 0.2s;
+        }
+
+        .tour-item:active {
+            background: #E3F2FD;
+        }
+
+        .tour-item.completed {
+            background: #E0F0E6;
+            border-left: 3px solid #2C6E49;
+        }
+
+        .tour-icon {
+            font-size: 1.3rem;
+        }
+
+        .tour-text {
+            flex: 1;
+        }
+
+        .tour-title {
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+
+        .tour-desc {
+            font-size: 0.7rem;
+            color: #8E8E88;
+        }
+
+        .tour-check {
+            color: #2C6E49;
+            font-size: 1.1rem;
+        }
+
+        /* Keyboard */
+        .mobile-keyboard {
+            background: #F0F0EB;
+            border-radius: 20px;
+            padding: 12px;
+            margin: 16px 0;
+        }
+
+        .kb-row {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 6px;
+            margin-bottom: 6px;
+        }
+
+        .kb-key {
+            min-width: 42px;
+            height: 42px;
+            background: white;
+            border: 1px solid #D4D4CC;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-family: 'Noto Sans Devanagari', monospace;
+            cursor: pointer;
+            transition: all 0.1s;
+        }
+
+        .kb-key:active {
+            background: #2C6E49;
+            border-color: #2C6E49;
+            color: white;
+            transform: scale(0.95);
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 14px 20px;
+            border: none;
+            border-radius: 60px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+        }
+
+        .btn-primary {
+            background: #2C6E49;
+            color: white;
+        }
+
+        .btn-primary:active {
+            background: #215A3A;
+            transform: scale(0.98);
+        }
+
+        .btn-secondary {
+            background: #F0F0EB;
+            color: #2C6E49;
+        }
+
+        .btn-secondary:active {
+            background: #E4E4DC;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 12px;
+            margin: 20px 0;
+        }
+
+        .button-group .btn {
+            flex: 1;
+        }
+
+        /* Feedback */
+        .feedback {
+            padding: 14px;
+            border-radius: 16px;
+            margin: 16px 0;
+            font-size: 0.85rem;
+        }
+
+        .feedback-success {
+            background: #E0F0E6;
+            color: #2C6E49;
+            border-left: 3px solid #2C6E49;
+        }
+
+        .feedback-error {
+            background: #FDE9E7;
+            color: #B13E3A;
+            border-left: 3px solid #B13E3A;
+        }
+
+        .feedback-info {
+            background: #E3F2FD;
+            color: #4A6FA5;
+            border-left: 3px solid #4A6FA5;
+        }
+
+        /* Loading */
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #8E8E88;
+        }
+    </style>
+</head>
+<body>
+    <div class="mobile-header">
+        <div class="logo">
+            <h1>Akshar Training</h1>
+            <p>Mobile Certification</p>
+        </div>
+        <div class="user-controls">
+            <span class="cert-badge pending" id="certBadge">Training</span>
+            <a href="{{ url_for_path('index') }}" class="back-btn">← Back</a>
+        </div>
+    </div>
+
+    <div class="training-container" id="trainingContainer">
+        <div class="progress-card">
+            <div class="progress-header">
+                <span class="progress-title">Overall Progress</span>
+                <span class="progress-percent" id="overallPercent">0%</span>
+            </div>
+            <div class="progress-bar-bg">
+                <div class="progress-bar-fill" id="overallFill"></div>
+            </div>
+        </div>
+
+        <div id="modulesList"></div>
+
+        <div id="contentArea">
+            <div class="loading">Select a module to begin...</div>
+        </div>
+    </div>
+
+    <script>
+        const BASE_PATH = "{{ base_path }}";
+        const USERNAME = "{{ user }}";
+
+        // Course Data (same as desktop version)
+        const modules = [
+            {
+                id: 1,
+                title: "Introduction to Audio Annotation",
+                estimated_time: "5-10 min",
+                steps: [
+                    { id: "1.1", type: "video", title: "What is Audio Annotation?", duration: "2:30", video_key: "1.1" },
+                    { id: "1.2", type: "quiz", title: "Check Your Understanding", 
+                      questions: [{ text: "What is the main purpose of audio annotation?", options: ["Speech recognition training", "Music analysis", "Background noise removal", "Audio compression"], correct: 0 }] },
+                    { id: "1.3", type: "video", title: "Platform Overview", duration: "2:00", video_key: "1.3" },
+                    { id: "1.4", type: "interactive", title: "Interface Tour", interactive_type: "tour" }
+                ]
+            },
+            {
+                id: 2,
+                title: "Understanding Akshars",
+                estimated_time: "10-15 min",
+                steps: [
+                    { id: "2.1", type: "video", title: "What are Akshars? The 40 Characters", duration: "3:00", video_key: "2.1" },
+                    { id: "2.2", type: "game", title: "Match the Sound", game_type: "flashcard", items: ["अ", "क", "म", "स", "त"] },
+                    { id: "2.3", type: "video", title: "Vowels vs Consonants", duration: "2:30", video_key: "2.3" },
+                    { id: "2.4", type: "quiz", title: "Akshar Recognition", 
+                      questions: [{ text: "Which of these is a vowel?", options: ["क", "त", "अ", "म"], correct: 2 }] }
+                ]
+            },
+            {
+                id: 3,
+                title: "Single Cell Annotation",
+                estimated_time: "15-20 min",
+                steps: [
+                    { id: "3.1", type: "video", title: "One Cell = One Sound Unit", duration: "2:00", video_key: "3.1" },
+                    { id: "3.2", type: "exercise", title: "Exercise: Annotate One Cell", exercise_type: "single_cell", correct_answer: "अ" },
+                    { id: "3.3", type: "exercise", title: "Exercise: Annotate Two Cells", exercise_type: "multi_cell", cells: [{correct: "क"}, {correct: "र"}] },
+                    { id: "3.4", type: "video", title: "Using Slowed Audio", duration: "1:30", video_key: "3.4" }
+                ]
+            },
+            {
+                id: 4,
+                title: "The Three-Tier System",
+                estimated_time: "20-25 min",
+                steps: [
+                    { id: "4.1", type: "video", title: "Understanding 216ms, 108ms, 54ms", duration: "3:00", video_key: "4.1" },
+                    { id: "4.2", type: "exercise", title: "Practice: 216ms Tier", exercise_type: "three_tier", frames_216: 3 },
+                    { id: "4.3", type: "exercise", title: "Practice: All Three Tiers", exercise_type: "three_tier_complete", frames_216: 3, frames_108: 6, frames_54: 12 }
+                ]
+            },
+            {
+                id: 5,
+                title: "Practice & Mastery",
+                estimated_time: "30-40 min",
+                steps: [
+                    { id: "5.1", type: "video", title: "Common Mistakes", duration: "2:30", video_key: "5.1" },
+                    { id: "5.2", type: "exercise", title: "Practice: Short Sentence", exercise_type: "three_tier_complete", frames_216: 5, frames_108: 10, frames_54: 20 },
+                    { id: "5.3", type: "exercise", title: "Practice: Medium Sentence", exercise_type: "three_tier_complete", frames_216: 8, frames_108: 16, frames_54: 32 },
+                    { id: "5.4", type: "quiz", title: "Scenario Questions", 
+                      questions: [
+                        { text: "What should you do when you hear an unclear sound?", options: ["Skip the file", "Use slowed audio", "Guess randomly", "Leave it blank"], correct: 1 },
+                        { text: "How many akshars maximum per cell?", options: ["1", "2", "3", "4"], correct: 2 }
+                      ] }
+                ]
+            },
+            {
+                id: 6,
+                title: "Quality & Speed",
+                estimated_time: "15-20 min",
+                steps: [
+                    { id: "6.1", type: "video", title: "Quality Standards", duration: "2:00", video_key: "6.1" },
+                    { id: "6.2", type: "video", title: "Keyboard Shortcuts & Tips", duration: "2:00", video_key: "6.2" },
+                    { id: "6.3", type: "exercise", title: "Timed Practice", exercise_type: "timed" }
+                ]
+            },
+            {
+                id: 7,
+                title: "Final Assessment",
+                estimated_time: "20-30 min",
+                steps: [
+                    { id: "7.1", type: "assessment", title: "Assessment 1: Single Sounds", assessment_type: "single_cells", count: 10 },
+                    { id: "7.2", type: "assessment", title: "Assessment 2: Words", assessment_type: "words", count: 5 },
+                    { id: "7.3", type: "assessment", title: "Assessment 3: Full Sentences", assessment_type: "full_three_tier", count: 2 }
+                ]
+            },
+            {
+                id: 8,
+                title: "Certification Exam",
+                estimated_time: "30-40 min",
+                steps: [
+                    { id: "8.1", type: "exam", title: "Exam: Part 1 - Single Cells", exam_type: "single_cells", count: 10, required_score: 85 },
+                    { id: "8.2", type: "exam", title: "Exam: Part 2 - Words", exam_type: "words", count: 5, required_score: 85 },
+                    { id: "8.3", type: "exam", title: "Exam: Part 3 - Full Sentences", exam_type: "full_three_tier", count: 3, required_score: 85 }
+                ]
+            }
+        ];
+
+        // Video URLs
+        const videoMapping = {
+            "1.1": "/static/training/videos/tut_1.mp4",
+            "1.3": "/static/training/videos/tut_2.mp4",
+            "2.1": "/static/training/videos/tut_3.mp4",
+            "2.3": "/static/training/videos/tut_4.mp4",
+            "3.1": "/static/training/videos/tut_5.mp4",
+            "3.4": "/static/training/videos/tut_6.mp4",
+            "4.1": "/static/training/videos/tut_7.mp4",
+            "5.1": "/static/training/videos/tut_8.mp4",
+            "6.1": "/static/training/videos/tut_9.mp4",
+            "6.2": "/static/training/videos/tut_10.mp4"
+        };
+
+        // Training State
+        let trainingState = {
+            currentModule: 1,
+            currentStep: 0,
+            completedSteps: new Set(),
+            stepData: {},
+            certified: false,
+            tourCompleted: {}
+        };
+
+        let currentAudio = null;
+        let currentSpeed = 1;
+
+        // Load/Save Progress
+        async function loadProgress() {
+            try {
+                const response = await fetch(`${BASE_PATH}/api/mobile-training-progress`);
+                if (response.ok) {
+                    const data = await response.json();
+                    trainingState.completedSteps = new Set(data.completed_steps || []);
+                    trainingState.stepData = data.step_data || {};
+                    trainingState.certified = data.certified || false;
+                    trainingState.tourCompleted = data.tour_completed || {};
+                    if (data.current_module) trainingState.currentModule = data.current_module;
+                    if (data.current_step !== undefined) trainingState.currentStep = data.current_step;
+                }
+            } catch(e) { console.log("No saved progress"); }
+            renderModulesList();
+            loadCurrentStep();
+            updateOverallProgress();
+        }
+
+        async function saveProgress() {
+            try {
+                await fetch(`${BASE_PATH}/api/mobile-training-progress`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        completed_steps: Array.from(trainingState.completedSteps),
+                        step_data: trainingState.stepData,
+                        current_module: trainingState.currentModule,
+                        current_step: trainingState.currentStep,
+                        certified: trainingState.certified,
+                        tour_completed: trainingState.tourCompleted
+                    })
+                });
+            } catch(e) { console.error("Save error:", e); }
+        }
+
+        // Render Modules List (Accordion style for mobile)
+        function renderModulesList() {
+            const container = document.getElementById('modulesList');
+            if (!container) return;
+            
+            container.innerHTML = modules.map(module => {
+                const stepsCompleted = module.steps.filter((step) => 
+                    trainingState.completedSteps.has(`${module.id}_${step.id}`)
+                ).length;
+                const totalSteps = module.steps.length;
+                const isCompleted = stepsCompleted === totalSteps;
+                const isActive = trainingState.currentModule === module.id;
+                
+                let badgeClass = 'module-badge';
+                if (isCompleted) badgeClass += ' completed';
+                else if (isActive) badgeClass += ' active';
+                
+                return `
+                    <div class="module-accordion ${isActive ? 'open' : ''}" data-module="${module.id}">
+                        <div class="module-header">
+                            <span class="module-title">Module ${module.id}: ${module.title}</span>
+                            <div class="module-meta">
+                                <span class="${badgeClass}">${stepsCompleted}/${totalSteps}</span>
+                                <span class="module-arrow">▼</span>
+                            </div>
+                        </div>
+                        <div class="module-steps">
+                            ${module.steps.map((step, idx) => {
+                                const stepCompleted = trainingState.completedSteps.has(`${module.id}_${step.id}`);
+                                const isCurrentStep = trainingState.currentModule === module.id && trainingState.currentStep === idx;
+                                const iconClass = stepCompleted ? 'completed' : (isCurrentStep ? 'active' : '');
+                                return `
+                                    <div class="step-item" data-module="${module.id}" data-step="${idx}">
+                                        <div class="step-icon ${iconClass}">
+                                            ${stepCompleted ? '✓' : (step.type === 'video' ? '▶' : (step.type === 'quiz' ? '?' : '●'))}
+                                        </div>
+                                        <div class="step-info">
+                                            <div class="step-title">${step.id} ${step.title}</div>
+                                            <div class="step-desc">${step.type} · ${step.duration || 'Interactive'}</div>
+                                        </div>
+                                        <div class="step-status">${stepCompleted ? 'Done' : ''}</div>
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            // Add event listeners
+            document.querySelectorAll('.module-accordion').forEach(el => {
+                const header = el.querySelector('.module-header');
+                header.addEventListener('click', (e) => {
+                    if (e.target.closest('.step-item')) return;
+                    el.classList.toggle('open');
+                });
+            });
+            
+            document.querySelectorAll('.step-item').forEach(el => {
+                el.addEventListener('click', () => {
+                    const moduleId = parseInt(el.dataset.module);
+                    const stepIdx = parseInt(el.dataset.step);
+                    trainingState.currentModule = moduleId;
+                    trainingState.currentStep = stepIdx;
+                    saveProgress();
+                    renderModulesList();
+                    loadCurrentStep();
+                });
+            });
+        }
+
+        // Load Current Step Content
+        async function loadCurrentStep() {
+            const module = modules[trainingState.currentModule - 1];
+            if (!module) return;
+            
+            const step = module.steps[trainingState.currentStep];
+            if (!step) return;
+            
+            const contentArea = document.getElementById('contentArea');
+            if (!contentArea) return;
+            
+            let html = `
+                <div class="content-card">
+                    <div class="content-header">
+                        <div class="content-step-title">${step.id} ${step.title}</div>
+                        <div class="content-step-meta">${module.title} · ${step.duration || 'Interactive'}</div>
+                    </div>
+                    <div class="content-body" id="stepContent">
+            `;
+            
+            if (step.type === 'video') {
+                html += renderVideoContent(step);
+            } else if (step.type === 'quiz') {
+                html += renderQuizContent(step);
+            } else if (step.type === 'exercise') {
+                html += renderExerciseContent(step);
+            } else if (step.type === 'game') {
+                html += renderGameContent(step);
+            } else if (step.type === 'interactive') {
+                html += renderInteractiveContent(step);
+            } else if (step.type === 'assessment' || step.type === 'exam') {
+                html += renderAssessmentContent(step);
+            }
+            
+            html += `
+                    </div>
+                    <div class="button-group">
+                        <button class="btn btn-secondary" id="prevBtn">← Previous</button>
+                        <button class="btn btn-primary" id="nextBtn">Next →</button>
+                    </div>
+                </div>
+            `;
+            
+            contentArea.innerHTML = html;
+            
+            // Add step-specific event listeners
+            attachStepEvents(step);
+            
+            // Navigation
+            document.getElementById('prevBtn')?.addEventListener('click', () => navigateStep(-1));
+            document.getElementById('nextBtn')?.addEventListener('click', () => navigateStep(1));
+        }
+        
+        function renderVideoContent(step) {
+            const videoUrl = videoMapping[step.id] || `/static/training/videos/tut_${step.id.split('.')[0]}.mp4`;
+            return `
+                <div class="video-container">
+                    <video id="stepVideo" controls width="100%" playsinline>
+                        <source src="${videoUrl}" type="video/mp4">
+                    </video>
+                </div>
+                <div class="feedback info">Watch the video, then tap "Mark Complete" when done.</div>
+                <button class="btn btn-primary" id="markCompleteBtn" style="width: 100%;">✓ Mark as Complete</button>
+            `;
+        }
+        
+        function renderQuizContent(step) {
+            return `
+                <div id="quizContainer">
+                    ${step.questions.map((q, idx) => `
+                        <div class="quiz-question">
+                            <div class="quiz-question-text">${idx + 1}. ${q.text}</div>
+                            <div class="quiz-options">
+                                ${q.options.map((opt, optIdx) => `
+                                    <label class="quiz-option">
+                                        <input type="radio" name="q${idx}" value="${optIdx}">
+                                        <span>${String.fromCharCode(65+optIdx)}. ${opt}</span>
+                                    </label>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `).join('')}
+                    <button class="btn btn-primary" id="submitQuizBtn" style="width: 100%;">Submit Answers</button>
+                    <div id="quizFeedback"></div>
+                </div>
+            `;
+        }
+        
+        function renderExerciseContent(step) {
+            if (step.exercise_type === 'single_cell') {
+                return `
+                    <div class="exercise-area">
+                        <div class="audio-player-card">
+                            <button class="play-circle" id="playAudioBtn">
+                                <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                            </button>
+                            <div class="speed-group">
+                                <button class="speed-chip" data-speed="0.5">0.5x</button>
+                                <button class="speed-chip active" data-speed="1">1x</button>
+                                <button class="speed-chip" data-speed="1.5">1.5x</button>
+                                <button class="speed-chip" data-speed="2">2x</button>
+                            </div>
+                        </div>
+                        <div class="cell-single">
+                            <input type="text" id="exerciseAnswer" class="cell-input-large" placeholder="अ" maxlength="3">
+                        </div>
+                        <button class="btn btn-primary" id="checkExerciseBtn">Check Answer</button>
+                        <div id="exerciseFeedback"></div>
+                    </div>
+                    ${renderMobileKeyboard()}
+                `;
+            } else if (step.exercise_type === 'multi_cell') {
+                return `
+                    <div class="exercise-area">
+                        <div class="audio-player-card">
+                            <button class="play-circle" id="playAudioBtn">
+                                <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                            </button>
+                            <div class="speed-group">
+                                <button class="speed-chip" data-speed="0.5">0.5x</button>
+                                <button class="speed-chip active" data-speed="1">1x</button>
+                                <button class="speed-chip" data-speed="1.5">1.5x</button>
+                                <button class="speed-chip" data-speed="2">2x</button>
+                            </div>
+                        </div>
+                        <div class="multi-cells">
+                            ${step.cells.map((cell, idx) => `
+                                <div class="cell-small">
+                                    <div class="cell-label">Cell ${idx + 1}</div>
+                                    <input type="text" data-cell="${idx}" class="exercise-multi" maxlength="3">
+                                </div>
+                            `).join('')}
+                        </div>
+                        <button class="btn btn-primary" id="checkExerciseBtn">Check Answers</button>
+                        <div id="exerciseFeedback"></div>
+                    </div>
+                    ${renderMobileKeyboard()}
+                `;
+            } else if (step.exercise_type === 'three_tier_complete') {
+                return renderThreeTierContent(step);
+            }
+            return `<div>Loading exercise...</div>`;
+        }
+        
+        function renderThreeTierContent(step) {
+            const tier216Cells = step.frames_216 || 3;
+            const tier108Cells = step.frames_108 || 6;
+            const tier54Cells = step.frames_54 || 12;
+            
+            return `
+                <div class="exercise-area">
+                    <div class="audio-player-card">
+                        <button class="play-circle" id="playAudioBtn">
+                            <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                        </button>
+                        <div class="speed-group">
+                            <button class="speed-chip" data-speed="0.5">0.5x</button>
+                            <button class="speed-chip active" data-speed="1">1x</button>
+                            <button class="speed-chip" data-speed="1.5">1.5x</button>
+                            <button class="speed-chip" data-speed="2">2x</button>
+                        </div>
+                    </div>
+                    
+                    <div class="three-tier-mobile">
+                        <!-- 216ms Tier -->
+                        <div class="tier-mobile">
+                            <div class="tier-title">🌬️ 216ms (Merged)</div>
+                            <div class="tier-cells-scroll">
+                                <div class="tier-cells-container" id="tier216Cells">
+                                    ${Array(tier216Cells).fill().map((_, i) => `
+                                        <div class="tier-cell tier-216">
+                                            <span class="tier-time">${(i * 0.216).toFixed(2)}s</span>
+                                            <input type="text" data-tier="216" data-idx="${i}" class="tier-input" maxlength="4">
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 108ms Tier -->
+                        <div class="tier-mobile">
+                            <div class="tier-title">🔥 108ms (Original)</div>
+                            <div class="tier-cells-scroll">
+                                <div class="tier-cells-container" id="tier108Cells">
+                                    ${Array(tier108Cells).fill().map((_, i) => `
+                                        <div class="tier-cell tier-108">
+                                            <span class="tier-time">${(i * 0.108).toFixed(2)}s</span>
+                                            <input type="text" data-tier="108" data-idx="${i}" class="tier-input" maxlength="3">
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 54ms Tier -->
+                        <div class="tier-mobile">
+                            <div class="tier-title">💧 54ms (Split)</div>
+                            <div class="tier-cells-scroll">
+                                <div class="tier-cells-container" id="tier54Cells">
+                                    ${Array(tier54Cells).fill().map((_, i) => `
+                                        <div class="tier-cell tier-54">
+                                            <span class="tier-time">${(i * 0.054).toFixed(2)}s</span>
+                                            <input type="text" data-tier="54" data-idx="${i}" class="tier-input" maxlength="3">
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button class="btn btn-primary" id="checkExerciseBtn">Check All Answers</button>
+                    <div id="exerciseFeedback"></div>
+                </div>
+                ${renderMobileKeyboard()}
+            `;
+        }
+        
+        function renderGameContent(step) {
+            return `
+                <div class="exercise-area">
+                    <p style="margin-bottom: 16px;">Tap the akshar that matches the sound you hear.</p>
+                    <div class="game-grid" id="gameGrid">
+                        ${step.items.map(item => `
+                            <div class="game-card" data-akshar="${item}">${item}</div>
+                        `).join('')}
+                    </div>
+                    <div id="gameFeedback"></div>
+                    <button id="nextGameBtn" style="display: none; margin-top: 16px;" class="btn btn-primary">Next Sound →</button>
+                </div>
+            `;
+        }
+        
+        function renderInteractiveContent(step) {
+            const tourKey = `${trainingState.currentModule}_${step.id}`;
+            const isCompleted = trainingState.tourCompleted[tourKey] || false;
+            
+            if (isCompleted) {
+                return `<div class="feedback success">✓ Tour completed! You've learned about all interface components.</div>`;
+            }
+            
+            return `
+                <div class="exercise-area">
+                    <p style="margin-bottom: 16px;">Tap each item to learn what it does. Complete all to finish the tour.</p>
+                    <div class="tour-items" id="tourItems">
+                        <div class="tour-item" data-tour="play">
+                            <div class="tour-icon">▶️</div>
+                            <div class="tour-text">
+                                <div class="tour-title">Play Button</div>
+                                <div class="tour-desc">Click to play/pause audio</div>
+                            </div>
+                            <div class="tour-check"></div>
+                        </div>
+                        <div class="tour-item" data-tour="cell">
+                            <div class="tour-icon">📝</div>
+                            <div class="tour-text">
+                                <div class="tour-title">Cell Input</div>
+                                <div class="tour-desc">Type akshars here (max 3)</div>
+                            </div>
+                            <div class="tour-check"></div>
+                        </div>
+                        <div class="tour-item" data-tour="speed">
+                            <div class="tour-icon">⚡</div>
+                            <div class="tour-text">
+                                <div class="tour-title">Speed Control</div>
+                                <div class="tour-desc">Slow down audio for clarity</div>
+                            </div>
+                            <div class="tour-check"></div>
+                        </div>
+                        <div class="tour-item" data-tour="submit">
+                            <div class="tour-icon">✓</div>
+                            <div class="tour-text">
+                                <div class="tour-title">Submit Button</div>
+                                <div class="tour-desc">Save and continue</div>
+                            </div>
+                            <div class="tour-check"></div>
+                        </div>
+                    </div>
+                    <div id="tourFeedback"></div>
+                </div>
+            `;
+        }
+        
+        function renderAssessmentContent(step) {
+            return `
+                <div class="exercise-area">
+                    <p style="margin-bottom: 16px;"><strong>Instructions:</strong> Complete this assessment to proceed. You need 90% to pass.</p>
+                    <button class="btn btn-primary" id="startAssessmentBtn" style="width: 100%;">Start Assessment</button>
+                    <div id="assessmentContainer"></div>
+                </div>
+            `;
+        }
+        
+        function renderMobileKeyboard() {
+            const rows = [
+                ["अ", "आ", "इ", "उ", "ए", "ओ", "ं", "ँ", "ॉ"],
+                ["क", "ख", "ग", "घ", "च", "छ", "ज", "झ", "ट"],
+                ["ठ", "ड", "ढ", "त", "थ", "द", "ध", "प", "फ"],
+                ["ब", "भ", "म", "य", "र", "ल", "व", "स", "ह"],
+                ["⌫", "🗑"]
+            ];
+            
+            return `
+                <div class="mobile-keyboard">
+                    ${rows.map(row => `
+                        <div class="kb-row">
+                            ${row.map(char => `
+                                <button class="kb-key" data-char="${char}">${char}</button>
+                            `).join('')}
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+        
+        function attachStepEvents(step) {
+            // Mark video complete
+            const markBtn = document.getElementById('markCompleteBtn');
+            if (markBtn) {
+                markBtn.onclick = () => markStepComplete(step);
+            }
+            
+            // Play audio simulation
+            const playBtn = document.getElementById('playAudioBtn');
+            if (playBtn) {
+                let isPlaying = false;
+                playBtn.onclick = () => {
+                    isPlaying = !isPlaying;
+                    playBtn.innerHTML = isPlaying ? 
+                        `<svg viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>` :
+                        `<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>`;
+                    showMessage("Playing audio... (demo mode)", "info");
+                    setTimeout(() => {
+                        if (isPlaying) {
+                            isPlaying = false;
+                            playBtn.innerHTML = `<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>`;
+                        }
+                    }, 2000);
+                };
+            }
+            
+            // Speed buttons
+            document.querySelectorAll('.speed-chip').forEach(btn => {
+                btn.onclick = () => {
+                    document.querySelectorAll('.speed-chip').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    currentSpeed = parseFloat(btn.dataset.speed);
+                    showMessage(`Speed: ${currentSpeed}x`, "info");
+                };
+            });
+            
+            // Check exercise
+            const checkBtn = document.getElementById('checkExerciseBtn');
+            if (checkBtn) {
+                checkBtn.onclick = () => {
+                    showMessage("✓ Exercise completed! Great work!", "success");
+                    markStepComplete(step);
+                };
+            }
+            
+            // Quiz submission
+            const quizBtn = document.getElementById('submitQuizBtn');
+            if (quizBtn && step.questions) {
+                quizBtn.onclick = () => {
+                    let correct = 0;
+                    step.questions.forEach((q, idx) => {
+                        const selected = document.querySelector(`input[name="q${idx}"]:checked`);
+                        if (selected && parseInt(selected.value) === q.correct) correct++;
+                    });
+                    const score = (correct / step.questions.length) * 100;
+                    const feedback = document.getElementById('quizFeedback');
+                    if (score >= 80) {
+                        feedback.innerHTML = `<div class="feedback success">✓ Great job! You scored ${Math.round(score)}%.</div>`;
+                        markStepComplete(step);
+                    } else {
+                        feedback.innerHTML = `<div class="feedback error">You scored ${Math.round(score)}%. Need 80% to pass. Review and try again.</div>`;
+                    }
+                };
+            }
+            
+            // Game interaction
+            if (step.type === 'game') {
+                let currentIndex = 0;
+                const gameItems = step.items;
+                const gameFeedback = document.getElementById('gameFeedback');
+                const nextBtn = document.getElementById('nextGameBtn');
+                
+                function playCurrentSound() {
+                    gameFeedback.innerHTML = `<div class="feedback info">🔊 Playing sound for: ${gameItems[currentIndex]}</div>`;
+                    setTimeout(() => gameFeedback.innerHTML = '', 1500);
+                }
+                
+                document.querySelectorAll('.game-card').forEach(card => {
+                    card.onclick = () => {
+                        if (card.dataset.akshar === gameItems[currentIndex]) {
+                            gameFeedback.innerHTML = `<div class="feedback success">✓ Correct! ${gameItems[currentIndex]} is right.</div>`;
+                            currentIndex++;
+                            if (currentIndex >= gameItems.length) {
+                                gameFeedback.innerHTML = `<div class="feedback success">🎉 Excellent! You've mastered all sounds!</div>`;
+                                nextBtn.style.display = 'none';
+                                markStepComplete(step);
+                            } else {
+                                nextBtn.style.display = 'block';
+                            }
+                        } else {
+                            gameFeedback.innerHTML = `<div class="feedback error">✗ Wrong. The sound was ${gameItems[currentIndex]}. Try again.</div>`;
+                        }
+                        setTimeout(() => {
+                            if (gameFeedback.innerHTML.includes('Wrong')) gameFeedback.innerHTML = '';
+                        }, 2000);
+                    };
+                });
+                
+                if (nextBtn) {
+                    nextBtn.onclick = () => {
+                        nextBtn.style.display = 'none';
+                        playCurrentSound();
+                    };
+                }
+                playCurrentSound();
+            }
+            
+            // Interactive Tour
+            if (step.type === 'interactive') {
+                const tourKey = `${trainingState.currentModule}_${step.id}`;
+                const tourItems = document.querySelectorAll('.tour-item');
+                const tourFeedback = document.getElementById('tourFeedback');
+                let completedCount = 0;
+                const totalItems = tourItems.length;
+                
+                function updateTourProgress() {
+                    if (completedCount === totalItems) {
+                        tourFeedback.innerHTML = `<div class="feedback success">✓ Tour completed! You've learned all components.</div>`;
+                        trainingState.tourCompleted[tourKey] = true;
+                        saveProgress();
+                        markStepComplete(step);
+                    }
+                }
+                
+                tourItems.forEach(item => {
+                    if (item.classList.contains('completed')) completedCount++;
+                    
+                    item.onclick = () => {
+                        if (item.classList.contains('completed')) {
+                            tourFeedback.innerHTML = `<div class="feedback info">You already completed this item!</div>`;
+                            setTimeout(() => tourFeedback.innerHTML = '', 1500);
+                            return;
+                        }
+                        
+                        const tourName = item.dataset.tour;
+                        let message = '';
+                        switch(tourName) {
+                            case 'play':
+                                message = 'The Play button plays the audio segment. Tap it to listen.';
+                                break;
+                            case 'cell':
+                                message = 'Cell inputs are where you type the akshars. Use the keyboard below.';
+                                break;
+                            case 'speed':
+                                message = 'Speed controls slow down audio (0.5x, 1x, 1.5x, 2x) for unclear sounds.';
+                                break;
+                            case 'submit':
+                                message = 'Submit saves your work and moves to the next annotation.';
+                                break;
+                            default:
+                                message = 'You explored an interface component!';
+                        }
+                        
+                        tourFeedback.innerHTML = `<div class="feedback success">✓ ${message}</div>`;
+                        item.classList.add('completed');
+                        item.querySelector('.tour-check').innerHTML = '✓';
+                        completedCount++;
+                        updateTourProgress();
+                        setTimeout(() => tourFeedback.innerHTML = '', 2500);
+                    };
+                });
+            }
+            
+            // Assessment start
+            const startAssessment = document.getElementById('startAssessmentBtn');
+            if (startAssessment) {
+                startAssessment.onclick = () => {
+                    const container = document.getElementById('assessmentContainer');
+                    container.innerHTML = `<div class="feedback success">Assessment started! (Demo mode - would show actual questions)</div>`;
+                    setTimeout(() => markStepComplete(step), 2000);
+                };
+            }
+            
+            // Keyboard support
+            document.querySelectorAll('.kb-key').forEach(btn => {
+                btn.onclick = () => {
+                    const char = btn.dataset.char;
+                    const activeElement = document.activeElement;
+                    if (activeElement && activeElement.classList && activeElement.classList.contains('tier-input') || activeElement.classList.contains('cell-input-large') || activeElement.classList.contains('exercise-multi')) {
+                        let current = activeElement.value;
+                        let next;
+                        if (char === '⌫') {
+                            next = current.slice(0, -1);
+                        } else if (char === '🗑') {
+                            next = '';
+                        } else {
+                            next = current + char;
+                            if (next.length > 4) next = next.slice(0, 4);
+                        }
+                        activeElement.value = next;
+                        // Trigger input event
+                        activeElement.dispatchEvent(new Event('input', { bubbles: true }));
+                    }
+                };
+            });
+        }
+        
+        function markStepComplete(step) {
+            const stepKey = `${trainingState.currentModule}_${step.id}`;
+            if (!trainingState.completedSteps.has(stepKey)) {
+                trainingState.completedSteps.add(stepKey);
+                saveProgress();
+                renderModulesList();
+                updateOverallProgress();
+                showMessage("✓ Step completed!", "success");
+            }
+        }
+        
+        function navigateStep(direction) {
+            const module = modules[trainingState.currentModule - 1];
+            if (!module) return;
+            
+            const newStep = trainingState.currentStep + direction;
+            
+            if (newStep >= 0 && newStep < module.steps.length) {
+                trainingState.currentStep = newStep;
+                saveProgress();
+                renderModulesList();
+                loadCurrentStep();
+            } else if (direction === 1 && trainingState.currentModule < modules.length) {
+                // Next module
+                trainingState.currentModule++;
+                trainingState.currentStep = 0;
+                saveProgress();
+                renderModulesList();
+                loadCurrentStep();
+            } else if (direction === -1 && trainingState.currentModule > 1) {
+                // Previous module
+                trainingState.currentModule--;
+                const prevModule = modules[trainingState.currentModule - 1];
+                trainingState.currentStep = prevModule.steps.length - 1;
+                saveProgress();
+                renderModulesList();
+                loadCurrentStep();
+            }
+        }
+        
+        function updateOverallProgress() {
+            let totalSteps = 0;
+            let completedSteps = 0;
+            modules.forEach(module => {
+                module.steps.forEach(step => {
+                    totalSteps++;
+                    if (trainingState.completedSteps.has(`${module.id}_${step.id}`)) completedSteps++;
+                });
+            });
+            const percent = totalSteps > 0 ? (completedSteps / totalSteps) * 100 : 0;
+            const overallFill = document.getElementById('overallFill');
+            const overallPercent = document.getElementById('overallPercent');
+            if (overallFill) overallFill.style.width = `${percent}%`;
+            if (overallPercent) overallPercent.innerHTML = `${Math.round(percent)}%`;
+            
+            const certBadge = document.getElementById('certBadge');
+            if (certBadge) {
+                if (percent === 100) {
+                    certBadge.innerHTML = '✓ Certified';
+                    certBadge.className = 'cert-badge completed';
+                } else if (percent > 0) {
+                    certBadge.innerHTML = 'In Progress';
+                    certBadge.className = 'cert-badge in-progress';
+                } else {
+                    certBadge.innerHTML = 'Training';
+                    certBadge.className = 'cert-badge pending';
+                }
+            }
+        }
+        
+        function showMessage(msg, type) {
+            const contentArea = document.getElementById('contentArea');
+            if (!contentArea) return;
+            
+            const msgDiv = document.createElement('div');
+            msgDiv.className = `feedback ${type === 'success' ? 'feedback-success' : (type === 'error' ? 'feedback-error' : 'feedback-info')}`;
+            msgDiv.innerHTML = msg;
+            msgDiv.style.marginBottom = '16px';
+            
+            const existing = contentArea.querySelector('.feedback');
+            if (existing) existing.remove();
+            
+            contentArea.insertBefore(msgDiv, contentArea.firstChild);
+            setTimeout(() => msgDiv.remove(), 3000);
+        }
+        
+        // Initialize
+        loadProgress();
+    </script>
+</body>
+</html>

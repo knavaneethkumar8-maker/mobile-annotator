@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
-<title>Live News Annotation</title>
+<title>Live News Annotation - 3 Tier</title>
 <style>
 * {
   margin: 0;
@@ -136,7 +136,7 @@ body {
   border-radius: 44px;
 }
 
-/* ── silent-audio warning ── */
+/* silent-audio warning */
 .silent-banner {
   background: #FEF3C7;
   color: #92400E;
@@ -145,7 +145,7 @@ body {
   padding: 12px 16px;
   font-size: 0.82rem;
   margin: 10px 0;
-  display: none;               /* hidden by default */
+  display: none;
   align-items: center;
   gap: 10px;
   flex-wrap: wrap;
@@ -218,75 +218,223 @@ body {
 .btn-secondary { background: #F0F0EB; color: #6E6E68; }
 .btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
-.frames-grid {
+/* Sentence Input Section */
+.sentence-section {
+  margin: 16px 0;
+}
+.sentence-label {
+  font-size: 0.85rem;
+  font-weight: 550;
+  color: #1C1C1A;
+  display: block;
+  margin-bottom: 8px;
+}
+.sentence-input {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1.5px solid #E5E5DE;
+  border-radius: 16px;
+  font-size: 0.95rem;
+  font-family: monospace;
+  background: #FAFAF8;
+  transition: border-color 0.2s;
+}
+.sentence-input:focus {
+  outline: none;
+  border-color: #2C6E49;
+}
+.sentence-hint {
+  font-size: 0.7rem;
+  color: #8E8E88;
+  margin-top: 5px;
+}
+
+/* 3-TIER GRID STYLES */
+.three-tier-section {
+  margin: 16px 0;
+  border: 1px solid #eef2f8;
+  border-radius: 20px;
+  background: #ffffff;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+}
+
+.tier-row {
+  display: flex;
+  gap: 10px;
+  padding: 16px 20px;
+  border-bottom: 1px solid #ecf3fa;
+  background: white;
+  min-width: min-content;
+}
+
+.tier-row:last-child { border-bottom: none; }
+
+.tier-header {
+  writing-mode: horizontal-tb;
+  white-space: nowrap;
+  padding: 10px 12px;
+  background: #EBF2EA;
+  border-radius: 16px;
+  font-size: 0.75rem;
+  font-weight: 550;
+  color: #2C6E49;
+  text-align: center;
+  min-width: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 10px;
+}
+
+/* 216ms cells */
+.cell-216 {
+  flex: 0 0 370px;
+  min-width: 370px;
+  border: 2px solid #d1e0f0;
+  border-radius: 16px;
+  padding: 16px 10px;
+  cursor: pointer;
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  max-height: 400px;
-  overflow-y: auto;
-  margin: 16px 0;
-}
-.frame-card {
-  background: #FEFEFC;
-  border: 1px solid #E5E5DE;
-  border-radius: 16px;
-  padding: 12px;
-  cursor: pointer;
-}
-.frame-card.playing  { background: #D6EFE0; border-color: #2C6E49; }
-.frame-card.selected { background: #F0FAF3; border: 2px solid #2C6E49; }
-.frame-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  margin-bottom: 8px;
-  font-size: 0.7rem;
-  color: #6E6E68;
-}
-.frame-time { font-family: monospace; }
-.frame-input {
-  width: 100%;
-  padding: 10px;
-  font-size: 1rem;
-  border: 1px solid #E5E5DE;
-  border-radius: 12px;
-  font-family: monospace;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.1s;
   background: white;
 }
-.frame-input:focus { outline: none; border-color: #2C6E49; }
 
-.akshar-grid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin: 16px 0;
-}
-.akshar-item {
-  background: #F0F0EB;
-  border: 1px solid #E5E5DE;
-  border-radius: 12px;
-  padding: 8px 12px;
-  font-size: 1rem;
-  font-weight: 500;
-  text-align: center;
+/* 108ms cells */
+.cell-108 {
+  flex: 0 0 180px;
+  min-width: 180px;
+  border: 2px solid #e2edf7;
+  border-radius: 14px;
+  padding: 14px 8px;
   cursor: pointer;
-  transition: all 0.1s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.1s;
+  background: white;
 }
-.akshar-item:active { transform: scale(0.95); background: #2C6E49; color: white; }
+
+/* 54ms cells */
+.cell-54 {
+  flex: 0 0 85px;
+  min-width: 85px;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 12px 4px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.1s;
+  background: white;
+}
+
+.cell-216.selected, .cell-108.selected, .cell-54.selected {
+  background: #eff6ff;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59,130,246,0.2);
+}
+
+.cell-216:hover, .cell-108:hover, .cell-54:hover {
+  border-color: #cbd5e1;
+  background: #f8fafc;
+  transform: scale(1.01);
+}
+
+.cell-216.playing, .cell-108.playing, .cell-54.playing {
+  background: #e6f7ec;
+  border-color: #10b981;
+  animation: pulse 0.2s ease;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+.time-label {
+  font-size: 10px;
+  background: #f1f5f9;
+  padding: 3px 10px;
+  border-radius: 30px;
+  color: #334155;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.grid-input {
+  width: 100%;
+  text-align: center;
+  background: #fafcff;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 10px;
+  font-weight: 600;
+  font-family: 'Noto Sans Devanagari', monospace;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.cell-54 .grid-input { font-size: 0.9rem; padding: 8px 2px; }
+.cell-108 .grid-input { font-size: 1rem; padding: 10px 4px; }
+.cell-216 .grid-input { font-size: 1.2rem; padding: 12px 6px; }
+
+.grid-input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  background: white;
+  box-shadow: 0 0 0 2px rgba(59,130,246,0.1);
+}
+
+.grid-input.saved {
+  border-color: #10b981;
+  background: #f0fdf4;
+}
+
+.speed-control {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+  justify-content: center;
+}
+
+.speed-btn {
+  padding: 6px 16px;
+  border-radius: 30px;
+  border: 1.5px solid #cbd5e1;
+  background: white;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.speed-btn.active {
+  background: #2C6E49;
+  border-color: #2C6E49;
+  color: white;
+}
 
 .multi-bar {
-  display: flex;
+  display: none;
   align-items: center;
   justify-content: space-between;
   background: #1A4D3A;
   color: #fff;
   border-radius: 40px;
   padding: 10px 16px;
-  margin-bottom: 10px;
+  margin: 16px 0;
   gap: 10px;
   font-size: 0.82rem;
+  font-weight: 540;
 }
-.multi-bar.hidden { display: none; }
+
+.multi-bar.visible { display: flex; }
 .multi-bar-label { flex: 1; }
 .multi-bar-btn {
   background: rgba(255,255,255,0.15);
@@ -297,15 +445,51 @@ body {
   border-radius: 30px;
   cursor: pointer;
 }
-.sel-dot {
-  width: 9px; height: 9px;
-  border-radius: 50%;
-  border: 2px solid #2C6E49;
-  background: transparent;
-  display: inline-block;
-  margin-right: 6px;
+
+.multi-bar-btn.play {
+  background: #FFFFFF;
+  color: #1A4D3A;
 }
-.frame-card.selected .sel-dot { background: #2C6E49; }
+
+.akshar-set-section {
+  margin: 8px 0 20px;
+  background: #F8F8F4;
+  border-radius: 20px;
+  padding: 12px 16px;
+  border: 1px solid #E9E9E2;
+}
+
+.akshar-title {
+  font-weight: 590;
+  font-size: 0.75rem;
+  color: #2C6E49;
+  margin-bottom: 10px;
+}
+
+.akshar-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.akshar-item {
+  background: #FFFFFF;
+  border: 1px solid #E5E5DE;
+  border-radius: 12px;
+  padding: 8px 12px;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #1C1C1A;
+  min-width: 42px;
+  text-align: center;
+  font-family: monospace;
+  cursor: grab;
+  user-select: none;
+  transition: all 0.15s ease;
+  touch-action: none;
+}
+
+.akshar-item:active { cursor: grabbing; transform: scale(0.95); }
 
 .play-full-btn {
   background: #4A6FA5;
@@ -354,7 +538,7 @@ body {
 }
 @keyframes spin { to { transform: rotate(360deg); } }
 
-/* ── success modal ── */
+/* success modal */
 .modal-overlay {
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
@@ -401,9 +585,33 @@ body {
 }
 .modal-close-btn:active { transform: scale(0.97); }
 
+/* Scrollbar styling */
+.three-tier-section::-webkit-scrollbar {
+  height: 6px;
+}
+.three-tier-section::-webkit-scrollbar-track {
+  background: #EFEFE9;
+  border-radius: 8px;
+}
+.three-tier-section::-webkit-scrollbar-thumb {
+  background: #BDBDB3;
+  border-radius: 8px;
+}
+
 @media (max-width: 560px) {
   .container { padding: 16px; }
   .lang-btn  { padding: 8px 16px; font-size: 0.8rem; }
+  
+  .tier-row { gap: 6px; padding: 10px; }
+  .tier-header { min-width: 45px; font-size: 0.6rem; padding: 5px 4px; margin-right: 6px; }
+  .cell-216 { flex: 0 0 180px; min-width: 180px; padding: 10px 6px; }
+  .cell-108 { flex: 0 0 90px; min-width: 90px; padding: 8px 4px; }
+  .cell-54 { flex: 0 0 50px; min-width: 50px; padding: 6px 3px; }
+  .cell-54 .grid-input { font-size: 0.7rem; padding: 4px 1px; }
+  .cell-108 .grid-input { font-size: 0.75rem; padding: 6px 2px; }
+  .cell-216 .grid-input { font-size: 0.8rem; padding: 8px 3px; }
+  .time-label { font-size: 7px; padding: 2px 4px; }
+  
   .success-modal { padding: 24px 20px; }
   .success-icon  { width: 60px; height: 60px; }
   .success-icon svg { width: 32px; height: 32px; }
@@ -427,7 +635,7 @@ body {
 
   <div id="content">
 
-    <!-- ── Language selector ─────────────────────────────────────────────── -->
+    <!-- Language selector -->
     <div class="language-selector">
       <div class="language-label">Select News Language</div>
       <div class="language-options" id="languageOptions">
@@ -446,7 +654,7 @@ body {
       </div>
     </div>
 
-    <!-- ── Stream card ───────────────────────────────────────────────────── -->
+    <!-- Stream card -->
     <div class="stream-card">
       <div class="clip-info">
         <span class="clip-duration" id="clipDuration">📺 Select language and fetch news</span>
@@ -454,7 +662,6 @@ body {
 
       <audio id="audioPlayer" class="audio-player" controls playsinline style="width:100%"></audio>
 
-      <!-- shown only when server returns is_silent=true -->
       <div class="silent-banner" id="silentBanner">
         <span class="silent-banner-text">
           ⚠️ Stream not reachable — audio is silent. Try fetching again.
@@ -479,27 +686,63 @@ body {
       </div>
     </div>
 
-    <!-- ── Annotation section ────────────────────────────────────────────── -->
+    <!-- Annotation section with 3-Tier Grid -->
     <div id="annotationSection" class="hidden">
       <div class="stream-card">
-        <h3 style="margin-bottom:16px;">Annotate Frames</h3>
+        <h3 style="margin-bottom:16px;">3-Tier Annotation</h3>
 
-        <button class="play-full-btn" id="playFullBtn">
-          <svg viewBox="0 0 24 24" width="20" height="20" fill="white">
-            <path d="M8 5v14l11-7z"/>
-          </svg>
-          Play Full Audio
-        </button>
-
-        <div class="akshar-grid" id="aksharGrid"></div>
-
-        <div class="multi-bar hidden" id="multiBar">
-          <span class="multi-bar-label">0 segments selected</span>
-          <button class="multi-bar-btn" id="playSelectedBtn">▶ Play selected</button>
-          <button class="multi-bar-btn" id="clearSelectionBtn">✕ Clear</button>
+        <!-- Full Audio Control -->
+        <div class="full-audio-controls" style="display:flex; align-items:center; gap:12px; margin-bottom:16px; padding:10px 16px; background:#2C6E49; border-radius:48px; justify-content:space-between;">
+          <button id="playFullBtn" class="play-full-btn" style="background:white; border:none; width:48px; height:48px; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer;">
+            <svg viewBox="0 0 24 24" width="24" height="24" fill="#2C6E49">
+              <path d="M8 5v14l11-7z"/>
+            </svg>
+          </button>
+          <div class="full-audio-info" style="flex:1; color:white; font-size:0.85rem;">
+            <span>Full Audio</span>
+          </div>
+          <div id="progressBarFull" style="flex:2; height:4px; background:rgba(255,255,255,0.3); border-radius:4px; cursor:pointer; position:relative;">
+            <div id="progressFillFull" style="width:0%; height:100%; background:white; border-radius:4px;"></div>
+          </div>
+          <div id="timeDisplay" style="color:white; font-size:0.75rem; font-family:monospace; min-width:80px; text-align:center;">0:00 / 0:00</div>
         </div>
 
-        <div class="frames-grid" id="framesGrid"></div>
+        <!-- Speed Control -->
+        <div class="speed-control">
+          <button class="speed-btn" data-speed="0.5">0.5x</button>
+          <button class="speed-btn active" data-speed="1">1x</button>
+          <button class="speed-btn" data-speed="1.5">1.5x</button>
+          <button class="speed-btn" data-speed="2">2x</button>
+        </div>
+
+        <!-- Sentence Input Section -->
+        <div class="sentence-section">
+          <label class="sentence-label">📝 Full Sentence (will appear in TextGrid)</label>
+          <input type="text" id="sentenceInput" class="sentence-input" 
+                 placeholder="Enter the complete sentence from the audio clip..."
+                 maxlength="200">
+          <div class="sentence-hint">This sentence will be saved in the 'sentence' tier of the TextGrid</div>
+        </div>
+
+        <!-- 3-Tier Grid -->
+        <div class="three-tier-section">
+          <div class="tier-row tier-row-216" id="tier216Row"></div>
+          <div class="tier-row tier-row-108" id="tier108Row"></div>
+          <div class="tier-row tier-row-54" id="tier54Row"></div>
+        </div>
+
+        <!-- Multi-select toolbar -->
+        <div id="multiBar" class="multi-bar">
+          <span class="multi-bar-label">0 segments selected</span>
+          <button class="multi-bar-btn play" id="playSelectedBtn">▶ Play Selected</button>
+          <button class="multi-bar-btn" id="clearSelectionBtn">Clear</button>
+        </div>
+
+        <!-- Akshar Set -->
+        <div class="akshar-set-section">
+          <div class="akshar-title">Tap to insert | Long press cell to select | Drag & drop</div>
+          <div class="akshar-grid" id="aksharGrid"></div>
+        </div>
 
         <div class="button-group">
           <button class="btn btn-primary"   id="submitBtn">Submit Annotation</button>
@@ -508,24 +751,28 @@ body {
       </div>
     </div>
 
-  </div><!-- /#content -->
+  </div>
 
   <div id="messageArea"></div>
 </div>
 
 <script>
-const BASE_PATH     = "{{ base_path }}";
+const BASE_PATH = "{{ base_path }}";
 const CLIP_DURATION = 2;        // seconds
-const FRAME_SIZE_MS = 108;
+const FRAME_SIZE_MS_54 = 54;
+const FRAME_SIZE_MS_108 = 108;
+const FRAME_SIZE_MS_216 = 216;
+
 const AKSHAR_SET = [
-  "अ","आ","इ","उ","ए","ओ",
-  "क","ख","ग","घ","च","छ","ज","झ",
-  "ट","ठ","ड","ढ","त","थ","द","ध",
-  "प","फ","ब","भ",
-  "न","म",
-  "य","र","ल","व",
-  "स","ह","ं","ँ","ॉ","०"
+  "अ", "आ", "इ", "उ", "ए", "ओ",
+  "क", "ख", "ग", "घ", "च", "छ", "ज", "झ",
+  "ट", "ठ", "ड", "ढ", "त", "थ", "द", "ध",
+  "प", "फ", "ब", "भ",
+  "न", "म",
+  "य", "र", "ल", "व",
+  "स", "ह", "०"
 ];
+
 const LANG_NAMES = {
   hi: 'हिंदी',   te: 'తెలుగు', ta: 'தமிழ்',
   bn: 'বাংলা',   gu: 'ગુજરાતી', mr: 'मराठी',
@@ -533,22 +780,36 @@ const LANG_NAMES = {
   od: 'ଓଡ଼ିଆ',  pa: 'ਪੰਜਾਬੀ',  ur: 'اردو',
 };
 
-let currentUsername   = '';
-let currentLanguage   = 'hi';
-let currentAudio      = null;
-let currentAudioBlob  = null;
-let currentVolume     = 0.8;
-let audioContext      = null;
-let gainNode          = null;
+let currentUsername = '';
+let currentLanguage = 'hi';
+let currentAudio = null;
+let currentAudioBlob = null;
+let currentVolume = 0.8;
+let audioContext = null;
+let gainNode = null;
 let currentPlayTimeout = null;
-let audioUnlocked     = false;
-let currentFrames     = [];
-let selectedSegments  = new Set();
-let multiPlayQueue    = [];
-let multiPlayIndex    = 0;
-let multiPlayTimeout  = null;
-let activeFrameIndex  = null;
-let isFetching        = false;
+let audioUnlocked = false;
+let playbackSpeed = 1.0;
+let isFetching = false;
+
+// 3-Tier frames data
+let framesData = {
+  tier_216: [],
+  tier_108: [],
+  tier_54: []
+};
+
+let selectedSegments = {
+  tier_216: new Set(),
+  tier_108: new Set(),
+  tier_54: new Set()
+};
+
+let multiPlayQueue = [];
+let multiPlayIndex = 0;
+let multiPlayTimeout = null;
+let isFullAudioPlaying = false;
+let fullAudioProgressInterval = null;
 
 // ─── init ──────────────────────────────────────────────────────────────────
 async function init() {
@@ -556,6 +817,7 @@ async function init() {
   setupEventListeners();
   renderAksharSet();
   setupAudioUnlock();
+  setupDragAndDrop();
 }
 
 async function checkAuth() {
@@ -569,7 +831,45 @@ async function checkAuth() {
   } catch { window.location.href = `${BASE_PATH}/login`; return false; }
 }
 
-// ─── audio unlock (iOS requirement) ────────────────────────────────────────
+// ─── DRAG AND DROP SETUP ───────────────────────────────────────────────────
+function setupDragAndDrop() {
+  document.querySelectorAll('.akshar-item').forEach(el => {
+    el.setAttribute('draggable', 'true');
+    el.addEventListener('dragstart', (e) => {
+      e.dataTransfer.setData('text/plain', el.textContent);
+      e.dataTransfer.effectAllowed = 'copy';
+    });
+  });
+
+  document.addEventListener('dragover', (e) => e.preventDefault());
+  
+  document.addEventListener('drop', (e) => {
+    e.preventDefault();
+    const target = e.target;
+    if (target && target.tagName === 'INPUT' && target.classList.contains('grid-input')) {
+      const akshar = e.dataTransfer.getData('text/plain');
+      if (akshar) {
+        const start = target.selectionStart;
+        const end = target.selectionEnd;
+        const value = target.value;
+        const tier = target.getAttribute('data-tier');
+        let maxLen = 6;
+        if (tier === 'tier_108') maxLen = 4;
+        if (tier === 'tier_54') maxLen = 2;
+        
+        if (value.length < maxLen) {
+          target.value = value.substring(0, start) + akshar + value.substring(end);
+          target.dispatchEvent(new Event('input', { bubbles: true }));
+          target.focus();
+        } else {
+          showMessage('Maximum characters reached for this cell!', 'warning');
+        }
+      }
+    }
+  });
+}
+
+// ─── audio unlock functions ────────────────────────────────────────────────
 function setupAudioUnlock() {
   const h = () => {
     unlockAudio();
@@ -579,6 +879,7 @@ function setupAudioUnlock() {
   document.addEventListener('touchstart', h);
   document.addEventListener('click', h);
 }
+
 function unlockAudio() {
   if (audioUnlocked) return;
   if (audioContext && audioContext.state === 'suspended') {
@@ -591,6 +892,7 @@ function unlockAudio() {
   }
   audioUnlocked = true;
 }
+
 function initAudioContext() {
   if (!audioContext && currentAudio) {
     try {
@@ -603,6 +905,7 @@ function initAudioContext() {
     } catch (e) { console.warn('Web Audio init failed:', e); }
   }
 }
+
 function updateVolume(v) {
   currentVolume = v;
   document.getElementById('volumeValue').innerText = Math.round(v * 100) + '%';
@@ -610,9 +913,233 @@ function updateVolume(v) {
   if (currentAudio && !gainNode) currentAudio.volume = Math.min(v, 1);
 }
 
+function setPlaybackSpeed(speed) {
+  playbackSpeed = speed;
+  if (currentAudio) currentAudio.playbackRate = speed;
+  document.querySelectorAll('.speed-btn').forEach(btn => {
+    if (parseFloat(btn.dataset.speed) === speed) btn.classList.add('active');
+    else btn.classList.remove('active');
+  });
+  showMessage(`Speed: ${speed}x`, 'info');
+}
+
+// ─── playback helpers ───────────────────────────────────────────────────────
+function stopPlayback() {
+  if (currentPlayTimeout) clearTimeout(currentPlayTimeout);
+  if (multiPlayTimeout) clearTimeout(multiPlayTimeout);
+  if (currentAudio && !currentAudio.paused) currentAudio.pause();
+  document.querySelectorAll('.cell-216.playing, .cell-108.playing, .cell-54.playing')
+    .forEach(c => c.classList.remove('playing'));
+}
+
+function playSegmentAudio(startMs, endMs) {
+  if (!currentAudio) return;
+  
+  stopFullAudioPlayback();
+  
+  const startSec = startMs / 1000;
+  const durationSec = (endMs - startMs) / 1000;
+  if (currentPlayTimeout) clearTimeout(currentPlayTimeout);
+  
+  const doPlay = () => {
+    currentAudio.pause();
+    currentAudio.currentTime = startSec;
+    currentAudio.play().then(() => {
+      currentPlayTimeout = setTimeout(() => {
+        if (currentAudio && !currentAudio.paused) currentAudio.pause();
+      }, durationSec * 1000 / playbackSpeed);
+    }).catch(() => {});
+  };
+  
+  if (audioContext && audioContext.state === 'suspended') audioContext.resume().then(doPlay);
+  else doPlay();
+}
+
+function playCellAudio(tier, index) {
+  const frame = framesData[tier][index];
+  if (!frame) return;
+  playSegmentAudio(frame.start_ms, frame.end_ms);
+  
+  const cellClass = tier === 'tier_216' ? 'cell-216' : (tier === 'tier_108' ? 'cell-108' : 'cell-54');
+  const cell = document.querySelector(`.${cellClass}[data-idx="${index}"]`);
+  if (cell) {
+    cell.classList.add('playing');
+    setTimeout(() => cell.classList.remove('playing'), 300);
+  }
+}
+
+// ─── full audio playback ────────────────────────────────────────────────────
+function toggleFullAudioPlayback() {
+  if (!currentAudio) return;
+  
+  if (isFullAudioPlaying) {
+    stopFullAudioPlayback();
+  } else {
+    startFullAudioPlayback();
+  }
+}
+
+function startFullAudioPlayback() {
+  if (!currentAudio) return;
+  
+  if (currentPlayTimeout) clearTimeout(currentPlayTimeout);
+  if (multiPlayTimeout) clearTimeout(multiPlayTimeout);
+  
+  const doPlay = () => {
+    currentAudio.playbackRate = playbackSpeed;
+    currentAudio.play().then(() => {
+      isFullAudioPlaying = true;
+      updatePlayButtonUI(true);
+      startProgressTracking();
+    }).catch(err => {
+      console.log('Playback error:', err);
+    });
+  };
+  
+  if (audioContext && audioContext.state === 'suspended') {
+    audioContext.resume().then(doPlay);
+  } else {
+    doPlay();
+  }
+}
+
+function stopFullAudioPlayback() {
+  if (!currentAudio) return;
+  currentAudio.pause();
+  isFullAudioPlaying = false;
+  updatePlayButtonUI(false);
+  stopProgressTracking();
+}
+
+function updatePlayButtonUI(isPlaying) {
+  const playBtn = document.getElementById('playFullBtn');
+  if (!playBtn) return;
+  
+  if (isPlaying) {
+    playBtn.classList.add('playing');
+    playBtn.innerHTML = `<svg viewBox="0 0 24 24" width="24" height="24" fill="#2C6E49"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>`;
+  } else {
+    playBtn.classList.remove('playing');
+    playBtn.innerHTML = `<svg viewBox="0 0 24 24" width="24" height="24" fill="#2C6E49"><path d="M8 5v14l11-7z"/></svg>`;
+  }
+}
+
+function startProgressTracking() {
+  if (fullAudioProgressInterval) clearInterval(fullAudioProgressInterval);
+  
+  fullAudioProgressInterval = setInterval(() => {
+    if (!currentAudio || currentAudio.paused) {
+      if (isFullAudioPlaying) {
+        isFullAudioPlaying = false;
+        updatePlayButtonUI(false);
+      }
+      stopProgressTracking();
+      return;
+    }
+    
+    const currentTime = currentAudio.currentTime;
+    const duration = currentAudio.duration || 0;
+    const progressPercent = (currentTime / duration) * 100;
+    
+    const progressFill = document.getElementById('progressFillFull');
+    if (progressFill) progressFill.style.width = progressPercent + '%';
+    
+    const timeDisplay = document.getElementById('timeDisplay');
+    if (timeDisplay) {
+      const currentMin = Math.floor(currentTime / 60);
+      const currentSec = Math.floor(currentTime % 60);
+      const durationMin = Math.floor(duration / 60);
+      const durationSec = Math.floor(duration % 60);
+      timeDisplay.textContent = `${currentMin}:${currentSec.toString().padStart(2,'0')} / ${durationMin}:${durationSec.toString().padStart(2,'0')}`;
+    }
+    
+    if (currentTime >= duration) {
+      stopFullAudioPlayback();
+    }
+  }, 100);
+}
+
+function stopProgressTracking() {
+  if (fullAudioProgressInterval) {
+    clearInterval(fullAudioProgressInterval);
+    fullAudioProgressInterval = null;
+  }
+}
+
+function seekToPosition(e) {
+  if (!currentAudio) return;
+  const progressBar = document.getElementById('progressBarFull');
+  if (!progressBar) return;
+  
+  const rect = progressBar.getBoundingClientRect();
+  let clientX;
+  if (e.touches) {
+    clientX = e.touches[0].clientX;
+  } else {
+    clientX = e.clientX;
+  }
+  const clickX = clientX - rect.left;
+  const width = rect.width;
+  const clickPercent = clickX / width;
+  const duration = currentAudio.duration || 0;
+  const seekTime = clickPercent * duration;
+  currentAudio.currentTime = seekTime;
+}
+
+// ─── generate 3-tier frames from base 54ms frames ──────────────────────────
+function generateFramesFromBase54(baseFrames54) {
+  const tier54 = baseFrames54.map((f, idx) => ({ ...f, index: idx }));
+  
+  const tier108 = [];
+  for (let i = 0; i < baseFrames54.length; i += 2) {
+    const start = baseFrames54[i].start_ms;
+    const end = i + 1 < baseFrames54.length ? baseFrames54[i + 1].end_ms : baseFrames54[i].end_ms;
+    const text1 = baseFrames54[i].text || "";
+    const text2 = i + 1 < baseFrames54.length ? (baseFrames54[i + 1].text || "") : "";
+    tier108.push({
+      index: tier108.length,
+      start_ms: start,
+      end_ms: end,
+      text: (text1 + text2).slice(0, 4)
+    });
+  }
+  
+  const tier216 = [];
+  for (let i = 0; i < baseFrames54.length; i += 4) {
+    const start = baseFrames54[i].start_ms;
+    let end = start + FRAME_SIZE_MS_216;
+    if (end > CLIP_DURATION * 1000) end = CLIP_DURATION * 1000;
+    let combinedText = "";
+    for (let j = i; j < Math.min(i + 4, baseFrames54.length); j++) {
+      combinedText += baseFrames54[j].text || "";
+    }
+    tier216.push({
+      index: tier216.length,
+      start_ms: start,
+      end_ms: end,
+      text: combinedText.slice(0, 6)
+    });
+  }
+  
+  return { tier_216: tier216, tier_108: tier108, tier_54: tier54 };
+}
+
+function generateFramesForTier(durationMs, frameSizeMs) {
+  const numFrames = Math.ceil(durationMs / frameSizeMs);
+  const frames = [];
+  for (let i = 0; i < numFrames; i++) {
+    frames.push({
+      index: i,
+      start_ms: i * frameSizeMs,
+      end_ms: Math.min((i + 1) * frameSizeMs, durationMs),
+      text: ""
+    });
+  }
+  return frames;
+}
+
 // ─── event listeners ────────────────────────────────────────────────────────
 function setupEventListeners() {
-  // language buttons
   document.querySelectorAll('.lang-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('selected'));
@@ -621,67 +1148,43 @@ function setupEventListeners() {
       showMessage(`Language changed to ${btn.innerText}`, 'info');
       if (currentAudio) { currentAudio.pause(); currentAudio.src = ''; }
       hideSilentBanner();
-      document.getElementById('clipDuration').innerHTML =
-        `📺 Select "${btn.innerText}" and fetch news`;
+      document.getElementById('clipDuration').innerHTML = `📺 Select "${btn.innerText}" and fetch news`;
       document.getElementById('annotateBtn').disabled = true;
     });
   });
 
   document.getElementById('fetchBtn').addEventListener('click', fetchLiveNews);
-  document.getElementById('retryBtn').addEventListener('click', fetchLiveNews);   // ← retry
+  document.getElementById('retryBtn').addEventListener('click', fetchLiveNews);
   document.getElementById('annotateBtn').addEventListener('click', startAnnotation);
   document.getElementById('submitBtn').addEventListener('click', submitAnnotation);
   document.getElementById('cancelBtn').addEventListener('click', cancelAnnotation);
-  document.getElementById('playFullBtn')?.addEventListener('click', playFullAudio);
-  document.getElementById('playSelectedBtn')?.addEventListener('click', playSelectedSegments);
-  document.getElementById('clearSelectionBtn')?.addEventListener('click', clearSelection);
-  document.getElementById('volumeSlider')
-    .addEventListener('input', e => updateVolume(parseFloat(e.target.value)));
+  document.getElementById('playFullBtn').addEventListener('click', toggleFullAudioPlayback);
+  document.getElementById('playSelectedBtn').addEventListener('click', playSelectedSegments);
+  document.getElementById('clearSelectionBtn').addEventListener('click', clearSelection);
+  document.getElementById('volumeSlider').addEventListener('input', e => updateVolume(parseFloat(e.target.value)));
+  
+  document.querySelectorAll('.speed-btn').forEach(btn => {
+    btn.addEventListener('click', () => setPlaybackSpeed(parseFloat(btn.dataset.speed)));
+  });
+  
+  const progressBar = document.getElementById('progressBarFull');
+  if (progressBar) {
+    progressBar.addEventListener('click', seekToPosition);
+    progressBar.addEventListener('touchstart', seekToPosition);
+  }
+  
   updateVolume(0.8);
 }
 
-// ─── silent banner ──────────────────────────────────────────────────────────
-function showSilentBanner() { document.getElementById('silentBanner').classList.add('show'); }
 function hideSilentBanner() { document.getElementById('silentBanner').classList.remove('show'); }
-
-// ─── playback helpers ───────────────────────────────────────────────────────
-function playFullAudio() {
-  if (!currentAudio) { showMessage('No audio loaded. Fetch news first!', 'error'); return; }
-  stopPlayback();
-  currentAudio.currentTime = 0;
-  currentAudio.play().catch(() => showMessage('Tap the play button first', 'info'));
-}
-function stopPlayback() {
-  if (currentPlayTimeout) clearTimeout(currentPlayTimeout);
-  if (multiPlayTimeout)   clearTimeout(multiPlayTimeout);
-  if (currentAudio && !currentAudio.paused) currentAudio.pause();
-  document.querySelectorAll('.frame-card.playing').forEach(c => c.classList.remove('playing'));
-}
-function playSegmentAudio(startMs, endMs) {
-  if (!currentAudio) return;
-  if (currentPlayTimeout) clearTimeout(currentPlayTimeout);
-  const startSec = startMs / 1000;
-  const durSec   = (endMs - startMs) / 1000;
-  const doPlay = () => {
-    currentAudio.pause();
-    currentAudio.currentTime = startSec;
-    currentAudio.play().then(() => {
-      currentPlayTimeout = setTimeout(() => {
-        if (currentAudio && !currentAudio.paused) currentAudio.pause();
-      }, durSec * 1000);
-    }).catch(() => {});
-  };
-  if (audioContext && audioContext.state === 'suspended') audioContext.resume().then(doPlay);
-  else doPlay();
-}
 
 // ─── fetch live news ─────────────────────────────────────────────────────────
 async function fetchLiveNews() {
   if (isFetching) return;
   isFetching = true;
 
-  const fetchBtn  = document.getElementById('fetchBtn');
-  const loading   = document.getElementById('loadingIndicator');
+  const fetchBtn = document.getElementById('fetchBtn');
+  const loading = document.getElementById('loadingIndicator');
   fetchBtn.disabled = true;
   loading.classList.remove('hidden');
   hideSilentBanner();
@@ -691,9 +1194,7 @@ async function fetchLiveNews() {
   showMessage(`Fetching live ${langLabel} news (2 sec)…`, 'info');
 
   try {
-    const resp = await fetch(
-      `${BASE_PATH}/api/live-stream/fetch?lang=${currentLanguage}&duration=2`
-    );
+    const resp = await fetch(`${BASE_PATH}/api/live-stream/fetch?lang=${currentLanguage}&duration=2`);
     if (!resp.ok) {
       const err = await resp.json();
       throw new Error(err.error || 'Server error');
@@ -701,33 +1202,25 @@ async function fetchLiveNews() {
     const data = await resp.json();
     if (!data.success || !data.audio_blob) throw new Error(data.error || 'No audio received');
 
-    // load into player
-    const blob     = base64ToBlob(data.audio_blob, 'audio/wav');
+    const blob = base64ToBlob(data.audio_blob, 'audio/wav');
     currentAudioBlob = blob;
-    const url      = URL.createObjectURL(blob);
+    const url = URL.createObjectURL(blob);
     if (currentAudio) { currentAudio.pause(); URL.revokeObjectURL(currentAudio.src); }
-    currentAudio     = document.getElementById('audioPlayer');
+    currentAudio = document.getElementById('audioPlayer');
     currentAudio.src = url;
     currentAudio.load();
 
-    document.getElementById('clipDuration').innerHTML =
-      `📺 2 sec live news clip (${langLabel})`;
+    document.getElementById('clipDuration').innerHTML = `📺 2 sec live news clip (${langLabel})`;
 
     if (data.is_silent) {
-      // stream failed on server side — show banner + let user retry
       showSilentBanner();
-      showMessage(
-        `⚠️ ${langLabel} stream not reachable right now. Try fetching again.`,
-        'warning'
-      );
-      // still enable annotate so annotator can mark it as empty if needed
+      showMessage(`⚠️ ${langLabel} stream not reachable right now. Try fetching again.`, 'warning');
       document.getElementById('annotateBtn').disabled = false;
     } else {
       hideSilentBanner();
       showMessage(`✅ ${langLabel} news clip ready! Click "Annotate Clip" to label.`, 'success');
       document.getElementById('annotateBtn').disabled = false;
     }
-
   } catch (err) {
     console.error('Fetch error:', err);
     showMessage('Error: ' + err.message, 'error');
@@ -746,17 +1239,243 @@ function base64ToBlob(b64, mime) {
   return new Blob([bytes], { type: mime });
 }
 
-// ─── annotation ─────────────────────────────────────────────────────────────
+function showSilentBanner() { document.getElementById('silentBanner').classList.add('show'); }
+
+// ─── render 3-tier grid ─────────────────────────────────────────────────────
+function renderThreeTierGrid() {
+  const tier216Row = document.getElementById('tier216Row');
+  const tier108Row = document.getElementById('tier108Row');
+  const tier54Row = document.getElementById('tier54Row');
+  
+  if (!tier216Row) return;
+  
+  tier216Row.innerHTML = '';
+  tier108Row.innerHTML = '';
+  tier54Row.innerHTML = '';
+  
+  const header216 = document.createElement('div');
+  header216.className = 'tier-header';
+  header216.innerText = 'वायु (216ms)';
+  tier216Row.appendChild(header216);
+  
+  const header108 = document.createElement('div');
+  header108.className = 'tier-header';
+  header108.innerText = 'अग्नि (108ms)';
+  tier108Row.appendChild(header108);
+  
+  const header54 = document.createElement('div');
+  header54.className = 'tier-header';
+  header54.innerText = 'आकाश (54ms)';
+  tier54Row.appendChild(header54);
+  
+  framesData.tier_216.forEach((frame, idx) => {
+    const div = createCell(frame, idx, '216');
+    tier216Row.appendChild(div);
+  });
+  
+  framesData.tier_108.forEach((frame, idx) => {
+    const div = createCell(frame, idx, '108');
+    tier108Row.appendChild(div);
+  });
+  
+  framesData.tier_54.forEach((frame, idx) => {
+    const div = createCell(frame, idx, '54');
+    tier54Row.appendChild(div);
+  });
+}
+
+function createCell(frame, idx, tier) {
+  const div = document.createElement('div');
+  div.className = `cell-${tier}`;
+  div.setAttribute('data-idx', idx);
+  div.setAttribute('data-tier', `tier_${tier}`);
+  
+  const timeSpan = document.createElement('div');
+  timeSpan.className = 'time-label';
+  timeSpan.innerText = `${(frame.start_ms / 1000).toFixed(2)}s`;
+  
+  const input = document.createElement('input');
+  input.type = 'text';
+  input.className = 'grid-input';
+  input.value = frame.text || '';
+  input.placeholder = '';
+  input.setAttribute('data-idx', idx);
+  input.setAttribute('data-tier', `tier_${tier}`);
+  
+  if (tier === '216') input.setAttribute('maxlength', '6');
+  if (tier === '108') input.setAttribute('maxlength', '4');
+  if (tier === '54') input.setAttribute('maxlength', '2');
+  
+  input.addEventListener('focus', () => {});
+  input.addEventListener('input', (e) => {
+    let val = e.target.value;
+    if (tier === '216' && val.length > 6) val = val.slice(0, 6);
+    if (tier === '108' && val.length > 4) val = val.slice(0, 4);
+    if (tier === '54' && val.length > 2) val = val.slice(0, 2);
+    e.target.value = val;
+    framesData[`tier_${tier}`][idx].text = val;
+  });
+  
+  div.appendChild(timeSpan);
+  div.appendChild(input);
+  
+  div.addEventListener('click', (e) => {
+    if (e.target === input) return;
+    playCellAudio(`tier_${tier}`, idx);
+  });
+  
+  input.addEventListener('click', (e) => {
+    e.stopPropagation();
+    playCellAudio(`tier_${tier}`, idx);
+  });
+  
+  let pressTimer = null;
+  
+  div.addEventListener('touchstart', (e) => {
+    if (e.target === input) return;
+    pressTimer = setTimeout(() => {
+      toggleSegmentSelection(`tier_${tier}`, idx);
+      if (window.navigator && window.navigator.vibrate) {
+        window.navigator.vibrate(50);
+      }
+      pressTimer = null;
+    }, 500);
+  });
+  
+  div.addEventListener('touchend', () => {
+    if (pressTimer) {
+      clearTimeout(pressTimer);
+      pressTimer = null;
+    }
+  });
+  
+  div.addEventListener('touchmove', () => {
+    if (pressTimer) {
+      clearTimeout(pressTimer);
+      pressTimer = null;
+    }
+  });
+  
+  div.addEventListener('mousedown', (e) => {
+    if (e.target === input) return;
+    toggleSegmentSelection(`tier_${tier}`, idx);
+  });
+  
+  div.addEventListener('contextmenu', (e) => {
+    e.preventDefault();
+    return false;
+  });
+  
+  return div;
+}
+
+function toggleSegmentSelection(tier, index) {
+  const cellClass = tier === 'tier_216' ? 'cell-216' : (tier === 'tier_108' ? 'cell-108' : 'cell-54');
+  const cell = document.querySelector(`.${cellClass}[data-idx="${index}"]`);
+  if (!cell) return;
+  
+  if (selectedSegments[tier].has(index)) {
+    selectedSegments[tier].delete(index);
+    cell.classList.remove('selected');
+  } else {
+    selectedSegments[tier].add(index);
+    cell.classList.add('selected');
+  }
+  updateMultiBar();
+}
+
+function updateMultiBar() {
+  const bar = document.getElementById('multiBar');
+  if (!bar) return;
+  let totalSelected = selectedSegments.tier_216.size + selectedSegments.tier_108.size + selectedSegments.tier_54.size;
+  if (totalSelected === 0) {
+    bar.classList.remove('visible');
+  } else {
+    bar.classList.add('visible');
+    bar.querySelector('.multi-bar-label').textContent = `${totalSelected} segment${totalSelected > 1 ? 's' : ''} selected across all tiers`;
+  }
+}
+
+function clearSelection() {
+  selectedSegments.tier_216.clear();
+  selectedSegments.tier_108.clear();
+  selectedSegments.tier_54.clear();
+  document.querySelectorAll('.cell-216.selected, .cell-108.selected, .cell-54.selected')
+    .forEach(c => c.classList.remove('selected'));
+  updateMultiBar();
+}
+
+function playSelectedSegments() {
+  let allSelected = [];
+  for (let tier of ['tier_216', 'tier_108', 'tier_54']) {
+    for (let idx of selectedSegments[tier]) {
+      allSelected.push({ tier, index: idx });
+    }
+  }
+  if (allSelected.length === 0 || !currentAudio) return;
+  
+  stopPlayback();
+  stopFullAudioPlayback();
+  
+  allSelected.sort((a, b) => framesData[a.tier][a.index].start_ms - framesData[b.tier][b.index].start_ms);
+  
+  multiPlayQueue = allSelected;
+  multiPlayIndex = 0;
+  playNextInQueue();
+}
+
+function playNextInQueue() {
+  if (multiPlayIndex >= multiPlayQueue.length) {
+    document.querySelectorAll('.cell-216.playing, .cell-108.playing, .cell-54.playing')
+      .forEach(c => c.classList.remove('playing'));
+    return;
+  }
+  const item = multiPlayQueue[multiPlayIndex];
+  const frame = framesData[item.tier][item.index];
+  if (!frame) { multiPlayIndex++; playNextInQueue(); return; }
+
+  const cellClass = item.tier === 'tier_216' ? 'cell-216' : (item.tier === 'tier_108' ? 'cell-108' : 'cell-54');
+  document.querySelectorAll(`.${cellClass}.playing`).forEach(c => c.classList.remove('playing'));
+  const cell = document.querySelector(`.${cellClass}[data-idx="${item.index}"]`);
+  if (cell) cell.classList.add('playing');
+
+  playSegmentAudio(frame.start_ms, frame.end_ms);
+  
+  multiPlayTimeout = setTimeout(() => {
+    multiPlayIndex++;
+    playNextInQueue();
+  }, (frame.end_ms - frame.start_ms) / playbackSpeed);
+}
+
+// ─── annotation start ────────────────────────────────────────────────────────
 function startAnnotation() {
   if (!currentAudioBlob) { showMessage('No clip to annotate. Fetch news first!', 'error'); return; }
-  const n = Math.floor((CLIP_DURATION * 1000) / FRAME_SIZE_MS);
-  currentFrames = Array.from({ length: n }, (_, i) => ({
-    index: i, start_ms: i * FRAME_SIZE_MS, end_ms: (i+1) * FRAME_SIZE_MS, text: ''
-  }));
-  renderAnnotationFrames();
+  
+  const durationMs = CLIP_DURATION * 1000;
+  const baseFrames54 = generateFramesForTier(durationMs, FRAME_SIZE_MS_54);
+  framesData = generateFramesFromBase54(baseFrames54);
+  
+  renderThreeTierGrid();
+  renderAksharSet();
   initAudioContext();
+  setPlaybackSpeed(playbackSpeed);
+  
+  // Clear sentence input
+  document.getElementById('sentenceInput').value = '';
+  
+  stopFullAudioPlayback();
+  if (currentAudio) {
+    const duration = currentAudio.duration || 0;
+    const durationMin = Math.floor(duration / 60);
+    const durationSec = Math.floor(duration % 60);
+    const timeDisplay = document.getElementById('timeDisplay');
+    if (timeDisplay) timeDisplay.textContent = `0:00 / ${durationMin}:${durationSec.toString().padStart(2,'0')}`;
+    const progressFill = document.getElementById('progressFillFull');
+    if (progressFill) progressFill.style.width = '0%';
+  }
+  
   document.getElementById('annotationSection').classList.remove('hidden');
-  showMessage(`Ready! ${n} frames to annotate. Tap a frame to play it.`, 'success');
+  showMessage(`Ready! 3-tier grid loaded. Tap a cell to play, long press to select, drag & drop akshars.`, 'success');
 }
 
 function renderAksharSet() {
@@ -765,110 +1484,39 @@ function renderAksharSet() {
   c.innerHTML = '';
   AKSHAR_SET.forEach(a => {
     const s = document.createElement('span');
-    s.className   = 'akshar-item';
+    s.className = 'akshar-item';
     s.textContent = a;
-    s.onclick     = () => insertAkshar(a);
+    s.setAttribute('draggable', 'true');
+    s.onclick = () => insertAkshar(a);
+    s.addEventListener('dragstart', (e) => {
+      e.dataTransfer.setData('text/plain', a);
+      e.dataTransfer.effectAllowed = 'copy';
+    });
     c.appendChild(s);
   });
 }
 
 function insertAkshar(akshar) {
-  if (activeFrameIndex !== null && currentFrames[activeFrameIndex]) {
-    const inp = document.querySelector(`.frame-input[data-index="${activeFrameIndex}"]`);
-    if (inp) {
-      const nxt = (currentFrames[activeFrameIndex].text || '') + akshar;
-      if (nxt.length <= 4) { inp.value = nxt; currentFrames[activeFrameIndex].text = nxt; }
-      else showMessage('Maximum 2 akshars per frame!', 'warning');
+  const activeElement = document.activeElement;
+  if (activeElement && activeElement.tagName === 'INPUT' && activeElement.classList.contains('grid-input')) {
+    const start = activeElement.selectionStart;
+    const end = activeElement.selectionEnd;
+    const value = activeElement.value;
+    const tier = activeElement.getAttribute('data-tier');
+    let maxLen = 6;
+    if (tier === 'tier_108') maxLen = 4;
+    if (tier === 'tier_54') maxLen = 2;
+    
+    if (value.length < maxLen) {
+      activeElement.value = value.substring(0, start) + akshar + value.substring(end);
+      activeElement.dispatchEvent(new Event('input', { bubbles: true }));
+      activeElement.focus();
+    } else {
+      showMessage('Maximum characters reached for this cell!', 'warning');
     }
+  } else {
+    showMessage('Tap on a grid cell first to insert akshar!', 'info');
   }
-}
-
-function toggleSegmentSelection(i) {
-  const card = document.querySelector(`.frame-card[data-frame-index="${i}"]`);
-  if (!card) return;
-  if (selectedSegments.has(i)) { selectedSegments.delete(i); card.classList.remove('selected'); }
-  else                         { selectedSegments.add(i);    card.classList.add('selected'); }
-  updateMultiBar();
-}
-function updateMultiBar() {
-  const bar = document.getElementById('multiBar');
-  if (!bar) return;
-  if (selectedSegments.size === 0) { bar.classList.add('hidden'); }
-  else {
-    bar.classList.remove('hidden');
-    bar.querySelector('.multi-bar-label').textContent =
-      `${selectedSegments.size} segment${selectedSegments.size > 1 ? 's' : ''} selected`;
-  }
-}
-function clearSelection() {
-  selectedSegments.clear();
-  document.querySelectorAll('.frame-card.selected').forEach(c => c.classList.remove('selected'));
-  updateMultiBar();
-}
-function playSelectedSegments() {
-  if (!selectedSegments.size || !currentAudio) return;
-  stopPlayback();
-  multiPlayQueue = [...selectedSegments].sort((a,b) => a-b);
-  multiPlayIndex = 0;
-  playNextInQueue();
-}
-function playNextInQueue() {
-  if (multiPlayIndex >= multiPlayQueue.length) {
-    document.querySelectorAll('.frame-card.playing').forEach(c => c.classList.remove('playing'));
-    return;
-  }
-  const fi   = multiPlayQueue[multiPlayIndex];
-  const frame = currentFrames[fi];
-  if (!frame) { multiPlayIndex++; playNextInQueue(); return; }
-  document.querySelectorAll('.frame-card.playing').forEach(c => c.classList.remove('playing'));
-  document.querySelector(`.frame-card[data-frame-index="${fi}"]`)?.classList.add('playing');
-  playSegmentAudio(frame.start_ms, frame.end_ms);
-  multiPlayTimeout = setTimeout(() => { multiPlayIndex++; playNextInQueue(); },
-                                 (frame.end_ms - frame.start_ms) + 50);
-}
-function playSegmentByIndex(i) {
-  if (!currentFrames || !currentAudio) return;
-  const frame = currentFrames[i];
-  if (!frame) return;
-  stopPlayback();
-  const card = document.querySelector(`.frame-card[data-frame-index="${i}"]`);
-  playSegmentAudio(frame.start_ms, frame.end_ms);
-  if (card) { card.classList.add('playing'); setTimeout(() => card.classList.remove('playing'), frame.end_ms - frame.start_ms); }
-}
-
-function renderAnnotationFrames() {
-  const grid = document.getElementById('framesGrid');
-  grid.innerHTML = '';
-  currentFrames.forEach((frame, idx) => {
-    const card = document.createElement('div');
-    card.className = 'frame-card';
-    card.setAttribute('data-frame-index', idx);
-
-    const hdr = document.createElement('div');
-    hdr.className = 'frame-header';
-    hdr.innerHTML = `
-      <span class="frame-label"><span class="sel-dot"></span> ${idx+1}</span>
-      <span class="frame-time">${(frame.start_ms/1000).toFixed(2)}–${(frame.end_ms/1000).toFixed(2)}s</span>`;
-
-    const inp = document.createElement('input');
-    inp.type        = 'text';
-    inp.className   = 'frame-input';
-    inp.placeholder = 'Akshars (max 2)';
-    inp.value       = frame.text || '';
-    inp.setAttribute('data-index', idx);
-    inp.addEventListener('focus', () => { activeFrameIndex = idx; });
-    inp.addEventListener('input', e => {
-      let v = e.target.value;
-      if (v.length > 4) { v = v.slice(0,4); e.target.value = v; showMessage('Max 2 akshars!','warning'); }
-      currentFrames[idx].text = v;
-    });
-    inp.addEventListener('click', e => { e.stopPropagation(); playSegmentByIndex(idx); });
-    card.addEventListener('click', e => { if (e.target === inp || inp.contains(e.target)) return; toggleSegmentSelection(idx); });
-
-    card.appendChild(hdr);
-    card.appendChild(inp);
-    grid.appendChild(card);
-  });
 }
 
 // ─── success modal ───────────────────────────────────────────────────────────
@@ -885,11 +1533,11 @@ function showSuccessModal(aksharCount) {
         </svg>
       </div>
       <h3>✓ Submitted!</h3>
-      <p>Your annotation has been successfully saved.</p>
+      <p>Your 3-tier annotation has been successfully saved.</p>
       <div class="success-stats">
         <div class="stat-item"><span class="stat-label">Akshars Added</span><span class="stat-value">${aksharCount}</span></div>
         <div class="stat-item"><span class="stat-label">Duration</span><span class="stat-value">${CLIP_DURATION} sec</span></div>
-        <div class="stat-item"><span class="stat-label">Language</span><span class="stat-value">${LANG_NAMES[currentLanguage]||currentLanguage.toUpperCase()}</span></div>
+        <div class="stat-item"><span class="stat-label">Language</span><span class="stat-value">${LANG_NAMES[currentLanguage] || currentLanguage.toUpperCase()}</span></div>
       </div>
       <button class="modal-close-btn" onclick="this.closest('.modal-overlay').remove()">Continue</button>
     </div>`;
@@ -898,41 +1546,62 @@ function showSuccessModal(aksharCount) {
   setTimeout(() => { if (document.body.contains(ov)) ov.remove(); }, 3000);
 }
 
-// ─── submit ──────────────────────────────────────────────────────────────────
+// ─── submit 3-tier annotation ────────────────────────────────────────────────
 async function submitAnnotation() {
-  if (!currentFrames?.length) { showMessage('No clip to submit','error'); return; }
-  if (!currentFrames.some(f => f.text?.trim())) {
-    showMessage('Add annotations to at least one frame before submitting','warning'); return;
+  const totalAkshars = framesData.tier_54.reduce((sum, f) => sum + (f.text ? f.text.length : 0), 0);
+  const sentence = document.getElementById('sentenceInput')?.value || '';
+  
+  if (totalAkshars === 0) {
+    showMessage('Add annotations to at least one cell before submitting', 'warning');
+    return;
   }
-  showMessage('Submitting…','info');
+  
+  showMessage('Submitting 3-tier annotation…', 'info');
   document.getElementById('submitBtn').disabled = true;
+  
   try {
     const fd = new FormData();
-    fd.append('audio',    currentAudioBlob, `live_${currentLanguage}_${Date.now()}.wav`);
+    fd.append('audio', currentAudioBlob, `live_${currentLanguage}_${Date.now()}.wav`);
     fd.append('duration', CLIP_DURATION);
     fd.append('language', currentLanguage);
-    fd.append('frames',   JSON.stringify(currentFrames));
-    const resp = await fetch(`${BASE_PATH}/api/live-stream/submit`, { method:'POST', body:fd });
+    fd.append('frames_54', JSON.stringify(framesData.tier_54));
+    fd.append('frames_108', JSON.stringify(framesData.tier_108));
+    fd.append('frames_216', JSON.stringify(framesData.tier_216));
+    fd.append('sentence', sentence);
+    fd.append('is_three_tier', 'true');
+    
+    const resp = await fetch(`${BASE_PATH}/api/live-stream/submit-3-tier`, { method: 'POST', body: fd });
     const data = await resp.json();
+    
     if (data.success) {
-      const cnt = data.akshar_count || currentFrames.filter(f=>f.text?.trim()).length;
+      const cnt = data.akshar_count || totalAkshars;
       showSuccessModal(cnt);
-      showMessage(`✓ Submitted! ${cnt} akshars saved.`, 'success');
+      showMessage(`✓ 3-tier annotation submitted! ${cnt} akshars saved.`, 'success');
       cancelAnnotation();
-      if (currentAudio) { currentAudio.pause(); currentAudio.src=''; }
+      if (currentAudio) { currentAudio.pause(); currentAudio.src = ''; }
       document.getElementById('annotateBtn').disabled = true;
       document.getElementById('clipDuration').innerHTML = '📺 Select language and fetch news';
       hideSilentBanner();
-    } else { throw new Error(data.error || 'Submission failed'); }
-  } catch (e) { showMessage('Error: '+e.message,'error'); }
-  finally { document.getElementById('submitBtn').disabled = false; }
+    } else {
+      throw new Error(data.error || 'Submission failed');
+    }
+  } catch (e) {
+    showMessage('Error: ' + e.message, 'error');
+  } finally {
+    document.getElementById('submitBtn').disabled = false;
+  }
 }
 
 function cancelAnnotation() {
-  currentFrames = []; selectedSegments.clear();
+  framesData = { tier_216: [], tier_108: [], tier_54: [] };
+  selectedSegments = { tier_216: new Set(), tier_108: new Set(), tier_54: new Set() };
+  clearSelection();
   document.getElementById('annotationSection').classList.add('hidden');
-  document.getElementById('framesGrid').innerHTML = '';
-  showMessage('Annotation cancelled','info');
+  document.getElementById('tier216Row').innerHTML = '';
+  document.getElementById('tier108Row').innerHTML = '';
+  document.getElementById('tier54Row').innerHTML = '';
+  document.getElementById('sentenceInput').value = '';
+  showMessage('Annotation cancelled', 'info');
 }
 
 function showMessage(text, type) {

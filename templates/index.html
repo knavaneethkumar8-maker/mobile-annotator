@@ -135,6 +135,23 @@ body {
 
 .live-stream-btn:hover { background: #8B2C2A; }
 
+.training-btn {
+  background: #9B59B6;
+  border: none;
+  color: white;
+  font-size: 0.75rem;
+  cursor: pointer;
+  padding: 6px 14px;
+  font-weight: 500;
+  margin: 0;
+  width: auto;
+  border-radius: 40px;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.training-btn:hover { background: #8E44AD; }
+
 .remaining-badge {
   background: #E8E8E3;
   padding: 6px 14px;
@@ -745,7 +762,7 @@ audio {
     font-size: 0.8rem;
   }
   
-  .stats-btn, .self-record-btn, .live-stream-btn {
+  .stats-btn, .self-record-btn, .live-stream-btn, .training-btn {
     padding: 3px 6px;
     font-size: 0.6rem;
   }
@@ -823,6 +840,7 @@ audio {
       <button class="live-stream-btn" onclick="window.location.href='{{ url_for_path('live-stream') }}'">Live</button>
       <button class="stats-btn" onclick="window.location.href='{{ url_for_path('stats') }}'">Stats</button>
       <button class="stats-btn" onclick="window.location.href='{{ url_for_path('verify') }}'">Verify</button>
+      <button class="training-btn" onclick="window.location.href='{{ url_for_path('mobile-training') }}'">Training</button>
       <div class="user-info">
         <span class="user-name" id="usernameDisplay">Loading...</span>
         <button class="logout-btn" onclick="logout()">Sign out</button>
