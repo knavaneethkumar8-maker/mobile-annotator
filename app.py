@@ -1913,7 +1913,7 @@ def live_stream_submit_3_tier():
         frames_54 = json.loads(request.form.get('frames_54', '[]'))
         frames_108 = json.loads(request.form.get('frames_108', '[]'))
         frames_216 = json.loads(request.form.get('frames_216', '[]'))
-        sentence = request.form.get('sentence', '')  # Get the sentence from form data
+        sentence = request.form.get('sentence', '')
         
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         base_filename = f"live_3tier_{language}_{username}_{timestamp}"
@@ -1936,7 +1936,7 @@ def live_stream_submit_3_tier():
             "frames_54": frames_54,
             "frames_108": frames_108,
             "frames_216": frames_216,
-            "sentence": sentence,  # Add sentence to the JSON
+            "sentence": sentence,
             "type": "live_stream_3tier",
             "full_sequence": full_sequence,
             "submitted_by": username,
@@ -1955,7 +1955,7 @@ def live_stream_submit_3_tier():
             frames_108=frames_108,
             frames_54=frames_54,
             duration=duration,
-            sentence=sentence,  # Pass the sentence to TextGrid
+            sentence=sentence,
             annotator=username,
             verified_by=None
         )
@@ -2082,6 +2082,7 @@ def get_annotator_files():
             print(f"Error reading {json_path}: {e}")
     return jsonify({"files": unverified_files, "annotator": annotator, "count": len(unverified_files)})
 
+# ============= FIXED: Verification API to return 3-tier data =============
 @app.route("/verify/api/get-file/<path:json_file>")
 @verifier_login_required
 def get_verification_file(json_file):
@@ -2099,9 +2100,52 @@ def get_verification_file(json_file):
         wav_path = os.path.join(MOBILE_DATASET_FOLDER, data['wav_file'])
         if 'duration_ms' not in data or data['duration_ms'] == 0:
             data['duration_ms'] = get_audio_length(wav_path)
+        
+        # Ensure 3-tier data is returned for verification
+        # If the file already has frames_54, frames_108, frames_216, keep them
+        # If not, generate them from the frames data
+        if 'frames_54' not in data and 'frames_108' not in data and 'frames_216' not in data:
+            if 'frames' in data and data['frames']:
+                # Generate 3-tier from single-tier data
+                frames_108 = data['frames']
+                frames_54 = []
+                frames_216 = []
+                
+                # Generate 54ms frames (split each 108ms frame into 2)
+                for f in frames_108:
+                    half = (f['end_ms'] - f['start_ms']) // 2
+                    text = f.get('text', '')
+                    frames_54.append({
+                        'start_ms': f['start_ms'],
+                        'end_ms': f['start_ms'] + half,
+                        'text': text[:2] if text else ''
+                    })
+                    frames_54.append({
+                        'start_ms': f['start_ms'] + half,
+                        'end_ms': f['end_ms'],
+                        'text': text[2:4] if len(text) > 2 else ''
+                    })
+                
+                # Generate 216ms frames (merge every 2 frames)
+                for i in range(0, len(frames_108), 2):
+                    start = frames_108[i]['start_ms']
+                    end = frames_108[i+1]['end_ms'] if i+1 < len(frames_108) else frames_108[i]['end_ms']
+                    text1 = frames_108[i].get('text', '')
+                    text2 = frames_108[i+1].get('text', '') if i+1 < len(frames_108) else ''
+                    frames_216.append({
+                        'start_ms': start,
+                        'end_ms': end,
+                        'text': (text1 + text2)[:4]
+                    })
+                
+                data['frames_54'] = frames_54
+                data['frames_108'] = frames_108
+                data['frames_216'] = frames_216
+        
         return jsonify(data)
     except Exception as e:
         return jsonify({"error": f"Error loading file: {e}"}), 500
+# ============= END OF FIXED VERIFICATION API =============
 
 def get_next_verification_file():
     if not os.path.exists(MOBILE_DATASET_FOLDER):

@@ -22,7 +22,7 @@ body {
 }
 
 .container {
-  max-width: 680px;
+  max-width: 100%;
   margin: 0 auto;
   background: #FFFFFF;
   border-radius: 28px;
@@ -52,6 +52,7 @@ body {
   display: flex;
   align-items: center;
   gap: 12px;
+  flex-wrap: wrap;
 }
 
 .user-info {
@@ -197,6 +198,82 @@ body {
 
 .audio-wrapper { margin: 16px 0 18px; }
 
+.full-audio-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+  padding: 10px 16px;
+  background: #2C6E49;
+  border-radius: 48px;
+  justify-content: space-between;
+}
+
+.play-full-btn {
+  background: white;
+  border: none;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+.play-full-btn:hover {
+  transform: scale(1.05);
+  background: #f0f0f0;
+}
+
+.play-full-btn:active {
+  transform: scale(0.95);
+}
+
+.play-full-btn svg {
+  width: 24px;
+  height: 24px;
+  fill: #2C6E49;
+}
+
+.play-full-btn.playing svg {
+  fill: #B13E3A;
+}
+
+.full-audio-info {
+  flex: 1;
+  color: white;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.progress-bar-full {
+  flex: 2;
+  height: 4px;
+  background: rgba(255,255,255,0.3);
+  border-radius: 4px;
+  cursor: pointer;
+  position: relative;
+}
+
+.progress-bar-full .progress-fill-full {
+  width: 0%;
+  height: 100%;
+  background: white;
+  border-radius: 4px;
+  transition: width 0.1s linear;
+}
+
+.time-display {
+  color: white;
+  font-size: 0.75rem;
+  font-family: monospace;
+  min-width: 80px;
+  text-align: center;
+}
+
 .volume-control {
   display: flex;
   align-items: center;
@@ -228,17 +305,6 @@ body {
   border-radius: 50%;
   background: #2C6E49;
   cursor: pointer;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-}
-
-.volume-slider::-moz-range-thumb {
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  background: #2C6E49;
-  cursor: pointer;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-  border: none;
 }
 
 .volume-value {
@@ -254,6 +320,7 @@ audio {
   border-radius: 44px;
   background: #F9F9F6;
   outline: none;
+  display: none;
 }
 
 .current-file-card {
@@ -271,7 +338,7 @@ audio {
   color: #1A4D3A;
 }
 
-/* 3-Tier Grid Styles */
+/* ========== 3-TIER GRID STYLES ========== */
 .three-tier-section {
   margin: 16px 0;
   border: 1px solid #eef2f8;
@@ -310,49 +377,50 @@ audio {
   margin-right: 10px;
 }
 
-/* 216ms cells */
+.cell-216, .cell-108, .cell-54 {
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.1s;
+  background: white;
+}
+
 .cell-216 {
   flex: 0 0 370px;
   min-width: 370px;
   border: 2px solid #d1e0f0;
   border-radius: 16px;
   padding: 16px 10px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-  transition: all 0.1s;
-  background: #fefefe;
 }
 
-/* 108ms cells */
 .cell-108 {
   flex: 0 0 180px;
   min-width: 180px;
   border: 2px solid #e2edf7;
   border-radius: 14px;
   padding: 14px 8px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-  transition: all 0.1s;
-  background: #fefefe;
 }
 
-/* 54ms cells */
 .cell-54 {
   flex: 0 0 85px;
   min-width: 85px;
   border: 1.5px solid #e2e8f0;
   border-radius: 12px;
   padding: 12px 4px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-  transition: all 0.1s;
-  background: #fefefe;
+}
+
+.cell-216.selected, .cell-108.selected, .cell-54.selected {
+  background: #eff6ff;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59,130,246,0.2);
+}
+
+.cell-216:hover, .cell-108:hover, .cell-54:hover {
+  border-color: #cbd5e1;
+  background: #f8fafc;
+  transform: scale(1.01);
 }
 
 .cell-216.playing, .cell-108.playing, .cell-54.playing {
@@ -376,7 +444,7 @@ audio {
   white-space: nowrap;
 }
 
-.grid-text {
+.grid-input {
   width: 100%;
   text-align: center;
   background: #fafcff;
@@ -384,16 +452,44 @@ audio {
   border-radius: 10px;
   font-weight: 600;
   font-family: 'Noto Sans Devanagari', monospace;
-  padding: 8px;
-  font-size: 0.9rem;
-  word-break: break-all;
+  transition: border-color 0.15s, background 0.15s;
 }
 
-.cell-54 .grid-text { font-size: 0.9rem; }
-.cell-108 .grid-text { font-size: 1rem; }
-.cell-216 .grid-text { font-size: 1.1rem; }
+.cell-54 .grid-input { font-size: 0.9rem; padding: 8px 2px; }
+.cell-108 .grid-input { font-size: 1rem; padding: 10px 4px; }
+.cell-216 .grid-input { font-size: 1.2rem; padding: 12px 6px; }
 
-/* Multi-select toolbar */
+.grid-input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  background: white;
+  box-shadow: 0 0 0 2px rgba(59,130,246,0.1);
+}
+
+.speed-control {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+  justify-content: center;
+}
+
+.speed-btn {
+  padding: 6px 16px;
+  border-radius: 30px;
+  border: 1.5px solid #cbd5e1;
+  background: white;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.speed-btn.active {
+  background: #2C6E49;
+  border-color: #2C6E49;
+  color: white;
+}
+
 .multi-bar {
   display: none;
   align-items: center;
@@ -402,157 +498,26 @@ audio {
   color: #fff;
   border-radius: 40px;
   padding: 10px 16px;
-  margin-bottom: 10px;
+  margin: 16px 0;
   gap: 10px;
   font-size: 0.82rem;
   font-weight: 540;
 }
 
 .multi-bar.visible { display: flex; }
-
-.multi-bar-label { flex: 1; font-size: 0.82rem; }
-
+.multi-bar-label { flex: 1; }
 .multi-bar-btn {
   background: rgba(255,255,255,0.15);
   border: none;
   color: #fff;
   font-size: 0.78rem;
-  font-weight: 560;
   padding: 6px 14px;
   border-radius: 30px;
   cursor: pointer;
-  transition: 0.15s;
-  white-space: nowrap;
-  flex: none;
-  width: auto;
 }
-
-.multi-bar-btn:hover { background: rgba(255,255,255,0.28); }
-
 .multi-bar-btn.play {
   background: #FFFFFF;
   color: #1A4D3A;
-}
-
-.multi-bar-btn.play:active {
-  background: #D6EFE0;
-  transform: scale(0.97);
-}
-
-/* Frames grid for 3-tier individual frames */
-.frames-grid {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  max-height: 400px;
-  overflow-y: auto;
-  padding: 4px 2px 8px 2px;
-  margin-top: 8px;
-  margin-bottom: 16px;
-}
-
-.frame-card {
-  background: #FEFEFC;
-  border: 1px solid #E5E5DE;
-  border-radius: 20px;
-  padding: 12px 14px;
-  transition: all 0.2s ease;
-  cursor: pointer;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.02);
-}
-
-.frame-card.active {
-  background: #EBF2EA;
-  border-color: #2C6E49;
-  box-shadow: 0 2px 8px rgba(44,110,73,0.08);
-}
-
-.frame-card.selected {
-  background: #F0FAF3;
-  border: 2px solid #2C6E49;
-  box-shadow: 0 0 0 3px rgba(44,110,73,0.08);
-}
-
-.frame-card.playing {
-  background: #D6EFE0;
-  border: 2px solid #1A4D3A;
-  box-shadow: 0 2px 10px rgba(44,110,73,0.15);
-}
-
-.frame-card.drag-over {
-  background: #E8F0FE;
-  border-color: #2C6E49;
-  border-width: 2px;
-  transform: scale(1.01);
-}
-
-.frame-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  margin-bottom: 10px;
-  font-size: 0.7rem;
-  font-weight: 480;
-  letter-spacing: 0.3px;
-  color: #6E6E68;
-}
-
-.frame-time {
-  background: #EEEEE8;
-  padding: 2px 10px;
-  border-radius: 30px;
-  font-size: 0.7rem;
-  font-family: monospace;
-}
-
-.frame-label {
-  font-weight: 500;
-  text-transform: uppercase;
-  font-size: 0.7rem;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.sel-dot {
-  width: 9px;
-  height: 9px;
-  border-radius: 50%;
-  border: 2px solid #2C6E49;
-  background: transparent;
-  display: inline-block;
-  transition: background 0.15s;
-  flex-shrink: 0;
-}
-
-.frame-card.selected .sel-dot,
-.frame-card.playing .sel-dot {
-  background: #2C6E49;
-}
-
-.edit-text {
-  border: 1px solid #DCDCD4;
-  border-radius: 18px;
-  padding: 12px 14px;
-  background: #FFFFFF;
-  font-size: 1rem;
-  font-family: monospace;
-  width: 100%;
-  outline: none;
-  transition: 0.18s ease;
-  font-weight: 460;
-  color: #1C1C1A;
-  resize: vertical;
-  cursor: text;
-  box-sizing: border-box;
-  min-height: 50px;
-  white-space: pre-wrap;
-  word-wrap: break-word;
-}
-
-.edit-text:focus {
-  border-color: #2C6E49;
-  box-shadow: 0 0 0 2px rgba(44,110,73,0.2);
 }
 
 .akshar-set-section {
@@ -568,7 +533,6 @@ audio {
   font-size: 0.75rem;
   color: #2C6E49;
   margin-bottom: 10px;
-  letter-spacing: 0.3px;
 }
 
 .akshar-grid {
@@ -582,10 +546,10 @@ audio {
   border: 1px solid #E5E5DE;
   border-radius: 12px;
   padding: 8px 12px;
-  font-size: 1.1rem;
+  font-size: 1rem;
   font-weight: 500;
   color: #1C1C1A;
-  min-width: 48px;
+  min-width: 42px;
   text-align: center;
   font-family: monospace;
   cursor: grab;
@@ -595,25 +559,21 @@ audio {
 }
 
 .akshar-item:active { cursor: grabbing; transform: scale(0.95); }
-.akshar-item.dragging { opacity: 0.5; cursor: grabbing; }
-.akshar-item.drag-source { opacity: 0.4; transform: scale(0.95); }
 
 .button-group {
   display: flex;
   gap: 14px;
-  margin: 0 0 16px;
+  margin: 16px 0;
 }
 
-button {
+.btn {
   flex: 1;
   padding: 14px 8px;
   border: none;
   border-radius: 44px;
   font-size: 1rem;
   font-weight: 520;
-  font-family: inherit;
   cursor: pointer;
-  transition: all 0.2s ease;
   background: #F2F2EC;
   color: #2C2C2A;
 }
@@ -621,28 +581,20 @@ button {
 .btn-verify {
   background: #2C6E49;
   color: white;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
 }
-
-.btn-verify:active { background: #215A3A; transform: scale(0.97); }
 
 .btn-reject {
   background: #B13E3A;
   color: white;
 }
 
-.btn-reject:active { background: #8E2E2A; transform: scale(0.97); }
-
 .message-area { margin-top: 12px; }
-
 .message {
-  padding: 12px 16px;
-  border-radius: 28px;
+  padding: 12px;
+  border-radius: 20px;
   text-align: center;
   font-size: 0.85rem;
-  font-weight: 470;
 }
-
 .message.success { background: #E0F0E6; color: #1E5631; }
 .message.error   { background: #FDE9E7; color: #B13E3A; }
 .message.info    { background: #E9EDF2; color: #2B4F6C; }
@@ -652,11 +604,9 @@ button {
   padding: 48px 20px;
   font-size: 1rem;
   color: #6E6E68;
-  font-weight: 460;
 }
 
 .completion-box { text-align: center; padding: 36px 16px; }
-
 .completion-box h2 {
   font-size: 1.9rem;
   font-weight: 560;
@@ -664,9 +614,7 @@ button {
   color: #2C6E49;
   margin-bottom: 12px;
 }
-
 .completion-box p { font-size: 1rem; margin: 18px 0; color: #3C3C38; }
-
 .completion-box button {
   background: #2C6E49;
   color: white;
@@ -674,42 +622,45 @@ button {
   margin: 16px auto 0;
 }
 
-.frames-grid::-webkit-scrollbar { width: 4px; }
-.frames-grid::-webkit-scrollbar-track { background: #EFEFE9; border-radius: 8px; }
-.frames-grid::-webkit-scrollbar-thumb { background: #BDBDB3; border-radius: 8px; }
-.three-tier-section::-webkit-scrollbar { height: 6px; }
-.three-tier-section::-webkit-scrollbar-track { background: #EFEFE9; border-radius: 8px; }
-.three-tier-section::-webkit-scrollbar-thumb { background: #BDBDB3; border-radius: 8px; }
-
-@media (max-width: 560px) {
-  body { padding: 12px 0px; }
-  .container { padding: 18px 14px 24px; border-radius: 24px; }
-  .button-group { gap: 12px; }
-  button { padding: 12px 8px; font-size: 0.95rem; }
-  .edit-text { font-size: 0.9rem; padding: 10px 12px; }
-  .current-file-card { font-size: 0.85rem; padding: 12px 14px; }
-  .akshar-item { padding: 6px 10px; font-size: 1rem; min-width: 42px; }
-  .volume-control { gap: 8px; padding: 6px 10px; }
-  .volume-value { min-width: 48px; font-size: 0.75rem; }
-  
-  .tier-row { gap: 6px; padding: 10px; }
-  .tier-header { min-width: 45px; font-size: 0.6rem; padding: 5px 4px; margin-right: 6px; }
-  .cell-216 { flex: 0 0 180px; min-width: 180px; padding: 10px 6px; }
-  .cell-108 { flex: 0 0 90px; min-width: 90px; padding: 8px 4px; }
-  .cell-54 { flex: 0 0 50px; min-width: 50px; padding: 6px 3px; }
-  .cell-54 .grid-text { font-size: 0.7rem; padding: 4px 2px; }
-  .cell-108 .grid-text { font-size: 0.75rem; padding: 6px 2px; }
-  .cell-216 .grid-text { font-size: 0.8rem; padding: 8px 3px; }
-  .time-label { font-size: 7px; padding: 2px 4px; }
-}
-
 .empty-hint {
   font-size: 0.7rem;
   color: #8E8E88;
   text-align: right;
   margin-top: 6px;
-  padding-right: 4px;
 }
+
+@media (max-width: 560px) {
+  .container { padding: 10px; }
+  .tier-row { gap: 6px; padding: 10px; }
+  .tier-header { min-width: 45px; font-size: 0.6rem; padding: 5px 4px; margin-right: 6px; }
+  .cell-216 { flex: 0 0 180px; min-width: 180px; padding: 10px 6px; }
+  .cell-108 { flex: 0 0 90px; min-width: 90px; padding: 8px 4px; }
+  .cell-54 { flex: 0 0 50px; min-width: 50px; padding: 6px 3px; }
+  .cell-54 .grid-input { font-size: 0.7rem; padding: 4px 1px; }
+  .cell-108 .grid-input { font-size: 0.75rem; padding: 6px 2px; }
+  .cell-216 .grid-input { font-size: 0.8rem; padding: 8px 3px; }
+  .time-label { font-size: 7px; padding: 2px 4px; }
+  .header { flex-direction: column; align-items: stretch; }
+  .header-right { flex-wrap: wrap; justify-content: space-between; }
+  .stats-cards { gap: 6px; }
+  .stat-card { padding: 6px; }
+  .stat-card-value { font-size: 1rem; }
+  .stat-card-label { font-size: 0.6rem; }
+  .speed-btn { padding: 4px 10px; font-size: 10px; }
+  .akshar-item { padding: 5px 8px; font-size: 0.8rem; min-width: 32px; }
+  .btn { padding: 10px 6px; font-size: 0.8rem; }
+  .current-file-card { padding: 8px 12px; font-size: 0.75rem; }
+  .volume-control { padding: 6px 10px; }
+  .volume-value { min-width: 40px; font-size: 0.7rem; }
+  .full-audio-controls { padding: 8px 12px; }
+  .play-full-btn { width: 40px; height: 40px; }
+  .play-full-btn svg { width: 20px; height: 20px; }
+  .time-display { font-size: 0.7rem; min-width: 70px; }
+}
+
+.three-tier-section::-webkit-scrollbar { height: 6px; }
+.three-tier-section::-webkit-scrollbar-track { background: #EFEFE9; border-radius: 8px; }
+.three-tier-section::-webkit-scrollbar-thumb { background: #BDBDB3; border-radius: 8px; }
 </style>
 </head>
 <body>
@@ -777,96 +728,32 @@ const AKSHAR_SET = [
 let currentData = null;
 let currentAudio = null;
 let currentPlayTimeout = null;
-let currentVerifier = '';
 let audioContext = null;
 let gainNode = null;
-let sourceNode = null;
 let currentVolume = 1.0;
-const MAX_VOLUME = 6.0;
 let audioUnlocked = false;
+let playbackSpeed = 1.0;
+let isFullAudioPlaying = false;
+let fullAudioProgressInterval = null;
 
-let selectedSegments = new Set();
-let multiPlayQueue = [];
-let multiPlayIndex = 0;
-let multiPlayTimeout = null;
-
-let dragState = {
-  active: false, akshar: null, sourceElement: null,
-  startX: 0, startY: 0, currentX: 0, currentY: 0,
-  feedbackElement: null, targetFrameIndex: null
-};
-
-let currentAnnotator = null;
-let annotatorFilesList = [];
-
-// 3-tier data
-let threeTierData = {
+let framesData = {
   tier_216: [],
   tier_108: [],
   tier_54: []
 };
-let isThreeTierFile = false;
 
-// ========== NEW FUNCTION: Generate 3-tier from old single-tier data ==========
-function generateThreeTierFromSingleTier(frames108, durationMs) {
-    if (!frames108 || frames108.length === 0) {
-        return { tier_216: [], tier_108: [], tier_54: [] };
-    }
-    
-    const frameSizeMs108 = 108;
-    const frameSizeMs216 = 216;
-    const frameSizeMs54 = 54;
-    
-    // tier_108: same as source (already 108ms)
-    const tier108 = frames108.map((f, idx) => ({ 
-        index: idx, 
-        start_ms: f.start_ms, 
-        end_ms: f.end_ms, 
-        text: f.text || "" 
-    }));
-    
-    // tier_216: merge every 2 frames (108+108=216)
-    const tier216 = [];
-    for (let i = 0; i < frames108.length; i += 2) {
-        const start = frames108[i].start_ms;
-        const end = i + 1 < frames108.length ? frames108[i + 1].end_ms : frames108[i].end_ms;
-        const text1 = frames108[i].text || "";
-        const text2 = i + 1 < frames108.length ? (frames108[i + 1].text || "") : "";
-        let combinedText = text1 + text2;
-        if (combinedText.length > 6) combinedText = combinedText.slice(0, 6);
-        tier216.push({
-            index: tier216.length,
-            start_ms: start,
-            end_ms: end,
-            text: combinedText
-        });
-    }
-    
-    // tier_54: split each 108ms frame into 2 (54ms each)
-    const tier54 = [];
-    for (let i = 0; i < frames108.length; i++) {
-        const f = frames108[i];
-        const half = (f.end_ms - f.start_ms) / 2;
-        const text1 = f.text ? f.text.slice(0, 2) : "";
-        const text2 = f.text ? (f.text.length > 2 ? f.text.slice(2, 4) : "") : "";
-        
-        tier54.push({
-            index: tier54.length,
-            start_ms: f.start_ms,
-            end_ms: f.start_ms + half,
-            text: text1
-        });
-        tier54.push({
-            index: tier54.length,
-            start_ms: f.start_ms + half,
-            end_ms: f.end_ms,
-            text: text2
-        });
-    }
-    
-    return { tier_216: tier216, tier_108: tier108, tier_54: tier54 };
-}
-// ========== END OF NEW FUNCTION ==========
+let selectedSegments = {
+  tier_216: new Set(),
+  tier_108: new Set(),
+  tier_54: new Set()
+};
+
+let multiPlayQueue = [];
+let multiPlayIndex = 0;
+let multiPlayTimeout = null;
+
+let currentAnnotator = null;
+let annotatorFilesList = [];
 
 function unlockAudio() {
   if (audioUnlocked) return;
@@ -874,10 +761,7 @@ function unlockAudio() {
     audioContext.resume().then(() => { audioUnlocked = true; }).catch(() => {});
   }
   if (currentAudio) {
-    const p = currentAudio.play();
-    if (p !== undefined) {
-      p.then(() => { currentAudio.pause(); currentAudio.currentTime = 0; audioUnlocked = true; }).catch(() => {});
-    }
+    currentAudio.play().then(() => { currentAudio.pause(); currentAudio.currentTime = 0; }).catch(() => {});
   }
 }
 
@@ -885,6 +769,360 @@ function setupAudioUnlock() {
   const h = () => { unlockAudio(); document.removeEventListener('touchstart', h); document.removeEventListener('click', h); };
   document.addEventListener('touchstart', h);
   document.addEventListener('click', h);
+}
+
+function initAudioContext() {
+  if (!audioContext && currentAudio) {
+    try {
+      audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      const source = audioContext.createMediaElementSource(currentAudio);
+      gainNode = audioContext.createGain();
+      source.connect(gainNode);
+      gainNode.connect(audioContext.destination);
+      gainNode.gain.value = currentVolume;
+    } catch (e) { console.warn('Web Audio init failed:', e); }
+  }
+}
+
+function updateVolume(value) {
+  currentVolume = value;
+  const volumeSpan = document.getElementById('volumeValue');
+  if (volumeSpan) volumeSpan.innerText = Math.round(value * 100) + '%';
+  if (gainNode) gainNode.gain.value = value;
+  if (currentAudio && !gainNode) currentAudio.volume = Math.min(value, 1.0);
+}
+
+function setPlaybackSpeed(speed) {
+  playbackSpeed = speed;
+  if (currentAudio) currentAudio.playbackRate = speed;
+  document.querySelectorAll('.speed-btn').forEach(btn => {
+    if (parseFloat(btn.dataset.speed) === speed) btn.classList.add('active');
+    else btn.classList.remove('active');
+  });
+  showMessage(`Speed: ${speed}x`, 'info');
+}
+
+function playSegmentAudio(startMs, endMs) {
+  if (!currentAudio) return;
+  stopFullAudioPlayback();
+  const startSec = startMs / 1000;
+  const durationSec = (endMs - startMs) / 1000;
+  if (currentPlayTimeout) clearTimeout(currentPlayTimeout);
+  const doPlay = () => {
+    currentAudio.pause();
+    currentAudio.currentTime = startSec;
+    currentAudio.play().then(() => {
+      currentPlayTimeout = setTimeout(() => {
+        if (currentAudio && !currentAudio.paused) currentAudio.pause();
+      }, durationSec * 1000 / playbackSpeed);
+    }).catch(() => {});
+  };
+  if (audioContext && audioContext.state === 'suspended') audioContext.resume().then(doPlay);
+  else doPlay();
+}
+
+function stopPlayback() {
+  if (currentPlayTimeout) clearTimeout(currentPlayTimeout);
+  if (multiPlayTimeout) clearTimeout(multiPlayTimeout);
+  if (currentAudio && !currentAudio.paused) currentAudio.pause();
+  document.querySelectorAll('.cell-216.playing, .cell-108.playing, .cell-54.playing').forEach(c => c.classList.remove('playing'));
+}
+
+function toggleFullAudioPlayback() {
+  if (!currentAudio) return;
+  if (isFullAudioPlaying) stopFullAudioPlayback();
+  else startFullAudioPlayback();
+}
+
+function startFullAudioPlayback() {
+  if (!currentAudio) return;
+  if (currentPlayTimeout) clearTimeout(currentPlayTimeout);
+  if (multiPlayTimeout) clearTimeout(multiPlayTimeout);
+  const doPlay = () => {
+    currentAudio.playbackRate = playbackSpeed;
+    currentAudio.play().then(() => {
+      isFullAudioPlaying = true;
+      updatePlayButtonUI(true);
+      startProgressTracking();
+    }).catch(err => console.log('Playback error:', err));
+  };
+  if (audioContext && audioContext.state === 'suspended') audioContext.resume().then(doPlay);
+  else doPlay();
+}
+
+function stopFullAudioPlayback() {
+  if (!currentAudio) return;
+  currentAudio.pause();
+  isFullAudioPlaying = false;
+  updatePlayButtonUI(false);
+  stopProgressTracking();
+}
+
+function updatePlayButtonUI(isPlaying) {
+  const playBtn = document.getElementById('playFullBtn');
+  if (!playBtn) return;
+  if (isPlaying) {
+    playBtn.classList.add('playing');
+    playBtn.innerHTML = `<svg viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>`;
+  } else {
+    playBtn.classList.remove('playing');
+    playBtn.innerHTML = `<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>`;
+  }
+}
+
+function startProgressTracking() {
+  if (fullAudioProgressInterval) clearInterval(fullAudioProgressInterval);
+  fullAudioProgressInterval = setInterval(() => {
+    if (!currentAudio || currentAudio.paused) {
+      if (isFullAudioPlaying) { isFullAudioPlaying = false; updatePlayButtonUI(false); }
+      stopProgressTracking();
+      return;
+    }
+    const currentTime = currentAudio.currentTime;
+    const duration = currentAudio.duration || 0;
+    const progressPercent = (currentTime / duration) * 100;
+    const progressFill = document.getElementById('progressFillFull');
+    if (progressFill) progressFill.style.width = progressPercent + '%';
+    const timeDisplay = document.getElementById('timeDisplay');
+    if (timeDisplay) {
+      const currentMin = Math.floor(currentTime / 60);
+      const currentSec = Math.floor(currentTime % 60);
+      const durationMin = Math.floor(duration / 60);
+      const durationSec = Math.floor(duration % 60);
+      timeDisplay.textContent = `${currentMin}:${currentSec.toString().padStart(2,'0')} / ${durationMin}:${durationSec.toString().padStart(2,'0')}`;
+    }
+    if (currentTime >= duration) stopFullAudioPlayback();
+  }, 100);
+}
+
+function stopProgressTracking() {
+  if (fullAudioProgressInterval) { clearInterval(fullAudioProgressInterval); fullAudioProgressInterval = null; }
+}
+
+function seekToPosition(e) {
+  if (!currentAudio) return;
+  const progressBar = document.getElementById('progressBarFull');
+  if (!progressBar) return;
+  const rect = progressBar.getBoundingClientRect();
+  let clientX = e.touches ? e.touches[0].clientX : e.clientX;
+  const clickX = clientX - rect.left;
+  const width = rect.width;
+  const clickPercent = clickX / width;
+  const duration = currentAudio.duration || 0;
+  const seekTime = clickPercent * duration;
+  currentAudio.currentTime = seekTime;
+}
+
+function playCellAudio(tier, index) {
+  const frame = framesData[tier][index];
+  if (!frame) return;
+  playSegmentAudio(frame.start_ms, frame.end_ms);
+  const cellClass = tier === 'tier_216' ? 'cell-216' : (tier === 'tier_108' ? 'cell-108' : 'cell-54');
+  const cell = document.querySelector(`.${cellClass}[data-idx="${index}"]`);
+  if (cell) { cell.classList.add('playing'); setTimeout(() => cell.classList.remove('playing'), 300); }
+}
+
+function toggleSegmentSelection(tier, index) {
+  const cellClass = tier === 'tier_216' ? 'cell-216' : (tier === 'tier_108' ? 'cell-108' : 'cell-54');
+  const cell = document.querySelector(`.${cellClass}[data-idx="${index}"]`);
+  if (!cell) return;
+  if (selectedSegments[tier].has(index)) {
+    selectedSegments[tier].delete(index);
+    cell.classList.remove('selected');
+  } else {
+    selectedSegments[tier].add(index);
+    cell.classList.add('selected');
+  }
+  updateMultiBar();
+}
+
+function updateMultiBar() {
+  const bar = document.getElementById('multiBar');
+  if (!bar) return;
+  let totalSelected = selectedSegments.tier_216.size + selectedSegments.tier_108.size + selectedSegments.tier_54.size;
+  if (totalSelected === 0) bar.classList.remove('visible');
+  else {
+    bar.classList.add('visible');
+    bar.querySelector('.multi-bar-label').textContent = `${totalSelected} segment${totalSelected > 1 ? 's' : ''} selected across all tiers`;
+  }
+}
+
+function clearSelection() {
+  selectedSegments.tier_216.clear();
+  selectedSegments.tier_108.clear();
+  selectedSegments.tier_54.clear();
+  document.querySelectorAll('.cell-216.selected, .cell-108.selected, .cell-54.selected').forEach(c => c.classList.remove('selected'));
+  updateMultiBar();
+}
+
+function playSelectedSegments() {
+  let allSelected = [];
+  for (let tier of ['tier_216', 'tier_108', 'tier_54']) {
+    for (let idx of selectedSegments[tier]) {
+      allSelected.push({ tier, index: idx });
+    }
+  }
+  if (allSelected.length === 0 || !currentAudio) return;
+  stopPlayback();
+  stopFullAudioPlayback();
+  allSelected.sort((a, b) => framesData[a.tier][a.index].start_ms - framesData[b.tier][b.index].start_ms);
+  multiPlayQueue = allSelected;
+  multiPlayIndex = 0;
+  playNextInQueue();
+}
+
+function playNextInQueue() {
+  if (multiPlayIndex >= multiPlayQueue.length) {
+    document.querySelectorAll('.cell-216.playing, .cell-108.playing, .cell-54.playing').forEach(c => c.classList.remove('playing'));
+    return;
+  }
+  const item = multiPlayQueue[multiPlayIndex];
+  const frame = framesData[item.tier][item.index];
+  if (!frame) { multiPlayIndex++; playNextInQueue(); return; }
+  const cellClass = item.tier === 'tier_216' ? 'cell-216' : (item.tier === 'tier_108' ? 'cell-108' : 'cell-54');
+  document.querySelectorAll(`.${cellClass}.playing`).forEach(c => c.classList.remove('playing'));
+  const cell = document.querySelector(`.${cellClass}[data-idx="${item.index}"]`);
+  if (cell) cell.classList.add('playing');
+  playSegmentAudio(frame.start_ms, frame.end_ms);
+  multiPlayTimeout = setTimeout(() => { multiPlayIndex++; playNextInQueue(); }, (frame.end_ms - frame.start_ms) / playbackSpeed);
+}
+
+function generateFramesForTier(durationMs, frameSizeMs) {
+  const numFrames = Math.ceil(durationMs / frameSizeMs);
+  const frames = [];
+  for (let i = 0; i < numFrames; i++) {
+    frames.push({ index: i, start_ms: i * frameSizeMs, end_ms: Math.min((i + 1) * frameSizeMs, durationMs), text: "" });
+  }
+  return frames;
+}
+
+function generateAllTiers(originalFrames, durationMs) {
+  let sourceFrames = originalFrames;
+  if (!sourceFrames || sourceFrames.length === 0) {
+    sourceFrames = generateFramesForTier(durationMs, 108);
+  }
+  const tier216 = [];
+  for (let i = 0; i < sourceFrames.length; i += 2) {
+    const start = sourceFrames[i].start_ms;
+    const end = i + 1 < sourceFrames.length ? sourceFrames[i + 1].end_ms : sourceFrames[i].end_ms;
+    const text1 = sourceFrames[i].text || "";
+    const text2 = i + 1 < sourceFrames.length ? (sourceFrames[i + 1].text || "") : "";
+    tier216.push({ index: tier216.length, start_ms: start, end_ms: end, text: (text1 + text2).slice(0, 4) });
+  }
+  const tier108 = sourceFrames.map((f, idx) => ({ ...f, index: idx }));
+  const tier54 = [];
+  for (let i = 0; i < sourceFrames.length; i++) {
+    const f = sourceFrames[i];
+    const half = (f.end_ms - f.start_ms) / 2;
+    const textPart = f.text || "";
+    tier54.push({ index: tier54.length, start_ms: f.start_ms, end_ms: f.start_ms + half, text: textPart.length > 0 ? textPart[0] : "" });
+    tier54.push({ index: tier54.length, start_ms: f.start_ms + half, end_ms: f.end_ms, text: textPart.length > 1 ? textPart.slice(1) : "" });
+  }
+  return { tier_216: tier216, tier_108: tier108, tier_54: tier54 };
+}
+
+function loadDataIntoTiers(audioData) {
+    let sourceFrames = audioData.frames_108 || audioData.frames || [];
+    if (sourceFrames.length === 0) {
+        const durationMs = audioData.duration_ms || 5000;
+        sourceFrames = generateFramesForTier(durationMs, 108);
+    }
+    const allTiers = generateAllTiers(sourceFrames, audioData.duration_ms || 5000);
+    framesData = allTiers;
+    renderThreeTierGrid();
+    if (currentAudio) {
+        currentAudio.pause();
+        currentAudio.src = `${BASE_PATH}/mobile-dataset/${audioData.wav_file}`;
+        currentAudio.load();
+        initAudioContext();
+        updateVolume(currentVolume);
+        setPlaybackSpeed(playbackSpeed);
+        stopFullAudioPlayback();
+        currentAudio.addEventListener('loadedmetadata', () => {
+          const duration = currentAudio.duration || 0;
+          const durationMin = Math.floor(duration / 60);
+          const durationSec = Math.floor(duration % 60);
+          const timeDisplay = document.getElementById('timeDisplay');
+          if (timeDisplay) timeDisplay.textContent = `0:00 / ${durationMin}:${durationSec.toString().padStart(2,'0')}`;
+        });
+        const progressFill = document.getElementById('progressFillFull');
+        if (progressFill) progressFill.style.width = '0%';
+    }
+}
+
+function renderThreeTierGrid() {
+  const tier216Row = document.getElementById('tier216Row');
+  const tier108Row = document.getElementById('tier108Row');
+  const tier54Row = document.getElementById('tier54Row');
+  if (!tier216Row) return;
+  tier216Row.innerHTML = '';
+  tier108Row.innerHTML = '';
+  tier54Row.innerHTML = '';
+  
+  const header216 = document.createElement('div');
+  header216.className = 'tier-header';
+  header216.innerText = 'वायु (216ms)';
+  tier216Row.appendChild(header216);
+  
+  const header108 = document.createElement('div');
+  header108.className = 'tier-header';
+  header108.innerText = 'अग्नि (108ms)';
+  tier108Row.appendChild(header108);
+  
+  const header54 = document.createElement('div');
+  header54.className = 'tier-header';
+  header54.innerText = 'आकाश (54ms)';
+  tier54Row.appendChild(header54);
+  
+  framesData.tier_216.forEach((frame, idx) => { const div = createCell(frame, idx, '216'); tier216Row.appendChild(div); });
+  framesData.tier_108.forEach((frame, idx) => { const div = createCell(frame, idx, '108'); tier108Row.appendChild(div); });
+  framesData.tier_54.forEach((frame, idx) => { const div = createCell(frame, idx, '54'); tier54Row.appendChild(div); });
+}
+
+function createCell(frame, idx, tier) {
+  const div = document.createElement('div');
+  div.className = `cell-${tier}`;
+  div.setAttribute('data-idx', idx);
+  div.setAttribute('data-tier', `tier_${tier}`);
+  
+  const timeSpan = document.createElement('div');
+  timeSpan.className = 'time-label';
+  timeSpan.innerText = `${(frame.start_ms / 1000).toFixed(2)}s`;
+  
+  const input = document.createElement('input');
+  input.type = 'text';
+  input.className = 'grid-input';
+  input.value = frame.text || '';
+  input.placeholder = '';
+  input.setAttribute('data-idx', idx);
+  input.setAttribute('data-tier', `tier_${tier}`);
+  let maxLen = tier === '216' ? 4 : (tier === '108' ? 4 : 2);
+  if (maxLen) input.setAttribute('maxlength', maxLen);
+  
+  input.addEventListener('input', (e) => {
+    let val = e.target.value;
+    if (maxLen && val.length > maxLen) val = val.slice(0, maxLen);
+    e.target.value = val;
+    framesData[`tier_${tier}`][idx].text = val;
+  });
+  
+  div.appendChild(timeSpan);
+  div.appendChild(input);
+  
+  div.addEventListener('click', (e) => { if (e.target === input) return; playCellAudio(`tier_${tier}`, idx); });
+  input.addEventListener('click', (e) => { e.stopPropagation(); playCellAudio(`tier_${tier}`, idx); });
+  
+  let pressTimer = null;
+  div.addEventListener('touchstart', (e) => {
+    if (e.target === input) return;
+    pressTimer = setTimeout(() => { toggleSegmentSelection(`tier_${tier}`, idx); if (window.navigator && window.navigator.vibrate) window.navigator.vibrate(50); pressTimer = null; }, 500);
+  });
+  div.addEventListener('touchend', () => { if (pressTimer) { clearTimeout(pressTimer); pressTimer = null; } });
+  div.addEventListener('touchmove', () => { if (pressTimer) { clearTimeout(pressTimer); pressTimer = null; } });
+  div.addEventListener('mousedown', (e) => { if (e.target === input) return; toggleSegmentSelection(`tier_${tier}`, idx); });
+  div.addEventListener('contextmenu', (e) => { e.preventDefault(); return false; });
+  
+  return div;
 }
 
 async function logout() {
@@ -915,33 +1153,22 @@ async function loadAnnotators() {
     data.annotators.forEach(annotator => {
       const option = document.createElement('option');
       option.value = annotator;
-      option.textContent = `${annotator} (${annotator === data.selected ? 'current' : ''})`;
+      option.textContent = annotator;
       select.appendChild(option);
     });
-    if (data.selected) {
-      select.value = data.selected;
-    }
-  } catch (err) {
-    console.error('Error loading annotators:', err);
-  }
+  } catch (err) { console.error('Error loading annotators:', err); }
 }
 
 document.getElementById('loadAnnotatorFiles').addEventListener('click', async () => {
   const select = document.getElementById('annotatorSelect');
   const annotator = select.value;
-  if (!annotator) {
-    showMessage('Please select an annotator first', 'error');
-    return;
-  }
-  
+  if (!annotator) { showMessage('Please select an annotator first', 'error'); return; }
   currentAnnotator = annotator;
   showMessage(`Loading files for annotator: ${annotator}...`, 'info');
-  
   try {
     const r = await fetch(`${BASE_PATH}/verify/api/annotator-files?annotator=${encodeURIComponent(annotator)}`);
     if (r.status === 401) { window.location.href = `${BASE_PATH}/verify/login`; return; }
     const data = await r.json();
-    
     if (data.files && data.files.length > 0) {
       annotatorFilesList = data.files;
       showMessage(`Found ${data.files.length} files for ${annotator}. Loading first file...`, 'success');
@@ -950,622 +1177,201 @@ document.getElementById('loadAnnotatorFiles').addEventListener('click', async ()
       showMessage(`No pending files found for annotator: ${annotator}`, 'info');
       document.getElementById('content').innerHTML = '<div class="loading">No files to verify for this annotator</div>';
     }
-  } catch (err) {
-    showMessage('Error loading annotator files: ' + err, 'error');
-  }
+  } catch (err) { showMessage('Error loading annotator files: ' + err, 'error'); }
 });
 
 async function loadSpecificFile(jsonFile) {
   const contentDiv = document.getElementById('content');
   contentDiv.innerHTML = '<div class="loading">Loading file for verification...</div>';
-  if (audioContext) { await audioContext.close(); audioContext = null; gainNode = null; sourceNode = null; }
+  if (audioContext) { await audioContext.close(); audioContext = null; gainNode = null; }
   audioUnlocked = false;
-  selectedSegments.clear();
-  
+  selectedSegments = { tier_216: new Set(), tier_108: new Set(), tier_54: new Set() };
   try {
     const r = await fetch(`${BASE_PATH}/verify/api/get-file/${encodeURIComponent(jsonFile)}?annotator=${encodeURIComponent(currentAnnotator)}`);
     if (r.status === 401) { window.location.href = `${BASE_PATH}/verify/login`; return; }
     const d = await r.json();
     if (d.error) { showErrorScreen(d.error); return; }
-    
-    // Check if this is a 3-tier file (has frames_54, frames_108, frames_216)
-    if (d.frames_54 && d.frames_108 && d.frames_216) {
-      // Already a 3-tier file
-      isThreeTierFile = true;
-      threeTierData = {
-        tier_216: d.frames_216 || [],
-        tier_108: d.frames_108 || [],
-        tier_54: d.frames_54 || []
-      };
-    } 
-    // Check if it's a single-tier file (has frames array) - GENERATE 3-TIER ON THE FLY
-    else if (d.frames && d.frames.length > 0) {
-      isThreeTierFile = true;  // We'll generate 3-tier from single-tier
-      const durationMs = d.duration_ms || (d.frames[d.frames.length - 1]?.end_ms || 5000);
-      threeTierData = generateThreeTierFromSingleTier(d.frames, durationMs);
-    }
-    else {
-      isThreeTierFile = false;
-      threeTierData = { tier_216: [], tier_108: [], tier_54: [] };
-    }
-    
-    renderVerificationInterface(d);
+    currentData = d;
+    loadDataIntoTiers(d);
+    renderVerificationUI();
   } catch (err) { showErrorScreen('Connection issue: ' + err); }
 }
 
-function renderAksharSet(containerId) {
-  const container = document.getElementById(containerId);
-  if (!container) return;
-  container.innerHTML = '';
+function showErrorScreen(message) {
+  document.getElementById('content').innerHTML = `<div class="message error" style="margin-top:20px;">Error: ${message}</div><div class="button-group" style="margin-top:20px;"><button class="btn-verify" onclick="location.reload()">Go Back</button></div>`;
+}
+
+function renderVerificationUI() {
+  const sentenceDisplay = currentData.sentence ? `<div><strong>Sentence:</strong> ${escapeHtml(currentData.sentence)}</div>` : '';
+  
+  document.getElementById('content').innerHTML = `
+    <div class="audio-wrapper">
+      <div class="full-audio-controls">
+        <button id="playFullBtn" class="play-full-btn" onclick="toggleFullAudioPlayback()"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></button>
+        <div class="full-audio-info"><span>Full Audio</span></div>
+        <div id="progressBarFull" class="progress-bar-full" onclick="seekToPosition(event)" ontouchstart="seekToPosition(event)"><div id="progressFillFull" class="progress-fill-full"></div></div>
+        <div id="timeDisplay" class="time-display">0:00 / 0:00</div>
+      </div>
+      <div class="volume-control">
+        <span class="volume-icon">🔊</span>
+        <input type="range" id="volumeSlider" class="volume-slider" min="0" max="1" step="0.01" value="1">
+        <span id="volumeValue" class="volume-value">100%</span>
+      </div>
+      <div class="speed-control">
+        <button class="speed-btn" data-speed="0.5">0.5x</button>
+        <button class="speed-btn active" data-speed="1">1x</button>
+        <button class="speed-btn" data-speed="1.5">1.5x</button>
+        <button class="speed-btn" data-speed="2">2x</button>
+      </div>
+      <div class="current-file-card">
+        <div><strong>File:</strong> ${currentData.json_file}</div>
+        <div><strong>Word:</strong> ${currentData.word || '—'}</div>
+        ${sentenceDisplay}
+        <div style="margin-top:8px;font-size:0.8rem;color:#6E6E68;"><strong>Original Annotator:</strong> ${currentData.submitted_by || 'unknown'}</div>
+        <div style="margin-top:4px;font-size:0.75rem;color:#8E8E88;"><strong>Progress:</strong> ${annotatorFilesList.indexOf(currentData.json_file) + 1} of ${annotatorFilesList.length} files for this annotator</div>
+      </div>
+    </div>
+    
+    <div class="three-tier-section">
+      <div class="tier-row tier-row-216" id="tier216Row"></div>
+      <div class="tier-row tier-row-108" id="tier108Row"></div>
+      <div class="tier-row tier-row-54" id="tier54Row"></div>
+    </div>
+    
+    <div id="multiBar" class="multi-bar">
+      <span class="multi-bar-label">0 segments selected</span>
+      <button class="multi-bar-btn play" onclick="playSelectedSegments()">▶ Play Selected</button>
+      <button class="multi-bar-btn" onclick="clearSelection()">Clear</button>
+    </div>
+    
+    <div class="akshar-set-section">
+      <div class="akshar-title">Tap to insert | Long press cell to select | Drag & drop akshars to edit</div>
+      <div class="akshar-grid" id="aksharGrid"></div>
+    </div>
+    
+    <div class="button-group">
+      <button class="btn btn-verify" id="verifyBtn">✅ Verify & Save</button>
+      <button class="btn btn-reject" id="rejectBtn">❌ Reject & Delete</button>
+    </div>
+    
+    <div id="messageArea" class="message-area"></div>
+  `;
+  
+  const volumeSlider = document.getElementById('volumeSlider');
+  if (volumeSlider) volumeSlider.addEventListener('input', (e) => updateVolume(parseFloat(e.target.value)));
+  document.querySelectorAll('.speed-btn').forEach(btn => btn.addEventListener('click', () => setPlaybackSpeed(parseFloat(btn.dataset.speed))));
+  
+  window.toggleFullAudioPlayback = toggleFullAudioPlayback;
+  window.seekToPosition = seekToPosition;
+  window.playSelectedSegments = playSelectedSegments;
+  window.clearSelection = clearSelection;
+  
+  const aksharGrid = document.getElementById('aksharGrid');
   AKSHAR_SET.forEach(akshar => {
     const span = document.createElement('span');
     span.className = 'akshar-item';
     span.textContent = akshar;
     span.setAttribute('draggable', 'true');
     span.setAttribute('data-akshar', akshar);
-    span.addEventListener('dragstart', handleDragStart);
-    span.addEventListener('dragend', handleDragEnd);
-    span.addEventListener('touchstart', handleTouchStart);
-    span.addEventListener('touchmove', handleTouchMove);
-    span.addEventListener('touchend', handleTouchEnd);
-    container.appendChild(span);
+    span.addEventListener('dragstart', (e) => { e.dataTransfer.setData('text/plain', akshar); e.dataTransfer.effectAllowed = 'copy'; });
+    span.addEventListener('click', (e) => {
+      const activeElement = document.activeElement;
+      if (activeElement && activeElement.tagName === 'INPUT' && activeElement.classList.contains('grid-input')) {
+        const start = activeElement.selectionStart;
+        const end = activeElement.selectionEnd;
+        const value = activeElement.value;
+        const tier = activeElement.getAttribute('data-tier');
+        let maxLen = tier === 'tier_54' ? 2 : 4;
+        if (value.length < maxLen) {
+          activeElement.value = value.substring(0, start) + akshar + value.substring(end);
+          activeElement.dispatchEvent(new Event('input', { bubbles: true }));
+          activeElement.focus();
+        } else { showMessage('Maximum characters reached for this cell!', 'warning'); }
+      } else { showMessage('Click on a grid cell first, then tap akshar to insert', 'info'); }
+    });
+    aksharGrid.appendChild(span);
   });
-}
-
-function handleDragStart(e) {
-  const akshar = e.target.getAttribute('data-akshar');
-  e.dataTransfer.setData('text/plain', akshar);
-  e.dataTransfer.effectAllowed = 'copy';
-  e.target.classList.add('dragging');
-  dragState.akshar = akshar;
-}
-
-function handleDragEnd(e) {
-  e.target.classList.remove('dragging');
-  dragState.akshar = null;
-  document.querySelectorAll('.frame-card').forEach(c => c.classList.remove('drag-over'));
-}
-
-function handleTouchStart(e) {
-  e.preventDefault();
-  const touch = e.touches[0];
-  const akshar = e.target.getAttribute('data-akshar');
-  if (!akshar) return;
-  dragState.active = true; dragState.akshar = akshar; dragState.sourceElement = e.target;
-  e.target.classList.add('drag-source');
-  const fb = document.createElement('div');
-  fb.textContent = akshar;
-  fb.style.cssText = `position:fixed;left:${touch.clientX-20}px;top:${touch.clientY-20}px;background:#2C6E49;color:white;padding:12px 16px;border-radius:24px;font-size:1.3rem;font-family:monospace;font-weight:bold;z-index:9999;pointer-events:none;box-shadow:0 4px 12px rgba(0,0,0,0.2);transform:scale(1.1)`;
-  fb.id = 'dragFeedback';
-  document.body.appendChild(fb);
-  showMessage('Drag to any segment field to add character', 'info');
-}
-
-function handleTouchMove(e) {
-  if (!dragState.active) return;
-  e.preventDefault();
-  const touch = e.touches[0];
-  const fb = document.getElementById('dragFeedback');
-  if (fb) { fb.style.left = (touch.clientX-25)+'px'; fb.style.top = (touch.clientY-25)+'px'; }
-  const el = document.elementFromPoint(touch.clientX, touch.clientY);
-  const targetCard = el?.closest('.frame-card');
-  document.querySelectorAll('.frame-card').forEach(c => { if (c !== targetCard) c.classList.remove('drag-over'); });
-  if (targetCard) { targetCard.classList.add('drag-over'); dragState.targetFrameIndex = parseInt(targetCard.getAttribute('data-frame-index')); }
-  else { dragState.targetFrameIndex = null; }
-}
-
-function handleTouchEnd(e) {
-  if (!dragState.active) return;
-  e.preventDefault();
-  const fb = document.getElementById('dragFeedback');
-  if (fb) fb.remove();
-  if (dragState.sourceElement) dragState.sourceElement.classList.remove('drag-source');
-  document.querySelectorAll('.frame-card').forEach(c => c.classList.remove('drag-over'));
-  if (dragState.targetFrameIndex !== null && dragState.akshar && currentData && currentData.frames) {
-    const fi = dragState.targetFrameIndex;
-    const targetEditDiv = document.querySelector(`.frame-card[data-frame-index="${fi}"] .edit-text`);
-    if (targetEditDiv && currentData.frames[fi]) {
-      const newText = (currentData.frames[fi].text || '') + dragState.akshar;
-      targetEditDiv.innerText = newText;
-      currentData.frames[fi].text = newText;
-      currentData.full_sequence = currentData.frames.map(f=>f.text||'').filter(t=>t!=='').join(' ');
-      showMessage(`Added "${dragState.akshar}" to segment ${fi+1}`, 'success');
-      targetEditDiv.focus();
-      const range = document.createRange(); const sel = window.getSelection();
-      range.selectNodeContents(targetEditDiv); range.collapse(false);
-      sel.removeAllRanges(); sel.addRange(range);
-    }
-  }
-  dragState.active = false; dragState.akshar = null; dragState.sourceElement = null; dragState.targetFrameIndex = null;
-}
-
-function setupDesktopDropZone(editDiv, frameIndex) {
-  editDiv.addEventListener('dragover', (e) => {
-    e.preventDefault(); e.dataTransfer.dropEffect = 'copy';
-    editDiv.closest('.frame-card')?.classList.add('drag-over');
-  });
-  editDiv.addEventListener('dragleave', () => editDiv.closest('.frame-card')?.classList.remove('drag-over'));
-  editDiv.addEventListener('drop', (e) => {
+  
+  document.addEventListener('dragover', (e) => e.preventDefault());
+  document.addEventListener('drop', (e) => {
     e.preventDefault();
-    editDiv.closest('.frame-card')?.classList.remove('drag-over');
-    const akshar = e.dataTransfer.getData('text/plain');
-    if (akshar && currentData && currentData.frames && currentData.frames[frameIndex]) {
-      const newText = (currentData.frames[frameIndex].text||'') + akshar;
-      editDiv.innerText = newText;
-      currentData.frames[frameIndex].text = newText;
-      currentData.full_sequence = currentData.frames.map(f=>f.text||'').filter(t=>t).join(' ');
-      showMessage(`Added "${akshar}" to segment ${frameIndex+1}`, 'success');
-      const range = document.createRange(); const sel = window.getSelection();
-      range.selectNodeContents(editDiv); range.collapse(false);
-      sel.removeAllRanges(); sel.addRange(range);
+    const target = e.target;
+    if (target && target.tagName === 'INPUT' && target.classList.contains('grid-input')) {
+      const akshar = e.dataTransfer.getData('text/plain');
+      if (akshar) {
+        const start = target.selectionStart;
+        const end = target.selectionEnd;
+        const value = target.value;
+        const tier = target.getAttribute('data-tier');
+        let maxLen = tier === 'tier_54' ? 2 : 4;
+        if (value.length < maxLen) {
+          target.value = value.substring(0, start) + akshar + value.substring(end);
+          target.dispatchEvent(new Event('input', { bubbles: true }));
+          target.focus();
+          showMessage(`Added "${akshar}" to cell`, 'success');
+        } else { showMessage('Maximum characters reached for this cell!', 'warning'); }
+      }
     }
   });
-}
-
-function initAudioContext() {
-  if (!audioContext && currentAudio) {
-    try {
-      audioContext = new (window.AudioContext || window.webkitAudioContext)();
-      const source = audioContext.createMediaElementSource(currentAudio);
-      gainNode = audioContext.createGain();
-      source.connect(gainNode);
-      gainNode.connect(audioContext.destination);
-      gainNode.gain.value = currentVolume;
-      sourceNode = source;
-      if (audioContext.state === 'suspended') {
-        const rh = () => { audioContext.resume(); document.removeEventListener('touchstart', rh); document.removeEventListener('click', rh); };
-        document.addEventListener('touchstart', rh);
-        document.addEventListener('click', rh);
-      }
-    } catch (e) { console.warn('Web Audio init failed:', e); }
-  }
-}
-
-function updateVolume(value) {
-  currentVolume = value;
-  document.getElementById('volumeValue').innerText = Math.round(value * 100) + '%';
-  if (gainNode) gainNode.gain.value = value;
-  if (currentAudio && !gainNode) currentAudio.volume = Math.min(value, 1.0);
-}
-
-function playSegmentAudio(startMs, endMs) {
-  if (!currentAudio) { showMessage('Audio not ready', 'error'); return; }
-  const startSec = startMs / 1000;
-  const durationSec = (endMs - startMs) / 1000;
-  if (currentPlayTimeout) { clearTimeout(currentPlayTimeout); currentPlayTimeout = null; }
-  const doPlay = () => playAudioSegment(startSec, durationSec);
-  if (audioContext && audioContext.state === 'suspended') audioContext.resume().then(doPlay).catch(doPlay);
-  else doPlay();
-}
-
-function playAudioSegment(startSec, durationSec) {
-  if (!currentAudio) return;
-  currentAudio.pause();
-  currentAudio.currentTime = startSec;
-  const p = currentAudio.play();
-  if (p !== undefined) {
-    p.then(() => {
-      currentPlayTimeout = setTimeout(() => {
-        if (currentAudio && !currentAudio.paused) currentAudio.pause();
-        currentPlayTimeout = null;
-      }, durationSec * 1000);
-    }).catch(err => { console.warn('Playback error:', err); showMessage('Tap the play button first to enable audio', 'info'); });
-  }
-  currentAudio.onended = () => { if (currentPlayTimeout) { clearTimeout(currentPlayTimeout); currentPlayTimeout = null; } };
-}
-
-function toggleSegmentSelection(frameIndex) {
-  const card = document.querySelector(`.frame-card[data-frame-index="${frameIndex}"]`);
-  if (!card) return;
-  if (selectedSegments.has(frameIndex)) {
-    selectedSegments.delete(frameIndex);
-    card.classList.remove('selected');
-  } else {
-    selectedSegments.add(frameIndex);
-    card.classList.add('selected');
-  }
-  updateMultiBar();
-}
-
-function updateMultiBar() {
-  const bar = document.getElementById('multiBar');
-  if (!bar) return;
-  if (selectedSegments.size === 0) {
-    bar.classList.remove('visible');
-  } else {
-    bar.classList.add('visible');
-    bar.querySelector('.multi-bar-label').textContent = `${selectedSegments.size} segment${selectedSegments.size > 1 ? 's' : ''} selected`;
-  }
-}
-
-function clearSelection() {
-  selectedSegments.clear();
-  document.querySelectorAll('.frame-card.selected').forEach(c => c.classList.remove('selected'));
-  updateMultiBar();
-}
-
-function playSelectedSegments() {
-  if (selectedSegments.size === 0 || !currentData || !currentAudio) return;
-  if (currentPlayTimeout) { clearTimeout(currentPlayTimeout); currentPlayTimeout = null; }
-  if (multiPlayTimeout) { clearTimeout(multiPlayTimeout); multiPlayTimeout = null; }
-  document.querySelectorAll('.frame-card.playing').forEach(c => c.classList.remove('playing'));
-  multiPlayQueue = Array.from(selectedSegments).sort((a, b) => a - b);
-  multiPlayIndex = 0;
-  playNextInQueue();
-}
-
-function playNextInQueue() {
-  if (multiPlayIndex >= multiPlayQueue.length) {
-    document.querySelectorAll('.frame-card.playing').forEach(c => c.classList.remove('playing'));
-    return;
-  }
-  const frameIndex = multiPlayQueue[multiPlayIndex];
-  const frame = currentData.frames[frameIndex];
-  if (!frame) { multiPlayIndex++; playNextInQueue(); return; }
-
-  document.querySelectorAll('.frame-card.playing').forEach(c => c.classList.remove('playing'));
-  const card = document.querySelector(`.frame-card[data-frame-index="${frameIndex}"]`);
-  if (card) { card.classList.add('playing'); card.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }
-
-  const startSec = frame.start_ms / 1000;
-  const durationSec = (frame.end_ms - frame.start_ms) / 1000;
-
-  unlockAudio();
-  currentAudio.pause();
-  currentAudio.currentTime = startSec;
-
-  const doPlay = () => {
-    const p = currentAudio.play();
-    if (p !== undefined) {
-      p.then(() => {
-        multiPlayTimeout = setTimeout(() => {
-          if (currentAudio && !currentAudio.paused) currentAudio.pause();
-          multiPlayIndex++;
-          playNextInQueue();
-        }, durationSec * 1000);
-      }).catch(err => console.warn('multi-play error:', err));
-    }
-  };
-
-  if (audioContext && audioContext.state === 'suspended') audioContext.resume().then(doPlay).catch(doPlay);
-  else doPlay();
-}
-
-function playSegmentByIndex(frameIndex) {
-  if (!currentData || !currentAudio) { showMessage('Audio not ready', 'error'); return; }
-  const frame = currentData.frames[frameIndex];
-  if (!frame) return;
-  if (multiPlayTimeout) { clearTimeout(multiPlayTimeout); multiPlayTimeout = null; }
-  document.querySelectorAll('.frame-card.playing').forEach(c => c.classList.remove('playing'));
-  document.querySelectorAll('.frame-card').forEach(c => c.classList.remove('active'));
-  const card = document.querySelector(`.frame-card[data-frame-index="${frameIndex}"]`);
-  if (card) card.classList.add('active');
-  unlockAudio();
-  playSegmentAudio(frame.start_ms, frame.end_ms);
-}
-
-function saveAllPendingEdits() {
-  document.querySelectorAll('.edit-text').forEach(div => {
-    const fi = parseInt(div.getAttribute('data-frame-idx'));
-    if (currentData && currentData.frames && currentData.frames[fi]) currentData.frames[fi].text = div.innerText || '';
-  });
-  if (currentData) currentData.full_sequence = (currentData.frames || []).map(f=>f.text||'').filter(t=>t).join(' ');
-}
-
-function preventNewlines(e) {
-  if (e.key === 'Enter') {
-    e.preventDefault();
-    return false;
-  }
-  return true;
-}
-
-function handlePaste(e) {
-  e.preventDefault();
-  const text = (e.clipboardData || window.clipboardData).getData('text');
-  const cleanedText = text.replace(/[\n\r]/g, '');
-  document.execCommand('insertText', false, cleanedText);
-}
-
-function showCompletionScreen() {
-  document.getElementById('content').innerHTML = `
-    <div class="completion-box">
-      <h2>All files verified for ${currentAnnotator}</h2>
-      <p>All annotated files for this annotator have been reviewed.</p>
-      <button class="btn-verify" onclick="location.reload()">Select Another Annotator</button>
-    </div>`;
-}
-
-function showErrorScreen(message) {
-  document.getElementById('content').innerHTML = `
-    <div class="message error" style="margin-top:20px;">Error: ${message}</div>
-    <div class="button-group" style="margin-top:20px;">
-      <button class="btn-verify" onclick="location.reload()">Go Back</button>
-    </div>`;
-}
-
-// Render 3-tier grid for verification
-function renderThreeTierGrid() {
-  if (!threeTierData.tier_216.length && !threeTierData.tier_108.length && !threeTierData.tier_54.length) {
-    return '';
-  }
   
-  let html = '<div class="three-tier-section">';
-  
-  // Tier 216
-  html += '<div class="tier-row tier-row-216">';
-  html += '<div class="tier-header">वायु (216ms)</div>';
-  threeTierData.tier_216.forEach((frame, idx) => {
-    html += `
-      <div class="cell-216" data-tier="216" data-idx="${idx}">
-        <div class="time-label">${(frame.start_ms / 1000).toFixed(2)}s</div>
-        <div class="grid-text">${escapeHtml(frame.text || '')}</div>
-      </div>
-    `;
-  });
-  html += '</div>';
-  
-  // Tier 108
-  html += '<div class="tier-row tier-row-108">';
-  html += '<div class="tier-header">अग्नि (108ms)</div>';
-  threeTierData.tier_108.forEach((frame, idx) => {
-    html += `
-      <div class="cell-108" data-tier="108" data-idx="${idx}">
-        <div class="time-label">${(frame.start_ms / 1000).toFixed(2)}s</div>
-        <div class="grid-text">${escapeHtml(frame.text || '')}</div>
-      </div>
-    `;
-  });
-  html += '</div>';
-  
-  // Tier 54
-  html += '<div class="tier-row tier-row-54">';
-  html += '<div class="tier-header">आकाश (54ms)</div>';
-  threeTierData.tier_54.forEach((frame, idx) => {
-    html += `
-      <div class="cell-54" data-tier="54" data-idx="${idx}">
-        <div class="time-label">${(frame.start_ms / 1000).toFixed(2)}s</div>
-        <div class="grid-text">${escapeHtml(frame.text || '')}</div>
-      </div>
-    `;
-  });
-  html += '</div>';
-  
-  html += '</div>';
-  return html;
-}
-
-function escapeHtml(text) {
-  const div = document.createElement('div');
-  div.textContent = text;
-  return div.innerHTML;
-}
-
-function renderVerificationInterface(data) {
-  currentData = data;
-  
-  // Initialize frames array if not present (for backward compatibility)
-  if (!data.frames) {
-    data.frames = [];
-  }
-  
-  // Build 3-tier grid HTML (will be shown for BOTH old and new data)
-  const threeTierHtml = isThreeTierFile ? renderThreeTierGrid() : '';
-  
-  // Build file info section with sentence
-  const sentenceDisplay = data.sentence ? `<div><strong>Sentence:</strong> ${escapeHtml(data.sentence)}</div>` : '';
-  
-  document.getElementById('content').innerHTML = `
-    <div class="audio-wrapper">
-      <audio id="audioPlayer" controls preload="auto" playsinline>
-        <source src="${BASE_PATH}/mobile-dataset/${data.wav_file}" type="audio/wav">
-      </audio>
-      <div class="volume-control">
-        <span class="volume-icon">🔊</span>
-        <input type="range" id="volumeSlider" class="volume-slider" min="0" max="${MAX_VOLUME}" step="0.05" value="1.0">
-        <span class="volume-value" id="volumeValue">100%</span>
-      </div>
-    </div>
-    <div class="current-file-card">
-      <div><strong>File:</strong> ${data.json_file}</div>
-      <div><strong>Word:</strong> ${data.word || '—'}</div>
-      ${sentenceDisplay}
-      <div style="margin-top:8px;font-size:0.8rem;color:#6E6E68;"><strong>Original Annotator:</strong> ${data.submitted_by || 'unknown'}</div>
-      <div style="margin-top:4px;font-size:0.75rem;color:#8E8E88;"><strong>Progress:</strong> ${annotatorFilesList.indexOf(data.json_file) + 1} of ${annotatorFilesList.length} files for this annotator</div>
-    </div>
-    ${threeTierHtml}
-    <div class="akshar-set-section">
-      <div class="akshar-title">Allowed Akshar Set (Drag & Drop)</div>
-      <div class="akshar-grid" id="aksharGridTop"></div>
-    </div>
-    <div class="multi-bar" id="multiBar">
-      <span class="multi-bar-label">0 segments selected</span>
-      <button class="multi-bar-btn play" onclick="playSelectedSegments()">▶ Play selected</button>
-      <button class="multi-bar-btn" onclick="clearSelection()">✕ Clear</button>
-    </div>
-    <div class="frames-grid" id="framesGrid"></div>
-    <div class="button-group">
-      <button class="btn-verify" id="verifyBtn">✅ Verify & Save</button>
-      <button class="btn-reject" id="rejectBtn">❌ Reject & Delete</button>
-    </div>
-    <div id="messageArea" class="message-area"></div>
-  `;
-
-  renderAksharSet('aksharGridTop');
-
-  currentAudio = document.getElementById('audioPlayer');
-  if (currentAudio) {
-    currentAudio.onerror = () => showMessage('Audio could not be loaded', 'error');
-    currentAudio.setAttribute('playsinline', '');
-    document.getElementById('volumeSlider').addEventListener('input', e => updateVolume(parseFloat(e.target.value)));
-    currentAudio.addEventListener('play', () => {
-      if (!audioContext) initAudioContext();
-      if (audioContext && audioContext.state === 'suspended') audioContext.resume();
-    });
-    currentAudio.addEventListener('touchstart', () => unlockAudio(), { once: true });
-  }
-
-  const framesGrid = document.getElementById('framesGrid');
-  framesGrid.innerHTML = '';
-
-  // Use data.frames for the detailed editable view
-  const frames = data.frames || [];
-  
-  frames.forEach((frame, idx) => {
-    const frameCard = document.createElement('div');
-    frameCard.className = 'frame-card';
-    frameCard.setAttribute('data-frame-index', idx);
-    frameCard.setAttribute('data-start-ms', frame.start_ms);
-    frameCard.setAttribute('data-end-ms', frame.end_ms);
-
-    const headerDiv = document.createElement('div');
-    headerDiv.className = 'frame-header';
-    headerDiv.innerHTML = `
-      <span class="frame-label"><span class="sel-dot"></span> Segment ${idx+1}</span>
-      <span class="frame-time">${frame.start_ms}–${frame.end_ms} ms</span>
-    `;
-
-    const editDiv = document.createElement('div');
-    editDiv.setAttribute('contenteditable', 'true');
-    editDiv.className = 'edit-text';
-    editDiv.innerText = frame.text || '';
-    editDiv.setAttribute('data-frame-idx', idx);
-    
-    editDiv.addEventListener('keydown', preventNewlines);
-    editDiv.addEventListener('paste', handlePaste);
-
-    setupDesktopDropZone(editDiv, idx);
-
-    editDiv.addEventListener('input', e => {
-      const newText = e.target.innerText || '';
-      const cleanedText = newText.replace(/[\n\r]/g, '');
-      if (cleanedText !== newText) {
-        e.target.innerText = cleanedText;
-      }
-      if (currentData && currentData.frames && currentData.frames[idx]) {
-        currentData.frames[idx].text = cleanedText;
-        currentData.full_sequence = currentData.frames.map(f=>f.text||'').filter(t=>t).join(' ');
-      }
-    });
-
-    editDiv.addEventListener('click', e => { e.stopPropagation(); playSegmentByIndex(idx); });
-
-    frameCard.addEventListener('click', e => {
-      if (e.target === editDiv || editDiv.contains(e.target)) return;
-      toggleSegmentSelection(idx);
-    });
-
-    frameCard.appendChild(headerDiv);
-    frameCard.appendChild(editDiv);
-    framesGrid.appendChild(frameCard);
-  });
-
-  const hint = document.createElement('div');
-  hint.className = 'empty-hint';
-  hint.innerText = '💡 Tap text field to play segment. Tap header to select. Use "Play selected" for multiple.';
-  framesGrid.appendChild(hint);
-
   document.getElementById('verifyBtn').addEventListener('click', () => submitVerification('verify'));
   document.getElementById('rejectBtn').addEventListener('click', () => submitVerification('reject'));
-  
-  // Add click handlers for 3-tier cells to play audio
-  if (isThreeTierFile) {
-    document.querySelectorAll('.cell-216, .cell-108, .cell-54').forEach(cell => {
-      cell.addEventListener('click', (e) => {
-        if (e.target === cell || cell.contains(e.target)) {
-          const tier = cell.getAttribute('data-tier');
-          const idx = parseInt(cell.getAttribute('data-idx'));
-          let frame = null;
-          if (tier === '216') frame = threeTierData.tier_216[idx];
-          else if (tier === '108') frame = threeTierData.tier_108[idx];
-          else frame = threeTierData.tier_54[idx];
-          if (frame && currentAudio) {
-            playSegmentAudio(frame.start_ms, frame.end_ms);
-            cell.classList.add('playing');
-            setTimeout(() => cell.classList.remove('playing'), 300);
-          }
-        }
-      });
-    });
-  }
+}
+
+function escapeHtml(text) { if (!text) return ''; const div = document.createElement('div'); div.textContent = text; return div.innerHTML; }
+
+function showMessage(text, type) {
+  let msgDiv = document.getElementById('messageArea');
+  if (!msgDiv) return;
+  msgDiv.innerHTML = `<div class="message ${type}">${text}</div>`;
+  setTimeout(() => { if (msgDiv.firstChild && msgDiv.firstChild.innerText === text) msgDiv.innerHTML = ''; }, 2800);
 }
 
 async function submitVerification(action) {
   if (!currentData) { showMessage('No data to submit', 'error'); return; }
-  saveAllPendingEdits();
+  
+  const frames_54 = framesData.tier_54.map(f => ({ text: f.text, start_ms: f.start_ms, end_ms: f.end_ms }));
+  const frames_108 = framesData.tier_108.map(f => ({ text: f.text, start_ms: f.start_ms, end_ms: f.end_ms }));
+  const frames_216 = framesData.tier_216.map(f => ({ text: f.text, start_ms: f.start_ms, end_ms: f.end_ms }));
+  const fullSequence = frames_108.map(f => f.text).filter(t => t).join(' ');
   
   const payload = {
     json_file: currentData.json_file,
     wav_file: currentData.wav_file,
     word: currentData.word,
     sentence: currentData.sentence,
-    sentence_devanagari: currentData.sentence_devanagari,
-    full_sequence: currentData.full_sequence,
-    frames: currentData.frames,
-    window_ms: currentData.window_ms,
-    language: currentData.language,
+    full_sequence: fullSequence,
+    frames_54: frames_54,
+    frames_108: frames_108,
+    frames_216: frames_216,
     duration_ms: currentData.duration_ms || 0,
     submitted_by: currentData.submitted_by,
     action: action,
-    annotator_filter: currentAnnotator
+    annotator_filter: currentAnnotator,
+    is_three_tier: true
   };
-  
-  // If it's a 3-tier file OR we generated 3-tier from old data, include the 3-tier data
-  if (isThreeTierFile && threeTierData.tier_54.length > 0) {
-    payload.frames_54 = threeTierData.tier_54;
-    payload.frames_108 = threeTierData.tier_108;
-    payload.frames_216 = threeTierData.tier_216;
-    payload.is_three_tier = true;
-  }
   
   showMessage(action === 'verify' ? 'Verifying and saving...' : 'Rejecting file...', 'info');
   
   try {
-    const r = await fetch(`${BASE_PATH}/verify/submit`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    });
+    const r = await fetch(`${BASE_PATH}/verify/submit`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
     if (r.status === 401) { window.location.href = `${BASE_PATH}/verify/login`; return; }
     const d = await r.json();
+    if (action === 'verify') showMessage('File verified and saved!', 'success');
+    else showMessage('File rejected and removed. It will be re-annotated.', 'success');
     
-    if (action === 'verify') {
-      showMessage('File verified and saved!', 'success');
-    } else {
-      showMessage('File rejected and removed. It will be re-annotated.', 'success');
-    }
-    
-    // Remove current file from list and load next
     const currentIndex = annotatorFilesList.indexOf(currentData.json_file);
-    if (currentIndex !== -1) {
-      annotatorFilesList.splice(currentIndex, 1);
-    }
-    
+    if (currentIndex !== -1) annotatorFilesList.splice(currentIndex, 1);
     await loadVerificationProgress();
-    
-    if (annotatorFilesList.length > 0) {
-      setTimeout(() => loadSpecificFile(annotatorFilesList[0]), 1200);
-    } else {
-      showCompletionScreen();
-    }
-  } catch (err) {
-    showMessage('Error during submission', 'error');
-  }
-}
-
-function showMessage(text, type) {
-  const msgDiv = document.getElementById('messageArea');
-  if (!msgDiv) return;
-  msgDiv.innerHTML = `<div class="message ${type}">${text}</div>`;
-  setTimeout(() => { if (msgDiv.firstChild && msgDiv.firstChild.innerText === text) msgDiv.innerHTML = ''; }, 2800);
+    if (annotatorFilesList.length > 0) setTimeout(() => loadSpecificFile(annotatorFilesList[0]), 1200);
+    else document.getElementById('content').innerHTML = `<div class="completion-box"><h2>All files verified for ${currentAnnotator}</h2><p>All annotated files for this annotator have been reviewed.</p><button class="btn-verify" onclick="location.reload()">Select Another Annotator</button></div>`;
+  } catch (err) { showMessage('Error during submission: ' + err, 'error'); }
 }
 
 async function init() {
   setupAudioUnlock();
   const verifierNameElem = document.getElementById('verifierName');
-  if (verifierNameElem) {
-    verifierNameElem.innerText = '{{ verifier_name }}';
-  }
+  if (verifierNameElem) verifierNameElem.innerText = '{{ verifier_name }}';
   await loadVerificationProgress();
   await loadAnnotators();
   setInterval(loadVerificationProgress, 10000);
