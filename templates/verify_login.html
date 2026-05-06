@@ -97,7 +97,8 @@
 </div>
 
 <script>
-const BASE_PATH = "{{ base_path }}";   // already passed from Flask
+// Get base_path from Flask template
+const BASE_PATH = "{{ base_path | safe }}";
 
 async function login() {
   const name = document.getElementById('verifierName').value.trim();
@@ -109,27 +110,48 @@ async function login() {
     return;
   }
   
-  // Build full URL using origin + base_path
-  const loginUrl = window.location.origin + BASE_PATH + '/verify/api/login';
+  // Build API URL correctly
+  let apiUrl = '';
+  if (BASE_PATH && BASE_PATH !== '/') {
+    apiUrl = window.location.origin + BASE_PATH + '/verify/api/login';
+  } else {
+    apiUrl = window.location.origin + '/verify/api/login';
+  }
+  
+  console.log('Login URL:', apiUrl);
   
   try {
-    const res = await fetch(loginUrl, {
+    const res = await fetch(apiUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ name: name, password: password })
     });
     const data = await res.json();
     if (res.ok) {
-      window.location.href = window.location.origin + BASE_PATH + '/verify';
+      // Redirect to verification page
+      let redirectUrl = '';
+      if (BASE_PATH && BASE_PATH !== '/') {
+        redirectUrl = window.location.origin + BASE_PATH + '/verify';
+      } else {
+        redirectUrl = window.location.origin + '/verify';
+      }
+      window.location.href = redirectUrl;
     } else {
       errorDiv.innerHTML = `<div class="error">${data.error || 'Login failed'}</div>`;
     }
   } catch (err) {
-    errorDiv.innerHTML = '<div class="error">Connection error</div>';
+    console.error('Login error:', err);
+    errorDiv.innerHTML = '<div class="error">Connection error. Make sure server is running.</div>';
   }
 }
-</script>
 
+// Allow Enter key to submit
+document.getElementById('password').addEventListener('keypress', function(e) {
+  if (e.key === 'Enter') {
+    login();
+  }
+});
+</script>
 
 </body>
 </html>

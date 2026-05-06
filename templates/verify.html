@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
-<title>Verification Tool - 3 Tier</title>
+<title>Verification Tool</title>
 
 <style>
 * {
@@ -177,12 +177,6 @@ body {
   font-family: inherit;
   cursor: pointer;
   outline: none;
-  transition: 0.18s ease;
-}
-
-.annotator-dropdown:focus {
-  border-color: #2C6E49;
-  box-shadow: 0 0 0 2px rgba(44,110,73,0.2);
 }
 
 .load-btn {
@@ -221,15 +215,6 @@ body {
   cursor: pointer;
   transition: all 0.2s ease;
   box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-}
-
-.play-full-btn:hover {
-  transform: scale(1.05);
-  background: #f0f0f0;
-}
-
-.play-full-btn:active {
-  transform: scale(0.95);
 }
 
 .play-full-btn svg {
@@ -299,7 +284,6 @@ body {
 
 .volume-slider::-webkit-slider-thumb {
   -webkit-appearance: none;
-  appearance: none;
   width: 18px;
   height: 18px;
   border-radius: 50%;
@@ -320,7 +304,6 @@ audio {
   border-radius: 44px;
   background: #F9F9F6;
   outline: none;
-  display: none;
 }
 
 .current-file-card {
@@ -338,14 +321,13 @@ audio {
   color: #1A4D3A;
 }
 
-/* ========== 3-TIER GRID STYLES ========== */
+/* 3-TIER GRID */
 .three-tier-section {
   margin: 16px 0;
   border: 1px solid #eef2f8;
   border-radius: 20px;
   background: #ffffff;
   overflow-x: auto;
-  overflow-y: hidden;
   -webkit-overflow-scrolling: touch;
 }
 
@@ -361,7 +343,6 @@ audio {
 .tier-row:last-child { border-bottom: none; }
 
 .tier-header {
-  writing-mode: horizontal-tb;
   white-space: nowrap;
   padding: 10px 12px;
   background: #EBF2EA;
@@ -417,12 +398,6 @@ audio {
   box-shadow: 0 0 0 2px rgba(59,130,246,0.2);
 }
 
-.cell-216:hover, .cell-108:hover, .cell-54:hover {
-  border-color: #cbd5e1;
-  background: #f8fafc;
-  transform: scale(1.01);
-}
-
 .cell-216.playing, .cell-108.playing, .cell-54.playing {
   background: #e6f7ec;
   border-color: #10b981;
@@ -451,8 +426,9 @@ audio {
   border: 1.5px solid #e2e8f0;
   border-radius: 10px;
   font-weight: 600;
-  font-family: 'Noto Sans Devanagari', monospace;
+  font-family: monospace;
   transition: border-color 0.15s, background 0.15s;
+  cursor: text;
 }
 
 .cell-54 .grid-input { font-size: 0.9rem; padding: 8px 2px; }
@@ -481,7 +457,6 @@ audio {
   cursor: pointer;
   font-size: 13px;
   font-weight: 500;
-  transition: all 0.2s;
 }
 
 .speed-btn.active {
@@ -501,7 +476,6 @@ audio {
   margin: 16px 0;
   gap: 10px;
   font-size: 0.82rem;
-  font-weight: 540;
 }
 
 .multi-bar.visible { display: flex; }
@@ -554,8 +528,6 @@ audio {
   font-family: monospace;
   cursor: grab;
   user-select: none;
-  transition: all 0.15s ease;
-  touch-action: none;
 }
 
 .akshar-item:active { cursor: grabbing; transform: scale(0.95); }
@@ -610,11 +582,9 @@ audio {
 .completion-box h2 {
   font-size: 1.9rem;
   font-weight: 560;
-  letter-spacing: -0.3px;
   color: #2C6E49;
   margin-bottom: 12px;
 }
-.completion-box p { font-size: 1rem; margin: 18px 0; color: #3C3C38; }
 .completion-box button {
   background: #2C6E49;
   color: white;
@@ -622,11 +592,14 @@ audio {
   margin: 16px auto 0;
 }
 
-.empty-hint {
-  font-size: 0.7rem;
-  color: #8E8E88;
-  text-align: right;
-  margin-top: 6px;
+.edit-hint {
+  text-align: center;
+  font-size: 0.75rem;
+  color: #2C6E49;
+  margin: 8px 0;
+  padding: 6px;
+  background: #EBF2EA;
+  border-radius: 20px;
 }
 
 @media (max-width: 560px) {
@@ -641,35 +614,17 @@ audio {
   .cell-216 .grid-input { font-size: 0.8rem; padding: 8px 3px; }
   .time-label { font-size: 7px; padding: 2px 4px; }
   .header { flex-direction: column; align-items: stretch; }
-  .header-right { flex-wrap: wrap; justify-content: space-between; }
-  .stats-cards { gap: 6px; }
-  .stat-card { padding: 6px; }
-  .stat-card-value { font-size: 1rem; }
-  .stat-card-label { font-size: 0.6rem; }
   .speed-btn { padding: 4px 10px; font-size: 10px; }
   .akshar-item { padding: 5px 8px; font-size: 0.8rem; min-width: 32px; }
   .btn { padding: 10px 6px; font-size: 0.8rem; }
-  .current-file-card { padding: 8px 12px; font-size: 0.75rem; }
-  .volume-control { padding: 6px 10px; }
-  .volume-value { min-width: 40px; font-size: 0.7rem; }
-  .full-audio-controls { padding: 8px 12px; }
-  .play-full-btn { width: 40px; height: 40px; }
-  .play-full-btn svg { width: 20px; height: 20px; }
-  .time-display { font-size: 0.7rem; min-width: 70px; }
 }
-
-.three-tier-section::-webkit-scrollbar { height: 6px; }
-.three-tier-section::-webkit-scrollbar-track { background: #EFEFE9; border-radius: 8px; }
-.three-tier-section::-webkit-scrollbar-thumb { background: #BDBDB3; border-radius: 8px; }
 </style>
 </head>
 <body>
 
 <div class="container">
   <div class="header">
-    <div class="header-left">
-      <h2>🔍 Verification Tool</h2>
-    </div>
+    <div class="header-left"><h2>🔍 Verification Tool</h2></div>
     <div class="header-right">
       <a href="{{ url_for_path('') }}" class="annotation-link">Annotate</a>
       <div class="user-info">
@@ -680,116 +635,65 @@ audio {
   </div>
 
   <div class="progress-section">
-    <div class="progress-bar">
-      <div class="progress-fill" id="progressFill"></div>
-    </div>
+    <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
   </div>
 
   <div class="stats-cards">
-    <div class="stat-card">
-      <div class="stat-card-label">Verified</div>
-      <div class="stat-card-value" id="verifiedCount">0</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-card-label">Remaining</div>
-      <div class="stat-card-value" id="remainingCount">0</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-card-label">Total</div>
-      <div class="stat-card-value" id="totalCount">0</div>
-    </div>
+    <div class="stat-card"><div class="stat-card-label">Verified</div><div class="stat-card-value" id="verifiedCount">0</div></div>
+    <div class="stat-card"><div class="stat-card-label">Remaining</div><div class="stat-card-value" id="remainingCount">0</div></div>
+    <div class="stat-card"><div class="stat-card-label">Total</div><div class="stat-card-value" id="totalCount">0</div></div>
   </div>
 
-  <div class="annotator-selector" id="annotatorSelector">
+  <div class="annotator-selector">
     <label>👤 Select Annotator to Verify</label>
-    <select id="annotatorSelect" class="annotator-dropdown">
-      <option value="">-- Select Annotator --</option>
-    </select>
+    <select id="annotatorSelect" class="annotator-dropdown"><option value="">-- Select Annotator --</option></select>
     <button id="loadAnnotatorFiles" class="load-btn">📂 Load Files</button>
   </div>
 
-  <div id="content">
-    <div class="loading">Select an annotator and click "Load Files" to start verification</div>
-  </div>
+  <div id="content"><div class="loading">Select an annotator and click "Load Files" to start verification</div></div>
 </div>
 
 <script>
 const BASE_PATH = "{{ base_path }}";
-const AKSHAR_SET = [
-  "अ", "आ", "इ", "उ", "ए", "ओ",
-  "क", "ख", "ग", "घ", "च", "छ", "ज", "झ",
-  "ट", "ठ", "ड", "ढ", "त", "थ", "द", "ध",
-  "प", "फ", "ब", "भ",
-  "न", "म",
-  "य", "र", "ल", "व",
-  "स", "ह", "०"
-];
+const AKSHAR_SET = ["अ","आ","इ","उ","ए","ओ","क","ख","ग","घ","च","छ","ज","झ","ट","ठ","ड","ढ","त","थ","द","ध","प","फ","ब","भ","न","म","य","र","ल","व","स","ह","०"];
 
-let currentData = null;
-let currentAudio = null;
-let currentPlayTimeout = null;
-let audioContext = null;
-let gainNode = null;
-let currentVolume = 1.0;
-let audioUnlocked = false;
-let playbackSpeed = 1.0;
-let isFullAudioPlaying = false;
-let fullAudioProgressInterval = null;
-
-let framesData = {
-  tier_216: [],
-  tier_108: [],
-  tier_54: []
-};
-
-let selectedSegments = {
-  tier_216: new Set(),
-  tier_108: new Set(),
-  tier_54: new Set()
-};
-
-let multiPlayQueue = [];
-let multiPlayIndex = 0;
-let multiPlayTimeout = null;
-
-let currentAnnotator = null;
-let annotatorFilesList = [];
+let currentData = null, currentAudio = null, currentPlayTimeout = null, audioContext = null, gainNode = null;
+let currentVolume = 1.0, audioUnlocked = false, playbackSpeed = 1.0, isFullAudioPlaying = false, fullAudioProgressInterval = null;
+let framesData = { tier_216: [], tier_108: [], tier_54: [] };
+let selectedSegments = { tier_216: new Set(), tier_108: new Set(), tier_54: new Set() };
+let multiPlayQueue = [], multiPlayIndex = 0, multiPlayTimeout = null;
+let currentAnnotator = null, annotatorFilesList = [];
 
 function unlockAudio() {
   if (audioUnlocked) return;
-  if (audioContext && audioContext.state === 'suspended') {
-    audioContext.resume().then(() => { audioUnlocked = true; }).catch(() => {});
-  }
-  if (currentAudio) {
-    currentAudio.play().then(() => { currentAudio.pause(); currentAudio.currentTime = 0; }).catch(() => {});
-  }
+  if (audioContext?.state === 'suspended') audioContext.resume().then(() => audioUnlocked = true).catch(()=>{});
+  if (currentAudio) currentAudio.play().then(()=>{ currentAudio.pause(); currentAudio.currentTime=0; audioUnlocked=true; }).catch(()=>{});
 }
 
 function setupAudioUnlock() {
-  const h = () => { unlockAudio(); document.removeEventListener('touchstart', h); document.removeEventListener('click', h); };
-  document.addEventListener('touchstart', h);
-  document.addEventListener('click', h);
+  const h = () => { unlockAudio(); document.removeEventListener('touchstart',h); document.removeEventListener('click',h); };
+  document.addEventListener('touchstart',h); document.addEventListener('click',h);
 }
 
 function initAudioContext() {
   if (!audioContext && currentAudio) {
     try {
-      audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      audioContext = new (window.AudioContext||window.webkitAudioContext)();
       const source = audioContext.createMediaElementSource(currentAudio);
       gainNode = audioContext.createGain();
       source.connect(gainNode);
       gainNode.connect(audioContext.destination);
       gainNode.gain.value = currentVolume;
-    } catch (e) { console.warn('Web Audio init failed:', e); }
+    } catch(e) { console.warn('Web Audio init failed:', e); }
   }
 }
 
-function updateVolume(value) {
-  currentVolume = value;
-  const volumeSpan = document.getElementById('volumeValue');
-  if (volumeSpan) volumeSpan.innerText = Math.round(value * 100) + '%';
-  if (gainNode) gainNode.gain.value = value;
-  if (currentAudio && !gainNode) currentAudio.volume = Math.min(value, 1.0);
+function updateVolume(v) {
+  currentVolume = v;
+  const span = document.getElementById('volumeValue');
+  if (span) span.innerText = Math.round(v*100)+'%';
+  if (gainNode) gainNode.gain.value = v;
+  if (currentAudio && !gainNode) currentAudio.volume = Math.min(v,1);
 }
 
 function setPlaybackSpeed(speed) {
@@ -802,579 +706,507 @@ function setPlaybackSpeed(speed) {
   showMessage(`Speed: ${speed}x`, 'info');
 }
 
-function playSegmentAudio(startMs, endMs) {
+function playSegmentAudio(startMs,endMs) {
   if (!currentAudio) return;
   stopFullAudioPlayback();
-  const startSec = startMs / 1000;
-  const durationSec = (endMs - startMs) / 1000;
-  if (currentPlayTimeout) clearTimeout(currentPlayTimeout);
-  const doPlay = () => {
+  const startSec=startMs/1000, durationSec=(endMs-startMs)/1000;
+  if(currentPlayTimeout) clearTimeout(currentPlayTimeout);
+  const doPlay=()=>{
     currentAudio.pause();
-    currentAudio.currentTime = startSec;
-    currentAudio.play().then(() => {
-      currentPlayTimeout = setTimeout(() => {
-        if (currentAudio && !currentAudio.paused) currentAudio.pause();
-      }, durationSec * 1000 / playbackSpeed);
-    }).catch(() => {});
+    currentAudio.currentTime=startSec;
+    currentAudio.play().then(()=>{
+      currentPlayTimeout=setTimeout(()=>{ if(currentAudio && !currentAudio.paused) currentAudio.pause(); }, durationSec*1000/playbackSpeed);
+    }).catch(()=>{});
   };
-  if (audioContext && audioContext.state === 'suspended') audioContext.resume().then(doPlay);
+  if(audioContext?.state==='suspended') audioContext.resume().then(doPlay);
   else doPlay();
 }
 
 function stopPlayback() {
-  if (currentPlayTimeout) clearTimeout(currentPlayTimeout);
-  if (multiPlayTimeout) clearTimeout(multiPlayTimeout);
-  if (currentAudio && !currentAudio.paused) currentAudio.pause();
-  document.querySelectorAll('.cell-216.playing, .cell-108.playing, .cell-54.playing').forEach(c => c.classList.remove('playing'));
+  if(currentPlayTimeout) clearTimeout(currentPlayTimeout);
+  if(multiPlayTimeout) clearTimeout(multiPlayTimeout);
+  if(currentAudio && !currentAudio.paused) currentAudio.pause();
+  document.querySelectorAll('.cell-216.playing,.cell-108.playing,.cell-54.playing').forEach(c=>c.classList.remove('playing'));
 }
 
 function toggleFullAudioPlayback() {
-  if (!currentAudio) return;
-  if (isFullAudioPlaying) stopFullAudioPlayback();
+  if(!currentAudio) return;
+  if(isFullAudioPlaying) stopFullAudioPlayback();
   else startFullAudioPlayback();
 }
 
 function startFullAudioPlayback() {
-  if (!currentAudio) return;
-  if (currentPlayTimeout) clearTimeout(currentPlayTimeout);
-  if (multiPlayTimeout) clearTimeout(multiPlayTimeout);
-  const doPlay = () => {
-    currentAudio.playbackRate = playbackSpeed;
-    currentAudio.play().then(() => {
-      isFullAudioPlaying = true;
-      updatePlayButtonUI(true);
-      startProgressTracking();
-    }).catch(err => console.log('Playback error:', err));
+  if(!currentAudio) return;
+  if(currentPlayTimeout) clearTimeout(currentPlayTimeout);
+  if(multiPlayTimeout) clearTimeout(multiPlayTimeout);
+  const doPlay=()=>{
+    currentAudio.playbackRate=playbackSpeed;
+    currentAudio.play().then(()=>{ isFullAudioPlaying=true; updatePlayButtonUI(true); startProgressTracking(); }).catch(err=>console.log(err));
   };
-  if (audioContext && audioContext.state === 'suspended') audioContext.resume().then(doPlay);
+  if(audioContext?.state==='suspended') audioContext.resume().then(doPlay);
   else doPlay();
 }
 
 function stopFullAudioPlayback() {
-  if (!currentAudio) return;
+  if(!currentAudio) return;
   currentAudio.pause();
-  isFullAudioPlaying = false;
+  isFullAudioPlaying=false;
   updatePlayButtonUI(false);
   stopProgressTracking();
 }
 
 function updatePlayButtonUI(isPlaying) {
-  const playBtn = document.getElementById('playFullBtn');
-  if (!playBtn) return;
-  if (isPlaying) {
-    playBtn.classList.add('playing');
-    playBtn.innerHTML = `<svg viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>`;
+  const btn=document.getElementById('playFullBtn');
+  if(!btn) return;
+  if(isPlaying){
+    btn.classList.add('playing');
+    btn.innerHTML='<svg viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>';
   } else {
-    playBtn.classList.remove('playing');
-    playBtn.innerHTML = `<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>`;
+    btn.classList.remove('playing');
+    btn.innerHTML='<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>';
   }
 }
 
 function startProgressTracking() {
-  if (fullAudioProgressInterval) clearInterval(fullAudioProgressInterval);
-  fullAudioProgressInterval = setInterval(() => {
-    if (!currentAudio || currentAudio.paused) {
-      if (isFullAudioPlaying) { isFullAudioPlaying = false; updatePlayButtonUI(false); }
+  if(fullAudioProgressInterval) clearInterval(fullAudioProgressInterval);
+  fullAudioProgressInterval=setInterval(()=>{
+    if(!currentAudio || currentAudio.paused){
+      if(isFullAudioPlaying){ isFullAudioPlaying=false; updatePlayButtonUI(false); }
       stopProgressTracking();
       return;
     }
-    const currentTime = currentAudio.currentTime;
-    const duration = currentAudio.duration || 0;
-    const progressPercent = (currentTime / duration) * 100;
-    const progressFill = document.getElementById('progressFillFull');
-    if (progressFill) progressFill.style.width = progressPercent + '%';
-    const timeDisplay = document.getElementById('timeDisplay');
-    if (timeDisplay) {
-      const currentMin = Math.floor(currentTime / 60);
-      const currentSec = Math.floor(currentTime % 60);
-      const durationMin = Math.floor(duration / 60);
-      const durationSec = Math.floor(duration % 60);
-      timeDisplay.textContent = `${currentMin}:${currentSec.toString().padStart(2,'0')} / ${durationMin}:${durationSec.toString().padStart(2,'0')}`;
+    const ct=currentAudio.currentTime, dur=currentAudio.duration||0;
+    const percent=(ct/dur)*100;
+    const fill=document.getElementById('progressFillFull');
+    if(fill) fill.style.width=percent+'%';
+    const td=document.getElementById('timeDisplay');
+    if(td){
+      const cm=Math.floor(ct/60), cs=Math.floor(ct%60);
+      const dm=Math.floor(dur/60), ds=Math.floor(dur%60);
+      td.textContent=`${cm}:${cs.toString().padStart(2,'0')} / ${dm}:${ds.toString().padStart(2,'0')}`;
     }
-    if (currentTime >= duration) stopFullAudioPlayback();
-  }, 100);
+    if(ct>=dur) stopFullAudioPlayback();
+  },100);
 }
 
 function stopProgressTracking() {
-  if (fullAudioProgressInterval) { clearInterval(fullAudioProgressInterval); fullAudioProgressInterval = null; }
+  if(fullAudioProgressInterval){ clearInterval(fullAudioProgressInterval); fullAudioProgressInterval=null; }
 }
 
 function seekToPosition(e) {
-  if (!currentAudio) return;
-  const progressBar = document.getElementById('progressBarFull');
-  if (!progressBar) return;
-  const rect = progressBar.getBoundingClientRect();
-  let clientX = e.touches ? e.touches[0].clientX : e.clientX;
-  const clickX = clientX - rect.left;
-  const width = rect.width;
-  const clickPercent = clickX / width;
-  const duration = currentAudio.duration || 0;
-  const seekTime = clickPercent * duration;
-  currentAudio.currentTime = seekTime;
+  if(!currentAudio) return;
+  const bar=document.getElementById('progressBarFull');
+  if(!bar) return;
+  const rect=bar.getBoundingClientRect();
+  const x=e.touches?e.touches[0].clientX:e.clientX;
+  const clickX=x-rect.left, width=rect.width;
+  const percent=clickX/width;
+  currentAudio.currentTime=percent*(currentAudio.duration||0);
 }
 
-function playCellAudio(tier, index) {
-  const frame = framesData[tier][index];
-  if (!frame) return;
-  playSegmentAudio(frame.start_ms, frame.end_ms);
-  const cellClass = tier === 'tier_216' ? 'cell-216' : (tier === 'tier_108' ? 'cell-108' : 'cell-54');
-  const cell = document.querySelector(`.${cellClass}[data-idx="${index}"]`);
-  if (cell) { cell.classList.add('playing'); setTimeout(() => cell.classList.remove('playing'), 300); }
+function playCellAudio(tier,idx){
+  const frame=framesData[tier][idx];
+  if(!frame) return;
+  playSegmentAudio(frame.start_ms,frame.end_ms);
+  const cellClass=tier==='tier_216'?'cell-216':(tier==='tier_108'?'cell-108':'cell-54');
+  const cell=document.querySelector(`.${cellClass}[data-idx="${idx}"]`);
+  if(cell){ cell.classList.add('playing'); setTimeout(()=>cell.classList.remove('playing'),300); }
 }
 
-function toggleSegmentSelection(tier, index) {
-  const cellClass = tier === 'tier_216' ? 'cell-216' : (tier === 'tier_108' ? 'cell-108' : 'cell-54');
-  const cell = document.querySelector(`.${cellClass}[data-idx="${index}"]`);
-  if (!cell) return;
-  if (selectedSegments[tier].has(index)) {
-    selectedSegments[tier].delete(index);
+function toggleSegmentSelection(tier,idx){
+  const cellClass=tier==='tier_216'?'cell-216':(tier==='tier_108'?'cell-108':'cell-54');
+  const cell=document.querySelector(`.${cellClass}[data-idx="${idx}"]`);
+  if(!cell) return;
+  if(selectedSegments[tier].has(idx)){
+    selectedSegments[tier].delete(idx);
     cell.classList.remove('selected');
   } else {
-    selectedSegments[tier].add(index);
+    selectedSegments[tier].add(idx);
     cell.classList.add('selected');
   }
   updateMultiBar();
 }
 
-function updateMultiBar() {
-  const bar = document.getElementById('multiBar');
-  if (!bar) return;
-  let totalSelected = selectedSegments.tier_216.size + selectedSegments.tier_108.size + selectedSegments.tier_54.size;
-  if (totalSelected === 0) bar.classList.remove('visible');
+function updateMultiBar(){
+  const bar=document.getElementById('multiBar');
+  if(!bar) return;
+  const total=selectedSegments.tier_216.size+selectedSegments.tier_108.size+selectedSegments.tier_54.size;
+  if(total===0) bar.classList.remove('visible');
   else {
     bar.classList.add('visible');
-    bar.querySelector('.multi-bar-label').textContent = `${totalSelected} segment${totalSelected > 1 ? 's' : ''} selected across all tiers`;
+    bar.querySelector('.multi-bar-label').textContent=`${total} segment${total>1?'s':''} selected`;
   }
 }
 
-function clearSelection() {
+function clearSelection(){
   selectedSegments.tier_216.clear();
   selectedSegments.tier_108.clear();
   selectedSegments.tier_54.clear();
-  document.querySelectorAll('.cell-216.selected, .cell-108.selected, .cell-54.selected').forEach(c => c.classList.remove('selected'));
+  document.querySelectorAll('.cell-216.selected,.cell-108.selected,.cell-54.selected').forEach(c=>c.classList.remove('selected'));
   updateMultiBar();
 }
 
-function playSelectedSegments() {
-  let allSelected = [];
-  for (let tier of ['tier_216', 'tier_108', 'tier_54']) {
-    for (let idx of selectedSegments[tier]) {
-      allSelected.push({ tier, index: idx });
-    }
+function playSelectedSegments(){
+  let all=[];
+  for(let tier of ['tier_216','tier_108','tier_54']){
+    for(let idx of selectedSegments[tier]) all.push({tier,index:idx});
   }
-  if (allSelected.length === 0 || !currentAudio) return;
-  stopPlayback();
-  stopFullAudioPlayback();
-  allSelected.sort((a, b) => framesData[a.tier][a.index].start_ms - framesData[b.tier][b.index].start_ms);
-  multiPlayQueue = allSelected;
-  multiPlayIndex = 0;
+  if(all.length===0 || !currentAudio) return;
+  stopPlayback(); stopFullAudioPlayback();
+  all.sort((a,b)=>framesData[a.tier][a.index].start_ms - framesData[b.tier][b.index].start_ms);
+  multiPlayQueue=all; multiPlayIndex=0;
   playNextInQueue();
 }
 
-function playNextInQueue() {
-  if (multiPlayIndex >= multiPlayQueue.length) {
-    document.querySelectorAll('.cell-216.playing, .cell-108.playing, .cell-54.playing').forEach(c => c.classList.remove('playing'));
+function playNextInQueue(){
+  if(multiPlayIndex>=multiPlayQueue.length){
+    document.querySelectorAll('.cell-216.playing,.cell-108.playing,.cell-54.playing').forEach(c=>c.classList.remove('playing'));
     return;
   }
-  const item = multiPlayQueue[multiPlayIndex];
-  const frame = framesData[item.tier][item.index];
-  if (!frame) { multiPlayIndex++; playNextInQueue(); return; }
-  const cellClass = item.tier === 'tier_216' ? 'cell-216' : (item.tier === 'tier_108' ? 'cell-108' : 'cell-54');
-  document.querySelectorAll(`.${cellClass}.playing`).forEach(c => c.classList.remove('playing'));
-  const cell = document.querySelector(`.${cellClass}[data-idx="${item.index}"]`);
-  if (cell) cell.classList.add('playing');
-  playSegmentAudio(frame.start_ms, frame.end_ms);
-  multiPlayTimeout = setTimeout(() => { multiPlayIndex++; playNextInQueue(); }, (frame.end_ms - frame.start_ms) / playbackSpeed);
+  const item=multiPlayQueue[multiPlayIndex];
+  const frame=framesData[item.tier][item.index];
+  if(!frame){ multiPlayIndex++; playNextInQueue(); return; }
+  const cellClass=item.tier==='tier_216'?'cell-216':(item.tier==='tier_108'?'cell-108':'cell-54');
+  document.querySelectorAll(`.${cellClass}.playing`).forEach(c=>c.classList.remove('playing'));
+  const cell=document.querySelector(`.${cellClass}[data-idx="${item.index}"]`);
+  if(cell) cell.classList.add('playing');
+  playSegmentAudio(frame.start_ms,frame.end_ms);
+  multiPlayTimeout=setTimeout(()=>{ multiPlayIndex++; playNextInQueue(); }, (frame.end_ms-frame.start_ms)/playbackSpeed);
 }
 
-function generateFramesForTier(durationMs, frameSizeMs) {
-  const numFrames = Math.ceil(durationMs / frameSizeMs);
-  const frames = [];
-  for (let i = 0; i < numFrames; i++) {
-    frames.push({ index: i, start_ms: i * frameSizeMs, end_ms: Math.min((i + 1) * frameSizeMs, durationMs), text: "" });
+function generateAllTiersFromFrames(frames, durationMs){
+  if(!frames || frames.length===0){
+    frames = [];
+    const num = Math.ceil(durationMs / 108);
+    for(let i=0;i<num;i++){
+      frames.push({start_ms:i*108, end_ms:Math.min((i+1)*108,durationMs), text:""});
+    }
   }
-  return frames;
-}
-
-function generateAllTiers(originalFrames, durationMs) {
-  let sourceFrames = originalFrames;
-  if (!sourceFrames || sourceFrames.length === 0) {
-    sourceFrames = generateFramesForTier(durationMs, 108);
-  }
+  
+  const tier108 = frames.map((f,idx)=>({index:idx, start_ms:f.start_ms, end_ms:f.end_ms, text:f.text||""}));
+  
   const tier216 = [];
-  for (let i = 0; i < sourceFrames.length; i += 2) {
-    const start = sourceFrames[i].start_ms;
-    const end = i + 1 < sourceFrames.length ? sourceFrames[i + 1].end_ms : sourceFrames[i].end_ms;
-    const text1 = sourceFrames[i].text || "";
-    const text2 = i + 1 < sourceFrames.length ? (sourceFrames[i + 1].text || "") : "";
-    tier216.push({ index: tier216.length, start_ms: start, end_ms: end, text: (text1 + text2).slice(0, 4) });
+  for(let i=0;i<frames.length;i+=2){
+    const start = frames[i].start_ms;
+    const end = i+1 < frames.length ? frames[i+1].end_ms : frames[i].end_ms;
+    const text1 = frames[i].text||"";
+    const text2 = i+1 < frames.length ? (frames[i+1].text||"") : "";
+    tier216.push({index:tier216.length, start_ms:start, end_ms:end, text:(text1+text2).slice(0,4)});
   }
-  const tier108 = sourceFrames.map((f, idx) => ({ ...f, index: idx }));
+  
   const tier54 = [];
-  for (let i = 0; i < sourceFrames.length; i++) {
-    const f = sourceFrames[i];
-    const half = (f.end_ms - f.start_ms) / 2;
-    const textPart = f.text || "";
-    tier54.push({ index: tier54.length, start_ms: f.start_ms, end_ms: f.start_ms + half, text: textPart.length > 0 ? textPart[0] : "" });
-    tier54.push({ index: tier54.length, start_ms: f.start_ms + half, end_ms: f.end_ms, text: textPart.length > 1 ? textPart.slice(1) : "" });
+  for(let i=0;i<frames.length;i++){
+    const f = frames[i];
+    const half = (f.end_ms - f.start_ms)/2;
+    const txt = f.text||"";
+    tier54.push({index:tier54.length, start_ms:f.start_ms, end_ms:f.start_ms+half, text:txt.substring(0,2)});
+    tier54.push({index:tier54.length, start_ms:f.start_ms+half, end_ms:f.end_ms, text:txt.substring(2,4)});
   }
-  return { tier_216: tier216, tier_108: tier108, tier_54: tier54 };
+  
+  return {tier_216:tier216, tier_108:tier108, tier_54:tier54};
 }
 
-function loadDataIntoTiers(audioData) {
-    let sourceFrames = audioData.frames_108 || audioData.frames || [];
-    if (sourceFrames.length === 0) {
-        const durationMs = audioData.duration_ms || 5000;
-        sourceFrames = generateFramesForTier(durationMs, 108);
-    }
-    const allTiers = generateAllTiers(sourceFrames, audioData.duration_ms || 5000);
-    framesData = allTiers;
-    renderThreeTierGrid();
-    if (currentAudio) {
-        currentAudio.pause();
-        currentAudio.src = `${BASE_PATH}/mobile-dataset/${audioData.wav_file}`;
-        currentAudio.load();
-        initAudioContext();
-        updateVolume(currentVolume);
-        setPlaybackSpeed(playbackSpeed);
-        stopFullAudioPlayback();
-        currentAudio.addEventListener('loadedmetadata', () => {
-          const duration = currentAudio.duration || 0;
-          const durationMin = Math.floor(duration / 60);
-          const durationSec = Math.floor(duration % 60);
-          const timeDisplay = document.getElementById('timeDisplay');
-          if (timeDisplay) timeDisplay.textContent = `0:00 / ${durationMin}:${durationSec.toString().padStart(2,'0')}`;
-        });
-        const progressFill = document.getElementById('progressFillFull');
-        if (progressFill) progressFill.style.width = '0%';
-    }
+function loadDataIntoTiers(audioData){
+  let frames = audioData.frames_108 || audioData.frames || [];
+  const durationMs = audioData.duration_ms || 5000;
+  const allTiers = generateAllTiersFromFrames(frames, durationMs);
+  framesData = allTiers;
+  renderThreeTierGrid();
+  
+  if(currentAudio){
+    currentAudio.pause();
+    const audioUrl = `${BASE_PATH}/mobile-dataset/${audioData.wav_file}`;
+    currentAudio.src = audioUrl;
+    currentAudio.load();
+    initAudioContext();
+    updateVolume(currentVolume);
+    setPlaybackSpeed(playbackSpeed);
+    stopFullAudioPlayback();
+  }
 }
 
-function renderThreeTierGrid() {
-  const tier216Row = document.getElementById('tier216Row');
-  const tier108Row = document.getElementById('tier108Row');
-  const tier54Row = document.getElementById('tier54Row');
-  if (!tier216Row) return;
-  tier216Row.innerHTML = '';
-  tier108Row.innerHTML = '';
-  tier54Row.innerHTML = '';
+function renderThreeTierGrid(){
+  const r216=document.getElementById('tier216Row');
+  const r108=document.getElementById('tier108Row');
+  const r54=document.getElementById('tier54Row');
+  if(!r216) return;
+  r216.innerHTML=''; r108.innerHTML=''; r54.innerHTML='';
   
-  const header216 = document.createElement('div');
-  header216.className = 'tier-header';
-  header216.innerText = 'वायु (216ms)';
-  tier216Row.appendChild(header216);
+  const h216=document.createElement('div'); h216.className='tier-header'; h216.innerText='वायु (216ms)'; r216.appendChild(h216);
+  const h108=document.createElement('div'); h108.className='tier-header'; h108.innerText='अग्नि (108ms)'; r108.appendChild(h108);
+  const h54=document.createElement('div'); h54.className='tier-header'; h54.innerText='आकाश (54ms)'; r54.appendChild(h54);
   
-  const header108 = document.createElement('div');
-  header108.className = 'tier-header';
-  header108.innerText = 'अग्नि (108ms)';
-  tier108Row.appendChild(header108);
-  
-  const header54 = document.createElement('div');
-  header54.className = 'tier-header';
-  header54.innerText = 'आकाश (54ms)';
-  tier54Row.appendChild(header54);
-  
-  framesData.tier_216.forEach((frame, idx) => { const div = createCell(frame, idx, '216'); tier216Row.appendChild(div); });
-  framesData.tier_108.forEach((frame, idx) => { const div = createCell(frame, idx, '108'); tier108Row.appendChild(div); });
-  framesData.tier_54.forEach((frame, idx) => { const div = createCell(frame, idx, '54'); tier54Row.appendChild(div); });
+  framesData.tier_216.forEach((f,i)=>{ r216.appendChild(createCell(f,i,'216')); });
+  framesData.tier_108.forEach((f,i)=>{ r108.appendChild(createCell(f,i,'108')); });
+  framesData.tier_54.forEach((f,i)=>{ r54.appendChild(createCell(f,i,'54')); });
 }
 
-function createCell(frame, idx, tier) {
-  const div = document.createElement('div');
-  div.className = `cell-${tier}`;
-  div.setAttribute('data-idx', idx);
-  div.setAttribute('data-tier', `tier_${tier}`);
+function createCell(frame,idx,tier){
+  const div=document.createElement('div');
+  div.className=`cell-${tier}`;
+  div.setAttribute('data-idx',idx);
+  div.setAttribute('data-tier',`tier_${tier}`);
   
-  const timeSpan = document.createElement('div');
-  timeSpan.className = 'time-label';
-  timeSpan.innerText = `${(frame.start_ms / 1000).toFixed(2)}s`;
+  const timeSpan=document.createElement('div');
+  timeSpan.className='time-label';
+  timeSpan.innerText=`${(frame.start_ms/1000).toFixed(2)}s`;
   
-  const input = document.createElement('input');
-  input.type = 'text';
-  input.className = 'grid-input';
-  input.value = frame.text || '';
-  input.placeholder = '';
-  input.setAttribute('data-idx', idx);
-  input.setAttribute('data-tier', `tier_${tier}`);
-  let maxLen = tier === '216' ? 4 : (tier === '108' ? 4 : 2);
-  if (maxLen) input.setAttribute('maxlength', maxLen);
+  const input=document.createElement('input');
+  input.type='text';
+  input.className='grid-input';
+  input.value=frame.text||'';
+  input.setAttribute('data-idx',idx);
+  input.setAttribute('data-tier',`tier_${tier}`);
+  const maxLen=tier==='216'?4:(tier==='108'?4:2);
+  if(maxLen) input.setAttribute('maxlength',maxLen);
   
-  input.addEventListener('input', (e) => {
-    let val = e.target.value;
-    if (maxLen && val.length > maxLen) val = val.slice(0, maxLen);
-    e.target.value = val;
-    framesData[`tier_${tier}`][idx].text = val;
+  input.addEventListener('input',(e)=>{
+    let val=e.target.value;
+    if(maxLen && val.length>maxLen) val=val.slice(0,maxLen);
+    e.target.value=val;
+    framesData[`tier_${tier}`][idx].text=val;
   });
   
   div.appendChild(timeSpan);
   div.appendChild(input);
   
-  div.addEventListener('click', (e) => { if (e.target === input) return; playCellAudio(`tier_${tier}`, idx); });
-  input.addEventListener('click', (e) => { e.stopPropagation(); playCellAudio(`tier_${tier}`, idx); });
+  div.addEventListener('click',(e)=>{ if(e.target===input) return; playCellAudio(`tier_${tier}`,idx); });
+  input.addEventListener('click',(e)=>{ e.stopPropagation(); playCellAudio(`tier_${tier}`,idx); });
   
-  let pressTimer = null;
-  div.addEventListener('touchstart', (e) => {
-    if (e.target === input) return;
-    pressTimer = setTimeout(() => { toggleSegmentSelection(`tier_${tier}`, idx); if (window.navigator && window.navigator.vibrate) window.navigator.vibrate(50); pressTimer = null; }, 500);
+  let pressTimer=null;
+  div.addEventListener('touchstart',(e)=>{
+    if(e.target===input) return;
+    pressTimer=setTimeout(()=>{ toggleSegmentSelection(`tier_${tier}`,idx); if(window.navigator?.vibrate) window.navigator.vibrate(50); pressTimer=null; },500);
   });
-  div.addEventListener('touchend', () => { if (pressTimer) { clearTimeout(pressTimer); pressTimer = null; } });
-  div.addEventListener('touchmove', () => { if (pressTimer) { clearTimeout(pressTimer); pressTimer = null; } });
-  div.addEventListener('mousedown', (e) => { if (e.target === input) return; toggleSegmentSelection(`tier_${tier}`, idx); });
-  div.addEventListener('contextmenu', (e) => { e.preventDefault(); return false; });
+  div.addEventListener('touchend',()=>{ if(pressTimer){ clearTimeout(pressTimer); pressTimer=null; } });
+  div.addEventListener('touchmove',()=>{ if(pressTimer){ clearTimeout(pressTimer); pressTimer=null; } });
+  div.addEventListener('mousedown',(e)=>{ if(e.target===input) return; toggleSegmentSelection(`tier_${tier}`,idx); });
+  div.addEventListener('contextmenu',(e)=>{ e.preventDefault(); return false; });
   
   return div;
 }
 
-async function logout() {
-  await fetch(`${BASE_PATH}/verify/api/logout`, { method: 'POST' });
-  window.location.href = `${BASE_PATH}/verify/login`;
+async function logout(){
+  await fetch(`${BASE_PATH}/verify/api/logout`,{method:'POST'});
+  window.location.href=`${BASE_PATH}/verify/login`;
 }
 
-async function loadVerificationProgress() {
-  try {
-    const r = await fetch(`${BASE_PATH}/verify/progress`);
-    if (r.status === 401) { window.location.href = `${BASE_PATH}/verify/login`; return; }
-    const d = await r.json();
-    document.getElementById('verifiedCount').innerText = d.verified || 0;
-    document.getElementById('remainingCount').innerText = d.remaining || 0;
-    document.getElementById('totalCount').innerText = d.total || 0;
-    const pct = d.percent || 0;
-    document.getElementById('progressFill').style.width = pct + '%';
-  } catch (err) { console.warn('Progress error:', err); }
+async function loadVerificationProgress(){
+  try{
+    const r=await fetch(`${BASE_PATH}/verify/progress`);
+    if(r.status===401){ window.location.href=`${BASE_PATH}/verify/login`; return; }
+    const d=await r.json();
+    document.getElementById('verifiedCount').innerText=d.verified||0;
+    document.getElementById('remainingCount').innerText=d.remaining||0;
+    document.getElementById('totalCount').innerText=d.total||0;
+    document.getElementById('progressFill').style.width=(d.percent||0)+'%';
+  }catch(err){ console.warn(err); }
 }
 
-async function loadAnnotators() {
-  try {
-    const r = await fetch(`${BASE_PATH}/verify/api/annotators`);
-    if (r.status === 401) { window.location.href = `${BASE_PATH}/verify/login`; return; }
-    const data = await r.json();
-    const select = document.getElementById('annotatorSelect');
-    select.innerHTML = '<option value="">-- Select Annotator --</option>';
-    data.annotators.forEach(annotator => {
-      const option = document.createElement('option');
-      option.value = annotator;
-      option.textContent = annotator;
-      select.appendChild(option);
-    });
-  } catch (err) { console.error('Error loading annotators:', err); }
+async function loadAnnotators(){
+  try{
+    const r=await fetch(`${BASE_PATH}/verify/api/annotators`);
+    if(r.status===401){ window.location.href=`${BASE_PATH}/verify/login`; return; }
+    const data=await r.json();
+    const select=document.getElementById('annotatorSelect');
+    select.innerHTML='<option value="">-- Select Annotator --</option>';
+    data.annotators.forEach(a=>{ const opt=document.createElement('option'); opt.value=a; opt.textContent=a; select.appendChild(opt); });
+  }catch(err){ console.error(err); }
 }
 
-document.getElementById('loadAnnotatorFiles').addEventListener('click', async () => {
-  const select = document.getElementById('annotatorSelect');
-  const annotator = select.value;
-  if (!annotator) { showMessage('Please select an annotator first', 'error'); return; }
-  currentAnnotator = annotator;
-  showMessage(`Loading files for annotator: ${annotator}...`, 'info');
-  try {
-    const r = await fetch(`${BASE_PATH}/verify/api/annotator-files?annotator=${encodeURIComponent(annotator)}`);
-    if (r.status === 401) { window.location.href = `${BASE_PATH}/verify/login`; return; }
-    const data = await r.json();
-    if (data.files && data.files.length > 0) {
-      annotatorFilesList = data.files;
-      showMessage(`Found ${data.files.length} files for ${annotator}. Loading first file...`, 'success');
+document.getElementById('loadAnnotatorFiles').addEventListener('click',async()=>{
+  const select=document.getElementById('annotatorSelect');
+  const annotator=select.value;
+  if(!annotator){ showMessage('Please select an annotator first','error'); return; }
+  currentAnnotator=annotator;
+  showMessage(`Loading files for ${annotator}...`,'info');
+  try{
+    const r=await fetch(`${BASE_PATH}/verify/api/annotator-files?annotator=${encodeURIComponent(annotator)}`);
+    if(r.status===401){ window.location.href=`${BASE_PATH}/verify/login`; return; }
+    const data=await r.json();
+    if(data.files && data.files.length>0){
+      annotatorFilesList=data.files;
+      showMessage(`Found ${data.files.length} files for ${annotator}`,'success');
       await loadSpecificFile(annotatorFilesList[0]);
     } else {
-      showMessage(`No pending files found for annotator: ${annotator}`, 'info');
-      document.getElementById('content').innerHTML = '<div class="loading">No files to verify for this annotator</div>';
+      showMessage(`No pending files for ${annotator}`,'info');
+      document.getElementById('content').innerHTML='<div class="loading">No files to verify for this annotator</div>';
     }
-  } catch (err) { showMessage('Error loading annotator files: ' + err, 'error'); }
+  }catch(err){ showMessage('Error: '+err,'error'); }
 });
 
-async function loadSpecificFile(jsonFile) {
-  const contentDiv = document.getElementById('content');
-  contentDiv.innerHTML = '<div class="loading">Loading file for verification...</div>';
-  if (audioContext) { await audioContext.close(); audioContext = null; gainNode = null; }
-  audioUnlocked = false;
-  selectedSegments = { tier_216: new Set(), tier_108: new Set(), tier_54: new Set() };
-  try {
-    const r = await fetch(`${BASE_PATH}/verify/api/get-file/${encodeURIComponent(jsonFile)}?annotator=${encodeURIComponent(currentAnnotator)}`);
-    if (r.status === 401) { window.location.href = `${BASE_PATH}/verify/login`; return; }
-    const d = await r.json();
-    if (d.error) { showErrorScreen(d.error); return; }
-    currentData = d;
+async function loadSpecificFile(jsonFile){
+  document.getElementById('content').innerHTML='<div class="loading">Loading file...</div>';
+  if(audioContext){ await audioContext.close(); audioContext=null; gainNode=null; }
+  audioUnlocked=false;
+  selectedSegments={tier_216:new Set(),tier_108:new Set(),tier_54:new Set()};
+  try{
+    const r=await fetch(`${BASE_PATH}/verify/api/get-file/${encodeURIComponent(jsonFile)}?annotator=${encodeURIComponent(currentAnnotator)}`);
+    if(r.status===401){ window.location.href=`${BASE_PATH}/verify/login`; return; }
+    const d=await r.json();
+    if(d.error){ showErrorScreen(d.error); return; }
+    currentData=d;
+    
+    if(currentAudio){
+      currentAudio.pause();
+      currentAudio.src='';
+    } else {
+      currentAudio = new Audio();
+      currentAudio.crossOrigin = "anonymous";
+      setupAudioUnlock();
+    }
+    
     loadDataIntoTiers(d);
-    renderVerificationUI();
-  } catch (err) { showErrorScreen('Connection issue: ' + err); }
+    renderUI();
+  }catch(err){ showErrorScreen('Connection issue: '+err); }
 }
 
-function showErrorScreen(message) {
-  document.getElementById('content').innerHTML = `<div class="message error" style="margin-top:20px;">Error: ${message}</div><div class="button-group" style="margin-top:20px;"><button class="btn-verify" onclick="location.reload()">Go Back</button></div>`;
+function showErrorScreen(msg){
+  document.getElementById('content').innerHTML=`<div class="message error" style="margin-top:20px;">Error: ${msg}</div><div class="button-group" style="margin-top:20px;"><button class="btn-verify" onclick="location.reload()">Go Back</button></div>`;
 }
 
-function renderVerificationUI() {
-  const sentenceDisplay = currentData.sentence ? `<div><strong>Sentence:</strong> ${escapeHtml(currentData.sentence)}</div>` : '';
+function renderUI(){
+  const sentDisplay=currentData.sentence?`<div><strong>Sentence:</strong> ${escapeHtml(currentData.sentence)}</div>`:'';
   
-  document.getElementById('content').innerHTML = `
+  document.getElementById('content').innerHTML=`
     <div class="audio-wrapper">
       <div class="full-audio-controls">
-        <button id="playFullBtn" class="play-full-btn" onclick="toggleFullAudioPlayback()"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></button>
+        <button id="playFullBtn" class="play-full-btn"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></button>
         <div class="full-audio-info"><span>Full Audio</span></div>
-        <div id="progressBarFull" class="progress-bar-full" onclick="seekToPosition(event)" ontouchstart="seekToPosition(event)"><div id="progressFillFull" class="progress-fill-full"></div></div>
+        <div id="progressBarFull" class="progress-bar-full"><div id="progressFillFull" class="progress-fill-full"></div></div>
         <div id="timeDisplay" class="time-display">0:00 / 0:00</div>
       </div>
-      <div class="volume-control">
-        <span class="volume-icon">🔊</span>
-        <input type="range" id="volumeSlider" class="volume-slider" min="0" max="1" step="0.01" value="1">
-        <span id="volumeValue" class="volume-value">100%</span>
-      </div>
-      <div class="speed-control">
-        <button class="speed-btn" data-speed="0.5">0.5x</button>
-        <button class="speed-btn active" data-speed="1">1x</button>
-        <button class="speed-btn" data-speed="1.5">1.5x</button>
-        <button class="speed-btn" data-speed="2">2x</button>
-      </div>
-      <div class="current-file-card">
-        <div><strong>File:</strong> ${currentData.json_file}</div>
-        <div><strong>Word:</strong> ${currentData.word || '—'}</div>
-        ${sentenceDisplay}
-        <div style="margin-top:8px;font-size:0.8rem;color:#6E6E68;"><strong>Original Annotator:</strong> ${currentData.submitted_by || 'unknown'}</div>
-        <div style="margin-top:4px;font-size:0.75rem;color:#8E8E88;"><strong>Progress:</strong> ${annotatorFilesList.indexOf(currentData.json_file) + 1} of ${annotatorFilesList.length} files for this annotator</div>
-      </div>
+      <div class="volume-control"><span class="volume-icon">🔊</span><input type="range" id="volumeSlider" class="volume-slider" min="0" max="1" step="0.01" value="1"><span id="volumeValue" class="volume-value">100%</span></div>
+      <div class="speed-control"><button class="speed-btn" data-speed="0.5">0.5x</button><button class="speed-btn active" data-speed="1">1x</button><button class="speed-btn" data-speed="1.5">1.5x</button><button class="speed-btn" data-speed="2">2x</button></div>
+      <div class="current-file-card"><div><strong>File:</strong> ${currentData.json_file}</div><div><strong>Word:</strong> ${currentData.word||'—'}</div>${sentDisplay}<div style="margin-top:8px;"><strong>Original Annotator:</strong> ${currentData.submitted_by||'unknown'}</div><div style="margin-top:4px;"><strong>Progress:</strong> ${annotatorFilesList.indexOf(currentData.json_file)+1} of ${annotatorFilesList.length} files</div></div>
     </div>
-    
-    <div class="three-tier-section">
-      <div class="tier-row tier-row-216" id="tier216Row"></div>
-      <div class="tier-row tier-row-108" id="tier108Row"></div>
-      <div class="tier-row tier-row-54" id="tier54Row"></div>
-    </div>
-    
-    <div id="multiBar" class="multi-bar">
-      <span class="multi-bar-label">0 segments selected</span>
-      <button class="multi-bar-btn play" onclick="playSelectedSegments()">▶ Play Selected</button>
-      <button class="multi-bar-btn" onclick="clearSelection()">Clear</button>
-    </div>
-    
-    <div class="akshar-set-section">
-      <div class="akshar-title">Tap to insert | Long press cell to select | Drag & drop akshars to edit</div>
-      <div class="akshar-grid" id="aksharGrid"></div>
-    </div>
-    
-    <div class="button-group">
-      <button class="btn btn-verify" id="verifyBtn">✅ Verify & Save</button>
-      <button class="btn btn-reject" id="rejectBtn">❌ Reject & Delete</button>
-    </div>
-    
-    <div id="messageArea" class="message-area"></div>
-  `;
+    <div class="three-tier-section"><div class="tier-row tier-row-216" id="tier216Row"></div><div class="tier-row tier-row-108" id="tier108Row"></div><div class="tier-row tier-row-54" id="tier54Row"></div></div>
+    <div class="edit-hint">✏️ <strong>Verifiers can edit:</strong> Click any cell → Type to edit | Drag & drop akshars below</div>
+    <div id="multiBar" class="multi-bar"><span class="multi-bar-label">0 segments selected</span><button class="multi-bar-btn play">▶ Play Selected</button><button class="multi-bar-btn">Clear</button></div>
+    <div class="akshar-set-section"><div class="akshar-title">Drag & drop akshars to edit cells</div><div class="akshar-grid" id="aksharGrid"></div></div>
+    <div class="button-group"><button class="btn btn-verify" id="verifyBtn">✅ Verify & Save</button><button class="btn btn-reject" id="rejectBtn">❌ Reject & Delete</button></div>
+    <div id="messageArea" class="message-area"></div>`;
   
-  const volumeSlider = document.getElementById('volumeSlider');
-  if (volumeSlider) volumeSlider.addEventListener('input', (e) => updateVolume(parseFloat(e.target.value)));
-  document.querySelectorAll('.speed-btn').forEach(btn => btn.addEventListener('click', () => setPlaybackSpeed(parseFloat(btn.dataset.speed))));
+  // Re-attach event listeners
+  const playBtn=document.getElementById('playFullBtn');
+  if(playBtn) playBtn.onclick=toggleFullAudioPlayback;
   
-  window.toggleFullAudioPlayback = toggleFullAudioPlayback;
-  window.seekToPosition = seekToPosition;
-  window.playSelectedSegments = playSelectedSegments;
-  window.clearSelection = clearSelection;
+  const progressBar=document.getElementById('progressBarFull');
+  if(progressBar){
+    progressBar.onclick=seekToPosition;
+    progressBar.ontouchstart=seekToPosition;
+  }
   
-  const aksharGrid = document.getElementById('aksharGrid');
-  AKSHAR_SET.forEach(akshar => {
-    const span = document.createElement('span');
-    span.className = 'akshar-item';
-    span.textContent = akshar;
-    span.setAttribute('draggable', 'true');
-    span.setAttribute('data-akshar', akshar);
-    span.addEventListener('dragstart', (e) => { e.dataTransfer.setData('text/plain', akshar); e.dataTransfer.effectAllowed = 'copy'; });
-    span.addEventListener('click', (e) => {
-      const activeElement = document.activeElement;
-      if (activeElement && activeElement.tagName === 'INPUT' && activeElement.classList.contains('grid-input')) {
-        const start = activeElement.selectionStart;
-        const end = activeElement.selectionEnd;
-        const value = activeElement.value;
-        const tier = activeElement.getAttribute('data-tier');
-        let maxLen = tier === 'tier_54' ? 2 : 4;
-        if (value.length < maxLen) {
-          activeElement.value = value.substring(0, start) + akshar + value.substring(end);
-          activeElement.dispatchEvent(new Event('input', { bubbles: true }));
-          activeElement.focus();
-        } else { showMessage('Maximum characters reached for this cell!', 'warning'); }
-      } else { showMessage('Click on a grid cell first, then tap akshar to insert', 'info'); }
-    });
+  const volumeSlider=document.getElementById('volumeSlider');
+  if(volumeSlider) volumeSlider.oninput=(e)=>updateVolume(parseFloat(e.target.value));
+  
+  document.querySelectorAll('.speed-btn').forEach(btn=>{
+    btn.onclick=()=>setPlaybackSpeed(parseFloat(btn.dataset.speed));
+  });
+  
+  const playSelectedBtn=document.querySelector('#multiBar .play');
+  if(playSelectedBtn) playSelectedBtn.onclick=playSelectedSegments;
+  
+  const clearBtn=document.querySelector('#multiBar .clear');
+  if(clearBtn) clearBtn.onclick=clearSelection;
+  
+  const aksharGrid=document.getElementById('aksharGrid');
+  AKSHAR_SET.forEach(akshar=>{
+    const span=document.createElement('span');
+    span.className='akshar-item';
+    span.textContent=akshar;
+    span.setAttribute('draggable','true');
+    span.setAttribute('data-akshar',akshar);
+    span.ondragstart=(e)=>{ e.dataTransfer.setData('text/plain',akshar); e.dataTransfer.effectAllowed='copy'; };
+    span.onclick=()=>{
+      const active=document.activeElement;
+      if(active && active.tagName==='INPUT' && active.classList.contains('grid-input')){
+        const start=active.selectionStart, end=active.selectionEnd, val=active.value;
+        const tier=active.getAttribute('data-tier');
+        let maxLen=tier==='tier_54'?2:4;
+        if(val.length<maxLen){
+          active.value=val.substring(0,start)+akshar+val.substring(end);
+          active.dispatchEvent(new Event('input',{bubbles:true}));
+          active.focus();
+          showMessage(`Added "${akshar}"`,'success');
+        } else showMessage('Maximum characters reached!','warning');
+      } else showMessage('Click on a grid cell first','info');
+    };
     aksharGrid.appendChild(span);
   });
   
-  document.addEventListener('dragover', (e) => e.preventDefault());
-  document.addEventListener('drop', (e) => {
+  document.ondragover=(e)=>e.preventDefault();
+  document.ondrop=(e)=>{
     e.preventDefault();
-    const target = e.target;
-    if (target && target.tagName === 'INPUT' && target.classList.contains('grid-input')) {
-      const akshar = e.dataTransfer.getData('text/plain');
-      if (akshar) {
-        const start = target.selectionStart;
-        const end = target.selectionEnd;
-        const value = target.value;
-        const tier = target.getAttribute('data-tier');
-        let maxLen = tier === 'tier_54' ? 2 : 4;
-        if (value.length < maxLen) {
-          target.value = value.substring(0, start) + akshar + value.substring(end);
-          target.dispatchEvent(new Event('input', { bubbles: true }));
-          target.focus();
-          showMessage(`Added "${akshar}" to cell`, 'success');
-        } else { showMessage('Maximum characters reached for this cell!', 'warning'); }
+    const t=e.target;
+    if(t && t.tagName==='INPUT' && t.classList.contains('grid-input')){
+      const akshar=e.dataTransfer.getData('text/plain');
+      if(akshar){
+        const start=t.selectionStart, end=t.selectionEnd, val=t.value;
+        const tier=t.getAttribute('data-tier');
+        let maxLen=tier==='tier_54'?2:4;
+        if(val.length<maxLen){
+          t.value=val.substring(0,start)+akshar+val.substring(end);
+          t.dispatchEvent(new Event('input',{bubbles:true}));
+          t.focus();
+          showMessage(`Added "${akshar}"`,'success');
+        } else showMessage('Maximum characters reached!','warning');
       }
     }
-  });
-  
-  document.getElementById('verifyBtn').addEventListener('click', () => submitVerification('verify'));
-  document.getElementById('rejectBtn').addEventListener('click', () => submitVerification('reject'));
-}
-
-function escapeHtml(text) { if (!text) return ''; const div = document.createElement('div'); div.textContent = text; return div.innerHTML; }
-
-function showMessage(text, type) {
-  let msgDiv = document.getElementById('messageArea');
-  if (!msgDiv) return;
-  msgDiv.innerHTML = `<div class="message ${type}">${text}</div>`;
-  setTimeout(() => { if (msgDiv.firstChild && msgDiv.firstChild.innerText === text) msgDiv.innerHTML = ''; }, 2800);
-}
-
-async function submitVerification(action) {
-  if (!currentData) { showMessage('No data to submit', 'error'); return; }
-  
-  const frames_54 = framesData.tier_54.map(f => ({ text: f.text, start_ms: f.start_ms, end_ms: f.end_ms }));
-  const frames_108 = framesData.tier_108.map(f => ({ text: f.text, start_ms: f.start_ms, end_ms: f.end_ms }));
-  const frames_216 = framesData.tier_216.map(f => ({ text: f.text, start_ms: f.start_ms, end_ms: f.end_ms }));
-  const fullSequence = frames_108.map(f => f.text).filter(t => t).join(' ');
-  
-  const payload = {
-    json_file: currentData.json_file,
-    wav_file: currentData.wav_file,
-    word: currentData.word,
-    sentence: currentData.sentence,
-    full_sequence: fullSequence,
-    frames_54: frames_54,
-    frames_108: frames_108,
-    frames_216: frames_216,
-    duration_ms: currentData.duration_ms || 0,
-    submitted_by: currentData.submitted_by,
-    action: action,
-    annotator_filter: currentAnnotator,
-    is_three_tier: true
   };
   
-  showMessage(action === 'verify' ? 'Verifying and saving...' : 'Rejecting file...', 'info');
+  document.getElementById('verifyBtn').onclick=()=>submitVerification('verify');
+  document.getElementById('rejectBtn').onclick=()=>submitVerification('reject');
   
-  try {
-    const r = await fetch(`${BASE_PATH}/verify/submit`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-    if (r.status === 401) { window.location.href = `${BASE_PATH}/verify/login`; return; }
-    const d = await r.json();
-    if (action === 'verify') showMessage('File verified and saved!', 'success');
-    else showMessage('File rejected and removed. It will be re-annotated.', 'success');
-    
-    const currentIndex = annotatorFilesList.indexOf(currentData.json_file);
-    if (currentIndex !== -1) annotatorFilesList.splice(currentIndex, 1);
-    await loadVerificationProgress();
-    if (annotatorFilesList.length > 0) setTimeout(() => loadSpecificFile(annotatorFilesList[0]), 1200);
-    else document.getElementById('content').innerHTML = `<div class="completion-box"><h2>All files verified for ${currentAnnotator}</h2><p>All annotated files for this annotator have been reviewed.</p><button class="btn-verify" onclick="location.reload()">Select Another Annotator</button></div>`;
-  } catch (err) { showMessage('Error during submission: ' + err, 'error'); }
+  // Re-render grid after UI is built
+  renderThreeTierGrid();
 }
 
-async function init() {
+function escapeHtml(t){ if(!t) return ''; const d=document.createElement('div'); d.textContent=t; return d.innerHTML; }
+
+function showMessage(text,type){
+  const div=document.getElementById('messageArea');
+  if(!div) return;
+  div.innerHTML=`<div class="message ${type}">${text}</div>`;
+  setTimeout(()=>{ if(div.firstChild?.innerText===text) div.innerHTML=''; },2800);
+}
+
+async function submitVerification(action){
+  if(!currentData){ showMessage('No data','error'); return; }
+  
+  const f54=framesData.tier_54.map(f=>({text:f.text,start_ms:f.start_ms,end_ms:f.end_ms}));
+  const f108=framesData.tier_108.map(f=>({text:f.text,start_ms:f.start_ms,end_ms:f.end_ms}));
+  const f216=framesData.tier_216.map(f=>({text:f.text,start_ms:f.start_ms,end_ms:f.end_ms}));
+  
+  const payload={
+    json_file:currentData.json_file, wav_file:currentData.wav_file, word:currentData.word,
+    sentence:currentData.sentence, full_sequence:f108.map(f=>f.text).filter(t=>t).join(' '),
+    frames_54:f54, frames_108:f108, frames_216:f216,
+    duration_ms:currentData.duration_ms||0, submitted_by:currentData.submitted_by,
+    action:action, annotator_filter:currentAnnotator, is_three_tier:true
+  };
+  
+  showMessage(action==='verify'?'Verifying...':'Rejecting...','info');
+  try{
+    const r=await fetch(`${BASE_PATH}/verify/submit`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+    if(r.status===401){ window.location.href=`${BASE_PATH}/verify/login`; return; }
+    const d=await r.json();
+    showMessage(action==='verify'?'File verified and saved!':'File rejected and removed.','success');
+    const idx=annotatorFilesList.indexOf(currentData.json_file);
+    if(idx!==-1) annotatorFilesList.splice(idx,1);
+    await loadVerificationProgress();
+    if(annotatorFilesList.length>0) setTimeout(()=>loadSpecificFile(annotatorFilesList[0]),1200);
+    else document.getElementById('content').innerHTML=`<div class="completion-box"><h2>All files verified for ${currentAnnotator}</h2><p>All done!</p><button class="btn-verify" onclick="location.reload()">Select Another Annotator</button></div>`;
+  }catch(err){ showMessage('Error: '+err,'error'); }
+}
+
+async function init(){
   setupAudioUnlock();
-  const verifierNameElem = document.getElementById('verifierName');
-  if (verifierNameElem) verifierNameElem.innerText = '{{ verifier_name }}';
+  const nameSpan=document.getElementById('verifierName');
+  if(nameSpan) nameSpan.innerText='{{ verifier_name }}';
   await loadVerificationProgress();
   await loadAnnotators();
-  setInterval(loadVerificationProgress, 10000);
+  setInterval(loadVerificationProgress,10000);
 }
 
 init();
