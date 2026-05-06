@@ -839,7 +839,8 @@ audio {
       <button class="self-record-btn" onclick="window.location.href='{{ url_for_path('self-record') }}'">Self</button>
       <button class="live-stream-btn" onclick="window.location.href='{{ url_for_path('live-stream') }}'">Live</button>
       <button class="stats-btn" onclick="window.location.href='{{ url_for_path('stats') }}'">Stats</button>
-      <button class="stats-btn" onclick="window.location.href='{{ url_for_path('verify') }}'">Verify</button>
+      <!-- FIXED: Verify button now uses direct path with base_path -->
+      <button class="stats-btn" onclick="window.location.href='{{ base_path }}/verify'">Verify</button>
       <button class="training-btn" onclick="window.location.href='{{ url_for_path('mobile-training') }}'">Training</button>
       <div class="user-info">
         <span class="user-name" id="usernameDisplay">Loading...</span>
