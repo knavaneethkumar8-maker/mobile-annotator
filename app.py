@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify, send_from_directory, session, redirect, url_for
+from flask import Flask, render_template, request, jsonify, send_from_directory, session, redirect, url_for, send_file
 import wave
 import math
 import os
@@ -71,7 +71,7 @@ if BASE_PATH:
 # ==============================
 
 # Base folder for mobile training data
-MOBILE_TRAINING_DATA_BASE_FOLDER = "/mnt/data_disk_2/UI_TRAINING_DATA/MOBILE_DATA/normal_data"
+MOBILE_TRAINING_DATA_BASE_FOLDER = "mnt/data_disk_2/UI_TRAINING_DATA/MOBILE_DATA/normal_data"
 
 # Create the base directory
 os.makedirs(MOBILE_TRAINING_DATA_BASE_FOLDER, exist_ok=True)
@@ -2259,7 +2259,7 @@ def verify_submit():
 
 MOBILE_TRAINING_PROGRESS_FOLDER = "mobile_training_progress"
 MOBILE_TRAINING_AUDIO_FOLDER = "mobile_training_audio"
-MOBILE_TRAINING_VIDEOS_FOLDER = "static/mobile_training/videos"
+MOBILE_TRAINING_VIDEOS_FOLDER = "static/mobile_training_videos"
 
 # Create folders
 os.makedirs(MOBILE_TRAINING_PROGRESS_FOLDER, exist_ok=True)
@@ -2269,6 +2269,86 @@ os.makedirs(MOBILE_TRAINING_VIDEOS_FOLDER, exist_ok=True)
 def get_mobile_training_progress_path(username):
     """Get path for user's mobile training progress"""
     return os.path.join(MOBILE_TRAINING_PROGRESS_FOLDER, f"{username}.json")
+
+def get_mobile_training_modules():
+    """Get the training modules structure for frontend"""
+    return [
+        {
+            "id": 1, "title": "Introduction to Audio Annotation", "estimated_time": "5-10 min",
+            "steps": [
+                {"id": "1.1", "type": "video", "title": "What is Audio Annotation?", "duration": "2:30"},
+                {"id": "1.2", "type": "quiz", "title": "Check Your Understanding", 
+                 "questions": [{"text": "What is the main purpose of audio annotation?", 
+                               "options": ["Speech recognition training", "Music analysis", "Background noise removal", "Audio compression"], 
+                               "correct": 0}]},
+                {"id": "1.3", "type": "video", "title": "Platform Overview", "duration": "2:00"},
+                {"id": "1.4", "type": "interactive", "title": "Interface Tour", "interactive_type": "tour"}
+            ]
+        },
+        {
+            "id": 2, "title": "Understanding Akshars", "estimated_time": "10-15 min",
+            "steps": [
+                {"id": "2.1", "type": "video", "title": "What are Akshars? The 40 Characters", "duration": "3:00"},
+                {"id": "2.2", "type": "game", "title": "Match the Sound", "game_type": "flashcard", "items": ["अ", "क", "म", "स", "त"]},
+                {"id": "2.3", "type": "video", "title": "Vowels vs Consonants", "duration": "2:30"},
+                {"id": "2.4", "type": "quiz", "title": "Akshar Recognition", 
+                 "questions": [{"text": "Which of these is a vowel?", "options": ["क", "त", "अ", "म"], "correct": 2}]}
+            ]
+        },
+        {
+            "id": 3, "title": "Single Tier Annotation", "estimated_time": "15-20 min",
+            "steps": [
+                {"id": "3.1", "type": "video", "title": "108ms Tier = One Sound Unit", "duration": "2:00"},
+                {"id": "3.2", "type": "exercise", "title": "Practice: 108ms Tier Annotation", "exercise_type": "single_cell_practice_dynamic", "audio_file": "three_2.wav"},
+                {"id": "3.3", "type": "video", "title": "Using Slowed Audio for Clarity", "duration": "1:30"}
+            ]
+        },
+        {
+            "id": 4, "title": "The Three-Tier System", "estimated_time": "20-25 min",
+            "steps": [
+                {"id": "4.1", "type": "video", "title": "Understanding 216ms, 108ms, 54ms", "duration": "3:00"},
+                {"id": "4.2", "type": "exercise", "title": "Practice: 216ms Tier", "exercise_type": "three_tier", "audio_file": "word_3cells.wav", "required_duration": 0.324},
+                {"id": "4.3", "type": "exercise", "title": "Practice: All Three Tiers", "exercise_type": "three_tier_complete", "audio_file": "namaste_full.wav", "required_duration": 1.3}
+            ]
+        },
+        {
+            "id": 5, "title": "Practice & Mastery", "estimated_time": "30-40 min",
+            "steps": [
+                {"id": "5.1", "type": "video", "title": "Common Mistakes", "duration": "2:30"},
+                {"id": "5.2", "type": "exercise", "title": "Practice: Short Sentence", "exercise_type": "three_tier_complete", "audio_file": "short_sentence.wav", "required_duration": 0.54},
+                {"id": "5.3", "type": "exercise", "title": "Practice: Medium Sentence", "exercise_type": "three_tier_complete", "audio_file": "medium_sentence.wav", "required_duration": 0.86},
+                {"id": "5.4", "type": "quiz", "title": "Scenario Questions", 
+                 "questions": [
+                     {"text": "What should you do when you hear an unclear sound?", "options": ["Skip the file", "Use slowed audio", "Guess randomly", "Leave it blank"], "correct": 1},
+                     {"text": "How many akshars maximum per cell?", "options": ["1", "2", "3", "4"], "correct": 2}
+                 ]}
+            ]
+        },
+        {
+            "id": 6, "title": "Quality & Speed", "estimated_time": "15-20 min",
+            "steps": [
+                {"id": "6.1", "type": "video", "title": "Quality Standards", "duration": "2:00"},
+                {"id": "6.2", "type": "video", "title": "Keyboard Shortcuts & Tips", "duration": "2:00"},
+                {"id": "6.3", "type": "exercise", "title": "Timed Practice", "exercise_type": "timed", "audio_file": "timed_practice.wav", "required_duration": 30}
+            ]
+        },
+        {
+            "id": 7, "title": "Final Assessment", "estimated_time": "20-30 min",
+            "steps": [
+                {"id": "7.1", "type": "assessment", "title": "Assessment 1: Single Tier (108ms)", "assessment_type": "single_cells", "count": 10},
+                {"id": "7.2", "type": "assessment", "title": "Assessment 2: Words", "assessment_type": "words", "count": 5},
+                {"id": "7.3", "type": "assessment", "title": "Assessment 3: Full Sentences", "assessment_type": "full_three_tier", "count": 2}
+            ]
+        },
+        {
+            "id": 8, "title": "Certification", "estimated_time": "30-40 min",
+            "steps": [
+                {"id": "8.1", "type": "exam", "title": "Exam: Part 1 - Single Tier", "exam_type": "single_cells", "count": 10, "required_score": 85},
+                {"id": "8.2", "type": "exam", "title": "Exam: Part 2 - Words", "exam_type": "words", "count": 5, "required_score": 85},
+                {"id": "8.3", "type": "exam", "title": "Exam: Part 3 - Full Sentences", "exam_type": "full_three_tier", "count": 3, "required_score": 85}
+            ]
+        }
+    ]
 
 @app.route('/mobile-training')
 @login_required
@@ -2293,7 +2373,8 @@ def get_mobile_training_progress():
         "step_data": {},
         "current_module": 1,
         "current_step": 0,
-        "certified": False
+        "certified": False,
+        "tour_completed": {}
     })
 
 @app.route('/api/mobile-training-progress', methods=['POST'])
@@ -2326,7 +2407,18 @@ def serve_mobile_training_audio(filename):
     filepath = os.path.join(MOBILE_TRAINING_AUDIO_FOLDER, filename)
     if os.path.exists(filepath):
         return send_file(filepath, mimetype='audio/wav')
-    return jsonify({"error": "Audio not found"}), 404
+    
+    # Try with game_sounds subfolder
+    filepath = os.path.join(MOBILE_TRAINING_AUDIO_FOLDER, "game_sounds", filename)
+    if os.path.exists(filepath):
+        return send_file(filepath, mimetype='audio/wav')
+    
+    # Try any subfolder
+    for root, dirs, files in os.walk(MOBILE_TRAINING_AUDIO_FOLDER):
+        if filename in files:
+            return send_file(os.path.join(root, filename), mimetype='audio/wav')
+    
+    return jsonify({"error": f"Audio not found: {filename}"}), 404
 
 @app.route('/mobile-training/videos/<filename>')
 @login_required
@@ -2336,6 +2428,63 @@ def serve_mobile_training_video(filename):
     if os.path.exists(filepath):
         return send_file(filepath, mimetype='video/mp4')
     return jsonify({"error": "Video not found"}), 404
+
+@app.route('/api/mobile-training/exercise-data/<filename>')
+@login_required
+def get_mobile_training_exercise_data(filename):
+    """Get exercise data: audio duration and correct answers from JSON"""
+    username = session["username"]
+    
+    # Get audio file path
+    audio_path = os.path.join(MOBILE_TRAINING_AUDIO_FOLDER, filename)
+    if not os.path.exists(audio_path):
+        if not filename.endswith('.wav'):
+            audio_path = os.path.join(MOBILE_TRAINING_AUDIO_FOLDER, f"{filename}.wav")
+        if not os.path.exists(audio_path):
+            return jsonify({"error": f"Audio file not found: {filename}"}), 404
+    
+    # Get audio duration
+    try:
+        import soundfile as sf
+        info = sf.info(audio_path)
+        duration = info.duration
+    except Exception as e:
+        print(f"Error reading audio duration: {e}")
+        duration = 0
+    
+    # Calculate number of 108ms cells
+    WINDOW_108 = 0.108
+    num_cells = max(1, int(math.ceil(duration / WINDOW_108)))
+    
+    # Try to load correct answers from JSON file (optional)
+    json_path = os.path.join(MOBILE_TRAINING_AUDIO_FOLDER, filename.replace('.wav', '.json'))
+    correct_answers = []
+    
+    if os.path.exists(json_path):
+        try:
+            with open(json_path, 'r', encoding='utf-8') as f:
+                data = json.load(f)
+                cells_data = data.get('cells', [])
+                for cell in cells_data:
+                    idx = cell.get('index', len(correct_answers))
+                    while len(correct_answers) <= idx:
+                        correct_answers.append("")
+                    correct_answers[idx] = cell.get('correct', "")
+        except Exception as e:
+            print(f"Error loading JSON: {e}")
+    
+    while len(correct_answers) < num_cells:
+        correct_answers.append("")
+    
+    return jsonify({
+        "success": True,
+        "filename": filename,
+        "duration": duration,
+        "num_cells": num_cells,
+        "window_ms": 108,
+        "correct_answers": correct_answers,
+        "audio_url": f"/mobile-training/audio/{filename}"
+    })
 
 @app.route('/api/mobile-training-certify', methods=['POST'])
 @login_required
@@ -2350,11 +2499,12 @@ def mobile_training_certify():
     with open(progress_path, 'r', encoding='utf-8') as f:
         progress = json.load(f)
     
-    # Total steps = 35 (sum of all steps in modules)
-    total_steps_expected = 35
+    # Calculate total steps from modules
+    modules = get_mobile_training_modules()
+    total_steps = sum(len(module["steps"]) for module in modules)
     completed_steps = len(progress.get("completed_steps", []))
     
-    if completed_steps >= total_steps_expected:
+    if completed_steps >= total_steps:
         progress["certified"] = True
         progress["certified_at"] = datetime.now().isoformat()
         
@@ -2363,7 +2513,7 @@ def mobile_training_certify():
         
         return jsonify({"success": True, "certified": True})
     
-    return jsonify({"success": False, "message": f"Complete {total_steps_expected - completed_steps} more steps first"}), 400
+    return jsonify({"success": False, "message": f"Complete {total_steps - completed_steps} more steps first"}), 400
 
 
 if __name__ == "__main__":

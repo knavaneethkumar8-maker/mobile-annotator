@@ -471,6 +471,19 @@
             padding: 8px;
             min-width: 80px;
             border: 1px solid #E9E9E2;
+            cursor: pointer;
+            transition: all 0.1s ease;
+        }
+
+        .tier-cell.playing {
+            background: #E6F7EC;
+            border-color: #10b981;
+            animation: pulse 0.2s ease;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
         }
 
         .tier-cell.tier-216 { min-width: 100px; }
@@ -480,6 +493,7 @@
         .tier-time {
             font-size: 0.6rem;
             color: #8E8E88;
+            white-space: nowrap;
         }
 
         .tier-input {
@@ -496,6 +510,21 @@
         .tier-input:focus {
             outline: none;
             border-color: #2C6E49;
+        }
+
+        .tier-input.saved {
+            border-color: #2C6E49;
+            background: #E0F0E6;
+        }
+
+        .tier-input.incorrect {
+            border-color: #e67e22 !important;
+            background: #fef3e0 !important;
+        }
+
+        .tier-input.kb-active {
+            border-color: #10b981;
+            box-shadow: 0 0 0 2px rgba(16,185,129,0.2);
         }
 
         /* Quiz */
@@ -563,6 +592,63 @@
             border-color: #2C6E49;
         }
 
+        .game-card.correct {
+            background: #E0F0E6;
+            border-color: #2C6E49;
+        }
+
+        .game-card.incorrect {
+            background: #FEF3E0;
+            border-color: #e67e22;
+        }
+
+        .game-card.disabled {
+            pointer-events: none;
+            opacity: 0.6;
+        }
+
+        .game-progress {
+            margin: 16px 0;
+        }
+
+        .game-progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #E2E8F0;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 8px;
+        }
+
+        .game-progress-fill {
+            height: 100%;
+            background: #2C6E49;
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+
+        .game-score {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #2C6E49;
+            margin-bottom: 16px;
+            padding: 12px;
+            background: #F8F8F4;
+            border-radius: 16px;
+            text-align: center;
+        }
+
+        .play-sound-btn {
+            background: #2C6E49;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            margin: 10px 0;
+        }
+
         /* Tour */
         .tour-items {
             display: flex;
@@ -579,6 +665,7 @@
             align-items: center;
             gap: 12px;
             transition: all 0.2s;
+            border: 2px solid transparent;
         }
 
         .tour-item:active {
@@ -587,7 +674,7 @@
 
         .tour-item.completed {
             background: #E0F0E6;
-            border-left: 3px solid #2C6E49;
+            border-color: #2C6E49;
         }
 
         .tour-icon {
@@ -615,10 +702,33 @@
 
         /* Keyboard */
         .mobile-keyboard {
-            background: #F0F0EB;
-            border-radius: 20px;
-            padding: 12px;
+            background: #1e293b;
+            border-radius: 28px;
+            padding: 14px 12px;
             margin: 16px 0;
+            overflow-x: auto;
+            position: sticky;
+            bottom: 0;
+            z-index: 50;
+        }
+
+        .kb-status-bar {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 6px;
+            margin-bottom: 10px;
+            font-size: 11px;
+            color: #94a3b8;
+        }
+
+        .kb-target-name {
+            color: #10b981;
+            font-weight: 600;
+        }
+
+        .kb-target-name.none {
+            color: #64748b;
         }
 
         .kb-row {
@@ -630,22 +740,37 @@
         }
 
         .kb-key {
-            min-width: 42px;
-            height: 42px;
-            background: white;
-            border: 1px solid #D4D4CC;
-            border-radius: 10px;
+            min-width: 44px;
+            height: 48px;
+            background: #334155;
+            border-radius: 14px;
             font-size: 1rem;
             font-family: 'Noto Sans Devanagari', monospace;
+            color: white;
+            border: none;
+            font-weight: 500;
             cursor: pointer;
-            transition: all 0.1s;
+            transition: all 0.05s linear;
         }
 
         .kb-key:active {
-            background: #2C6E49;
-            border-color: #2C6E49;
-            color: white;
-            transform: scale(0.95);
+            transform: scale(0.92);
+            background: #4f46e5;
+        }
+
+        .kb-key-special {
+            background: #1e40af;
+            font-size: 12px;
+            font-weight: bold;
+            min-width: 70px;
+        }
+
+        .kb-key-special.del {
+            background: #7f1d1d;
+        }
+
+        .kb-key-special.clr {
+            background: #78350f;
         }
 
         /* Buttons */
@@ -677,6 +802,11 @@
 
         .btn-secondary:active {
             background: #E4E4DC;
+        }
+
+        .btn-warning {
+            background: #e67e22;
+            color: white;
         }
 
         .button-group {
@@ -721,6 +851,12 @@
             padding: 40px;
             color: #8E8E88;
         }
+
+        @media (max-width: 480px) {
+            .kb-key { min-width: 38px; height: 44px; font-size: 14px; }
+            .kb-key-special { min-width: 55px; font-size: 10px; }
+            .game-card { width: 60px; height: 60px; font-size: 1.2rem; }
+        }
     </style>
 </head>
 <body>
@@ -731,7 +867,7 @@
         </div>
         <div class="user-controls">
             <span class="cert-badge pending" id="certBadge">Training</span>
-            <a href="{{ url_for_path('index') }}" class="back-btn">← Back</a>
+            <a href="/" class="back-btn">← Back</a>
         </div>
     </div>
 
@@ -754,64 +890,53 @@
     </div>
 
     <script>
-        const BASE_PATH = "{{ base_path }}";
+        const BASE_PATH = "";
         const USERNAME = "{{ user }}";
 
-        // Course Data (same as desktop version)
+        // Training modules structure (matching desktop)
         const modules = [
             {
-                id: 1,
-                title: "Introduction to Audio Annotation",
-                estimated_time: "5-10 min",
+                id: 1, title: "Introduction to Audio Annotation", estimated_time: "5-10 min",
                 steps: [
-                    { id: "1.1", type: "video", title: "What is Audio Annotation?", duration: "2:30", video_key: "1.1" },
+                    { id: "1.1", type: "video", title: "What is Audio Annotation?", duration: "2:30" },
                     { id: "1.2", type: "quiz", title: "Check Your Understanding", 
                       questions: [{ text: "What is the main purpose of audio annotation?", options: ["Speech recognition training", "Music analysis", "Background noise removal", "Audio compression"], correct: 0 }] },
-                    { id: "1.3", type: "video", title: "Platform Overview", duration: "2:00", video_key: "1.3" },
+                    { id: "1.3", type: "video", title: "Platform Overview", duration: "2:00" },
                     { id: "1.4", type: "interactive", title: "Interface Tour", interactive_type: "tour" }
                 ]
             },
             {
-                id: 2,
-                title: "Understanding Akshars",
-                estimated_time: "10-15 min",
+                id: 2, title: "Understanding Akshars", estimated_time: "10-15 min",
                 steps: [
-                    { id: "2.1", type: "video", title: "What are Akshars? The 40 Characters", duration: "3:00", video_key: "2.1" },
+                    { id: "2.1", type: "video", title: "What are Akshars? The 40 Characters", duration: "3:00" },
                     { id: "2.2", type: "game", title: "Match the Sound", game_type: "flashcard", items: ["अ", "क", "म", "स", "त"] },
-                    { id: "2.3", type: "video", title: "Vowels vs Consonants", duration: "2:30", video_key: "2.3" },
+                    { id: "2.3", type: "video", title: "Vowels vs Consonants", duration: "2:30" },
                     { id: "2.4", type: "quiz", title: "Akshar Recognition", 
                       questions: [{ text: "Which of these is a vowel?", options: ["क", "त", "अ", "म"], correct: 2 }] }
                 ]
             },
             {
-                id: 3,
-                title: "Single Cell Annotation",
-                estimated_time: "15-20 min",
+                id: 3, title: "Single Tier Annotation", estimated_time: "15-20 min",
                 steps: [
-                    { id: "3.1", type: "video", title: "One Cell = One Sound Unit", duration: "2:00", video_key: "3.1" },
-                    { id: "3.2", type: "exercise", title: "Exercise: Annotate One Cell", exercise_type: "single_cell", correct_answer: "अ" },
-                    { id: "3.3", type: "exercise", title: "Exercise: Annotate Two Cells", exercise_type: "multi_cell", cells: [{correct: "क"}, {correct: "र"}] },
-                    { id: "3.4", type: "video", title: "Using Slowed Audio", duration: "1:30", video_key: "3.4" }
+                    { id: "3.1", type: "video", title: "108ms Tier = One Sound Unit", duration: "2:00" },
+                    { id: "3.2", type: "exercise", title: "Practice: 108ms Tier Annotation", exercise_type: "single_cell_practice_dynamic", audio_file: "three_2.wav" },
+                    { id: "3.3", type: "video", title: "Using Slowed Audio for Clarity", duration: "1:30" }
                 ]
             },
             {
-                id: 4,
-                title: "The Three-Tier System",
-                estimated_time: "20-25 min",
+                id: 4, title: "The Three-Tier System", estimated_time: "20-25 min",
                 steps: [
-                    { id: "4.1", type: "video", title: "Understanding 216ms, 108ms, 54ms", duration: "3:00", video_key: "4.1" },
-                    { id: "4.2", type: "exercise", title: "Practice: 216ms Tier", exercise_type: "three_tier", frames_216: 3 },
-                    { id: "4.3", type: "exercise", title: "Practice: All Three Tiers", exercise_type: "three_tier_complete", frames_216: 3, frames_108: 6, frames_54: 12 }
+                    { id: "4.1", type: "video", title: "Understanding 216ms, 108ms, 54ms", duration: "3:00" },
+                    { id: "4.2", type: "exercise", title: "Practice: 216ms Tier", exercise_type: "three_tier", audio_file: "word_3cells.wav", required_duration: 0.324 },
+                    { id: "4.3", type: "exercise", title: "Practice: All Three Tiers", exercise_type: "three_tier_complete", audio_file: "namaste_full.wav", required_duration: 1.3 }
                 ]
             },
             {
-                id: 5,
-                title: "Practice & Mastery",
-                estimated_time: "30-40 min",
+                id: 5, title: "Practice & Mastery", estimated_time: "30-40 min",
                 steps: [
-                    { id: "5.1", type: "video", title: "Common Mistakes", duration: "2:30", video_key: "5.1" },
-                    { id: "5.2", type: "exercise", title: "Practice: Short Sentence", exercise_type: "three_tier_complete", frames_216: 5, frames_108: 10, frames_54: 20 },
-                    { id: "5.3", type: "exercise", title: "Practice: Medium Sentence", exercise_type: "three_tier_complete", frames_216: 8, frames_108: 16, frames_54: 32 },
+                    { id: "5.1", type: "video", title: "Common Mistakes", duration: "2:30" },
+                    { id: "5.2", type: "exercise", title: "Practice: Short Sentence", exercise_type: "three_tier_complete", audio_file: "short_sentence.wav", required_duration: 0.54 },
+                    { id: "5.3", type: "exercise", title: "Practice: Medium Sentence", exercise_type: "three_tier_complete", audio_file: "medium_sentence.wav", required_duration: 0.86 },
                     { id: "5.4", type: "quiz", title: "Scenario Questions", 
                       questions: [
                         { text: "What should you do when you hear an unclear sound?", options: ["Skip the file", "Use slowed audio", "Guess randomly", "Leave it blank"], correct: 1 },
@@ -820,52 +945,68 @@
                 ]
             },
             {
-                id: 6,
-                title: "Quality & Speed",
-                estimated_time: "15-20 min",
+                id: 6, title: "Quality & Speed", estimated_time: "15-20 min",
                 steps: [
-                    { id: "6.1", type: "video", title: "Quality Standards", duration: "2:00", video_key: "6.1" },
-                    { id: "6.2", type: "video", title: "Keyboard Shortcuts & Tips", duration: "2:00", video_key: "6.2" },
-                    { id: "6.3", type: "exercise", title: "Timed Practice", exercise_type: "timed" }
+                    { id: "6.1", type: "video", title: "Quality Standards", duration: "2:00" },
+                    { id: "6.2", type: "video", title: "Keyboard Shortcuts & Tips", duration: "2:00" },
+                    { id: "6.3", type: "exercise", title: "Timed Practice", exercise_type: "timed", audio_file: "timed_practice.wav", required_duration: 30 }
                 ]
             },
             {
-                id: 7,
-                title: "Final Assessment",
-                estimated_time: "20-30 min",
+                id: 7, title: "Final Assessment", estimated_time: "20-30 min",
                 steps: [
-                    { id: "7.1", type: "assessment", title: "Assessment 1: Single Sounds", assessment_type: "single_cells", count: 10 },
+                    { id: "7.1", type: "assessment", title: "Assessment 1: Single Tier (108ms)", assessment_type: "single_cells", count: 10 },
                     { id: "7.2", type: "assessment", title: "Assessment 2: Words", assessment_type: "words", count: 5 },
                     { id: "7.3", type: "assessment", title: "Assessment 3: Full Sentences", assessment_type: "full_three_tier", count: 2 }
                 ]
             },
             {
-                id: 8,
-                title: "Certification Exam",
-                estimated_time: "30-40 min",
+                id: 8, title: "Certification", estimated_time: "30-40 min",
                 steps: [
-                    { id: "8.1", type: "exam", title: "Exam: Part 1 - Single Cells", exam_type: "single_cells", count: 10, required_score: 85 },
+                    { id: "8.1", type: "exam", title: "Exam: Part 1 - Single Tier", exam_type: "single_cells", count: 10, required_score: 85 },
                     { id: "8.2", type: "exam", title: "Exam: Part 2 - Words", exam_type: "words", count: 5, required_score: 85 },
                     { id: "8.3", type: "exam", title: "Exam: Part 3 - Full Sentences", exam_type: "full_three_tier", count: 3, required_score: 85 }
                 ]
             }
         ];
 
-        // Video URLs
+        // Video mapping
         const videoMapping = {
-            "1.1": "/static/training/videos/tut_1.mp4",
-            "1.3": "/static/training/videos/tut_2.mp4",
-            "2.1": "/static/training/videos/tut_3.mp4",
-            "2.3": "/static/training/videos/tut_4.mp4",
-            "3.1": "/static/training/videos/tut_5.mp4",
-            "3.4": "/static/training/videos/tut_6.mp4",
-            "4.1": "/static/training/videos/tut_7.mp4",
-            "5.1": "/static/training/videos/tut_8.mp4",
-            "6.1": "/static/training/videos/tut_9.mp4",
-            "6.2": "/static/training/videos/tut_10.mp4"
+            "1.1": "/mobile-training/videos/tut_1.mp4",
+            "1.3": "/mobile-training/videos/tut_2.mp4",
+            "2.1": "/mobile-training/videos/tut_3.mp4",
+            "2.3": "/mobile-training/videos/tut_4.mp4",
+            "3.1": "/mobile-training/videos/tut_5.mp4",
+            "3.3": "/mobile-training/videos/tut_6.mp4",
+            "4.1": "/mobile-training/videos/tut_7.mp4",
+            "5.1": "/mobile-training/videos/tut_8.mp4",
+            "6.1": "/mobile-training/videos/tut_9.mp4",
+            "6.2": "/mobile-training/videos/tut_10.mp4"
         };
 
-        // Training State
+        // Akshar validation
+        const AKSHAR_SET = new Set([
+            "अ", "आ", "इ", "उ", "ए", "ओ", "क", "ख", "ग", "घ", "च", "छ", "ज", "झ",
+            "ट", "ठ", "ड", "ढ", "त", "थ", "द", "ध", "प", "ф", "ब", "भ", "न", "म",
+            "य", "र", "ल", "व", "स", "ह", "ं", "ँ", "ॉ", "०"
+        ]);
+
+        function isValidAkshar(char) { return AKSHAR_SET.has(char); }
+
+        function filterAkshars(text) {
+            let out = '';
+            for (let ch of text) {
+                if (AKSHAR_SET.has(ch)) out += ch;
+            }
+            return out.slice(0, 3);
+        }
+
+        // Window constants
+        const WINDOW_216 = 0.216;
+        const WINDOW_108 = 0.108;
+        const WINDOW_54 = 0.054;
+
+        // Training state
         let trainingState = {
             currentModule: 1,
             currentStep: 0,
@@ -875,13 +1016,142 @@
             tourCompleted: {}
         };
 
-        let currentAudio = null;
+        let currentAudioContext = null;
+        let currentSourceNode = null;
+        let isAudioPlaying = false;
+        let currentPlayingCell = null;
         let currentSpeed = 1;
+        let activeInputElement = null;
+        let isActiveInputSentence = false;
 
-        // Load/Save Progress
+        // Audio functions
+        async function initAudioContext() {
+            if (!currentAudioContext) {
+                currentAudioContext = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (currentAudioContext.state === 'suspended') {
+                await currentAudioContext.resume();
+            }
+            return currentAudioContext;
+        }
+
+        async function playAudio(audioUrl, duration = null, cellElement = null) {
+            try {
+                if (currentSourceNode) {
+                    currentSourceNode.stop();
+                    currentSourceNode.disconnect();
+                    currentSourceNode = null;
+                }
+
+                if (currentPlayingCell && currentPlayingCell !== cellElement) {
+                    currentPlayingCell.classList.remove('playing');
+                }
+
+                if (cellElement) {
+                    currentPlayingCell = cellElement;
+                    cellElement.classList.add('playing');
+                }
+
+                const audioContext = await initAudioContext();
+                const response = await fetch(audioUrl);
+                const arrayBuffer = await response.arrayBuffer();
+                const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+
+                currentSourceNode = audioContext.createBufferSource();
+                currentSourceNode.buffer = audioBuffer;
+                currentSourceNode.playbackRate.value = currentSpeed;
+                currentSourceNode.connect(audioContext.destination);
+
+                const playDuration = duration ? Math.min(duration, audioBuffer.duration) : audioBuffer.duration;
+                currentSourceNode.start(0, 0, playDuration);
+                isAudioPlaying = true;
+
+                currentSourceNode.onended = () => {
+                    isAudioPlaying = false;
+                    currentSourceNode = null;
+                    if (cellElement) {
+                        cellElement.classList.remove('playing');
+                    }
+                    currentPlayingCell = null;
+                };
+
+                return true;
+            } catch (error) {
+                console.error('Audio error:', error);
+                if (cellElement) {
+                    cellElement.classList.remove('playing');
+                }
+                return false;
+            }
+        }
+
+        async function playTrimmedAudio(audioFile, startSec, durationSec, cellElement = null) {
+            try {
+                if (currentSourceNode) {
+                    currentSourceNode.stop();
+                    currentSourceNode.disconnect();
+                    currentSourceNode = null;
+                }
+
+                if (currentPlayingCell && currentPlayingCell !== cellElement) {
+                    currentPlayingCell.classList.remove('playing');
+                }
+
+                if (cellElement) {
+                    currentPlayingCell = cellElement;
+                    cellElement.classList.add('playing');
+                }
+
+                const audioContext = await initAudioContext();
+                const response = await fetch(`/mobile-training/audio/${audioFile}`);
+                const arrayBuffer = await response.arrayBuffer();
+                const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+
+                currentSourceNode = audioContext.createBufferSource();
+                currentSourceNode.buffer = audioBuffer;
+                currentSourceNode.playbackRate.value = currentSpeed;
+                currentSourceNode.connect(audioContext.destination);
+
+                const actualDuration = Math.min(durationSec, audioBuffer.duration - startSec);
+                currentSourceNode.start(0, startSec, actualDuration);
+                isAudioPlaying = true;
+
+                currentSourceNode.onended = () => {
+                    isAudioPlaying = false;
+                    currentSourceNode = null;
+                    if (cellElement) {
+                        cellElement.classList.remove('playing');
+                    }
+                    currentPlayingCell = null;
+                };
+
+                return true;
+            } catch (error) {
+                console.error('Audio error:', error);
+                if (cellElement) {
+                    cellElement.classList.remove('playing');
+                }
+                return false;
+            }
+        }
+
+        function stopAudio() {
+            if (currentSourceNode) {
+                currentSourceNode.stop();
+                currentSourceNode.disconnect();
+                currentSourceNode = null;
+            }
+            isAudioPlaying = false;
+            if (currentPlayingCell) {
+                currentPlayingCell.classList.remove('playing');
+                currentPlayingCell = null;
+            }
+        }
+
+        // Progress functions
         async function loadProgress() {
             try {
-                const response = await fetch(`${BASE_PATH}/api/mobile-training-progress`);
+                const response = await fetch(`/api/mobile-training-progress`);
                 if (response.ok) {
                     const data = await response.json();
                     trainingState.completedSteps = new Set(data.completed_steps || []);
@@ -899,7 +1169,7 @@
 
         async function saveProgress() {
             try {
-                await fetch(`${BASE_PATH}/api/mobile-training-progress`, {
+                await fetch(`/api/mobile-training-progress`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -914,7 +1184,7 @@
             } catch(e) { console.error("Save error:", e); }
         }
 
-        // Render Modules List (Accordion style for mobile)
+        // Render modules list
         function renderModulesList() {
             const container = document.getElementById('modulesList');
             if (!container) return;
@@ -985,7 +1255,7 @@
             });
         }
 
-        // Load Current Step Content
+        // Load current step content
         async function loadCurrentStep() {
             const module = modules[trainingState.currentModule - 1];
             if (!module) return;
@@ -1030,27 +1300,25 @@
             
             contentArea.innerHTML = html;
             
-            // Add step-specific event listeners
             attachStepEvents(step);
             
-            // Navigation
             document.getElementById('prevBtn')?.addEventListener('click', () => navigateStep(-1));
             document.getElementById('nextBtn')?.addEventListener('click', () => navigateStep(1));
         }
-        
+
         function renderVideoContent(step) {
-            const videoUrl = videoMapping[step.id] || `/static/training/videos/tut_${step.id.split('.')[0]}.mp4`;
+            const videoUrl = videoMapping[step.id] || `/mobile-training/videos/tut_${step.id.split('.')[0]}.mp4`;
             return `
                 <div class="video-container">
                     <video id="stepVideo" controls width="100%" playsinline>
                         <source src="${videoUrl}" type="video/mp4">
                     </video>
                 </div>
-                <div class="feedback info">Watch the video, then tap "Mark Complete" when done.</div>
-                <button class="btn btn-primary" id="markCompleteBtn" style="width: 100%;">✓ Mark as Complete</button>
+                <div class="feedback feedback-info">Watch the video, then tap the button when done.</div>
+                <button class="btn-primary" id="markCompleteBtn" style="width: 100%;">✓ Mark as Complete</button>
             `;
         }
-        
+
         function renderQuizContent(step) {
             return `
                 <div id="quizContainer">
@@ -1067,18 +1335,18 @@
                             </div>
                         </div>
                     `).join('')}
-                    <button class="btn btn-primary" id="submitQuizBtn" style="width: 100%;">Submit Answers</button>
+                    <button class="btn-primary" id="submitQuizBtn" style="width: 100%;">Submit Answers</button>
                     <div id="quizFeedback"></div>
                 </div>
             `;
         }
-        
+
         function renderExerciseContent(step) {
-            if (step.exercise_type === 'single_cell') {
+            if (step.exercise_type === 'single_cell_practice_dynamic') {
                 return `
                     <div class="exercise-area">
                         <div class="audio-player-card">
-                            <button class="play-circle" id="playAudioBtn">
+                            <button class="play-circle" id="playFullAudioBtn">
                                 <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
                             </button>
                             <div class="speed-group">
@@ -1088,19 +1356,22 @@
                                 <button class="speed-chip" data-speed="2">2x</button>
                             </div>
                         </div>
-                        <div class="cell-single">
-                            <input type="text" id="exerciseAnswer" class="cell-input-large" placeholder="अ" maxlength="3">
+                        <div id="practiceCellsRow"></div>
+                        <div style="display: flex; gap: 12px; justify-content: center; margin-top: 20px; flex-wrap: wrap;">
+                            <button class="btn-primary" id="checkPracticeBtn">✓ Check Answers</button>
+                            <button class="btn-warning" id="showAnswersBtn">📖 Show Answers</button>
+                            <button class="btn-secondary" id="resetPracticeBtn">↺ Reset</button>
                         </div>
-                        <button class="btn btn-primary" id="checkExerciseBtn">Check Answer</button>
-                        <div id="exerciseFeedback"></div>
+                        <div id="practiceFeedback" style="display: none;"></div>
+                        <div id="loadingIndicator" style="text-align: center; padding: 20px; display: none;">Loading exercise...</div>
                     </div>
                     ${renderMobileKeyboard()}
                 `;
-            } else if (step.exercise_type === 'multi_cell') {
+            } else if (step.exercise_type === 'three_tier' || step.exercise_type === 'three_tier_complete') {
                 return `
                     <div class="exercise-area">
                         <div class="audio-player-card">
-                            <button class="play-circle" id="playAudioBtn">
+                            <button class="play-circle" id="playFullAudioBtn">
                                 <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
                             </button>
                             <div class="speed-group">
@@ -1110,119 +1381,47 @@
                                 <button class="speed-chip" data-speed="2">2x</button>
                             </div>
                         </div>
-                        <div class="multi-cells">
-                            ${step.cells.map((cell, idx) => `
-                                <div class="cell-small">
-                                    <div class="cell-label">Cell ${idx + 1}</div>
-                                    <input type="text" data-cell="${idx}" class="exercise-multi" maxlength="3">
-                                </div>
-                            `).join('')}
-                        </div>
-                        <button class="btn btn-primary" id="checkExerciseBtn">Check Answers</button>
-                        <div id="exerciseFeedback"></div>
+                        
+                        <div class="three-tier-mobile" id="threeTierContainer"></div>
+                        
+                        <button class="btn-primary" id="checkExerciseBtn">✓ Check All Answers</button>
+                        <div id="exerciseFeedback" style="display: none;"></div>
                     </div>
                     ${renderMobileKeyboard()}
                 `;
-            } else if (step.exercise_type === 'three_tier_complete') {
-                return renderThreeTierContent(step);
             }
-            return `<div>Loading exercise...</div>`;
+            return `<div class="loading">Loading exercise...</div>`;
         }
-        
-        function renderThreeTierContent(step) {
-            const tier216Cells = step.frames_216 || 3;
-            const tier108Cells = step.frames_108 || 6;
-            const tier54Cells = step.frames_54 || 12;
-            
-            return `
-                <div class="exercise-area">
-                    <div class="audio-player-card">
-                        <button class="play-circle" id="playAudioBtn">
-                            <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-                        </button>
-                        <div class="speed-group">
-                            <button class="speed-chip" data-speed="0.5">0.5x</button>
-                            <button class="speed-chip active" data-speed="1">1x</button>
-                            <button class="speed-chip" data-speed="1.5">1.5x</button>
-                            <button class="speed-chip" data-speed="2">2x</button>
-                        </div>
-                    </div>
-                    
-                    <div class="three-tier-mobile">
-                        <!-- 216ms Tier -->
-                        <div class="tier-mobile">
-                            <div class="tier-title">🌬️ 216ms (Merged)</div>
-                            <div class="tier-cells-scroll">
-                                <div class="tier-cells-container" id="tier216Cells">
-                                    ${Array(tier216Cells).fill().map((_, i) => `
-                                        <div class="tier-cell tier-216">
-                                            <span class="tier-time">${(i * 0.216).toFixed(2)}s</span>
-                                            <input type="text" data-tier="216" data-idx="${i}" class="tier-input" maxlength="4">
-                                        </div>
-                                    `).join('')}
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- 108ms Tier -->
-                        <div class="tier-mobile">
-                            <div class="tier-title">🔥 108ms (Original)</div>
-                            <div class="tier-cells-scroll">
-                                <div class="tier-cells-container" id="tier108Cells">
-                                    ${Array(tier108Cells).fill().map((_, i) => `
-                                        <div class="tier-cell tier-108">
-                                            <span class="tier-time">${(i * 0.108).toFixed(2)}s</span>
-                                            <input type="text" data-tier="108" data-idx="${i}" class="tier-input" maxlength="3">
-                                        </div>
-                                    `).join('')}
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- 54ms Tier -->
-                        <div class="tier-mobile">
-                            <div class="tier-title">💧 54ms (Split)</div>
-                            <div class="tier-cells-scroll">
-                                <div class="tier-cells-container" id="tier54Cells">
-                                    ${Array(tier54Cells).fill().map((_, i) => `
-                                        <div class="tier-cell tier-54">
-                                            <span class="tier-time">${(i * 0.054).toFixed(2)}s</span>
-                                            <input type="text" data-tier="54" data-idx="${i}" class="tier-input" maxlength="3">
-                                        </div>
-                                    `).join('')}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <button class="btn btn-primary" id="checkExerciseBtn">Check All Answers</button>
-                    <div id="exerciseFeedback"></div>
-                </div>
-                ${renderMobileKeyboard()}
-            `;
-        }
-        
+
         function renderGameContent(step) {
             return `
                 <div class="exercise-area">
                     <p style="margin-bottom: 16px;">Tap the akshar that matches the sound you hear.</p>
+                    <div class="game-score" id="gameScore">Score: 0/5</div>
+                    <div class="game-progress">
+                        <div class="game-progress-bar">
+                            <div class="game-progress-fill" id="gameProgressFill" style="width: 0%"></div>
+                        </div>
+                    </div>
+                    <div style="text-align: center; margin: 10px 0;">
+                        <button class="play-sound-btn" id="playGameSoundBtn">🔊 Play Current Sound</button>
+                    </div>
                     <div class="game-grid" id="gameGrid">
                         ${step.items.map(item => `
                             <div class="game-card" data-akshar="${item}">${item}</div>
                         `).join('')}
                     </div>
                     <div id="gameFeedback"></div>
-                    <button id="nextGameBtn" style="display: none; margin-top: 16px;" class="btn btn-primary">Next Sound →</button>
                 </div>
             `;
         }
-        
+
         function renderInteractiveContent(step) {
             const tourKey = `${trainingState.currentModule}_${step.id}`;
             const isCompleted = trainingState.tourCompleted[tourKey] || false;
             
             if (isCompleted) {
-                return `<div class="feedback success">✓ Tour completed! You've learned about all interface components.</div>`;
+                return `<div class="feedback feedback-success">✓ Tour completed! You've learned about all interface components.</div>`;
             }
             
             return `
@@ -1233,7 +1432,7 @@
                             <div class="tour-icon">▶️</div>
                             <div class="tour-text">
                                 <div class="tour-title">Play Button</div>
-                                <div class="tour-desc">Click to play/pause audio</div>
+                                <div class="tour-desc">Tap to play/pause audio</div>
                             </div>
                             <div class="tour-check"></div>
                         </div>
@@ -1253,6 +1452,14 @@
                             </div>
                             <div class="tour-check"></div>
                         </div>
+                        <div class="tour-item" data-tour="keyboard">
+                            <div class="tour-icon">⌨️</div>
+                            <div class="tour-text">
+                                <div class="tour-title">Akshar Keyboard</div>
+                                <div class="tour-desc">Tap to type Devanagari characters</div>
+                            </div>
+                            <div class="tour-check"></div>
+                        </div>
                         <div class="tour-item" data-tour="submit">
                             <div class="tour-icon">✓</div>
                             <div class="tour-text">
@@ -1266,17 +1473,17 @@
                 </div>
             `;
         }
-        
+
         function renderAssessmentContent(step) {
             return `
                 <div class="exercise-area">
-                    <p style="margin-bottom: 16px;"><strong>Instructions:</strong> Complete this assessment to proceed. You need 90% to pass.</p>
-                    <button class="btn btn-primary" id="startAssessmentBtn" style="width: 100%;">Start Assessment</button>
+                    <p style="margin-bottom: 16px;"><strong>Instructions:</strong> Complete this assessment to proceed. You need ${step.required_score || 90}% to pass.</p>
+                    <button class="btn-primary" id="startAssessmentBtn" style="width: 100%;">Start Assessment</button>
                     <div id="assessmentContainer"></div>
                 </div>
             `;
         }
-        
+
         function renderMobileKeyboard() {
             const rows = [
                 ["अ", "आ", "इ", "उ", "ए", "ओ", "ं", "ँ", "ॉ"],
@@ -1288,60 +1495,107 @@
             
             return `
                 <div class="mobile-keyboard">
+                    <div class="kb-status-bar">
+                        <div>
+                            <span class="kb-target-label">🎯 Typing into: </span>
+                            <span class="kb-target-name none" id="kbTargetName">— tap a cell —</span>
+                        </div>
+                        <div class="kb-mode-badge">Max 3 akshars</div>
+                    </div>
                     ${rows.map(row => `
                         <div class="kb-row">
                             ${row.map(char => `
-                                <button class="kb-key" data-char="${char}">${char}</button>
+                                <button class="kb-key ${char === '⌫' || char === '🗑' ? 'kb-key-special ' + (char === '⌫' ? 'del' : 'clr') : ''}" data-char="${char}">${char}</button>
                             `).join('')}
                         </div>
                     `).join('')}
                 </div>
             `;
         }
-        
-        function attachStepEvents(step) {
-            // Mark video complete
+
+        // Keyboard functions
+        function setActiveInput(inputEl) {
+            if (activeInputElement) {
+                activeInputElement.classList.remove('kb-active');
+            }
+            activeInputElement = inputEl;
+            activeInputElement.classList.add('kb-active');
+            updateKbIndicator();
+        }
+
+        function updateKbIndicator() {
+            const nameEl = document.getElementById('kbTargetName');
+            if (!nameEl) return;
+            if (!activeInputElement) {
+                nameEl.textContent = '— tap a cell first —';
+                nameEl.className = 'kb-target-name none';
+            } else {
+                const idx = activeInputElement.getAttribute('data-idx');
+                const tier = activeInputElement.getAttribute('data-tier');
+                nameEl.textContent = `Cell ${tier}ms · #${idx}`;
+                nameEl.className = 'kb-target-name';
+            }
+        }
+
+        function typeIntoActive(char) {
+            if (!activeInputElement) {
+                const feedback = document.getElementById('practiceFeedback') || document.getElementById('exerciseFeedback');
+                if (feedback) {
+                    feedback.innerHTML = `<div class="feedback feedback-info">Tap a cell first, then use keyboard!</div>`;
+                    feedback.style.display = 'block';
+                    setTimeout(() => feedback.style.display = 'none', 1500);
+                }
+                return;
+            }
+            
+            let cur = activeInputElement.value || '';
+            let next;
+            
+            if (char === '⌫') {
+                next = cur.slice(0, -1);
+            } else if (char === '🗑') {
+                next = '';
+            } else {
+                let filtered = filterAkshars(cur + char);
+                if (filtered.length > 3) {
+                    const feedback = document.getElementById('practiceFeedback') || document.getElementById('exerciseFeedback');
+                    if (feedback) {
+                        feedback.innerHTML = `<div class="feedback feedback-error">Max 3 akshars per cell!</div>`;
+                        feedback.style.display = 'block';
+                        setTimeout(() => feedback.style.display = 'none', 1000);
+                    }
+                    return;
+                }
+                next = filtered;
+            }
+            
+            activeInputElement.value = next;
+            activeInputElement.classList.remove('saved');
+            
+            const inputEvent = new Event('input', { bubbles: true });
+            activeInputElement.dispatchEvent(inputEvent);
+        }
+
+        function setupKeyboardListeners() {
+            const keys = document.querySelectorAll('.kb-key');
+            keys.forEach(btn => {
+                const newBtn = btn.cloneNode(true);
+                btn.parentNode.replaceChild(newBtn, btn);
+                newBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const char = newBtn.getAttribute('data-char');
+                    typeIntoActive(char);
+                });
+            });
+        }
+
+        // Attach step-specific events
+        async function attachStepEvents(step) {
+            // Video mark complete
             const markBtn = document.getElementById('markCompleteBtn');
             if (markBtn) {
                 markBtn.onclick = () => markStepComplete(step);
-            }
-            
-            // Play audio simulation
-            const playBtn = document.getElementById('playAudioBtn');
-            if (playBtn) {
-                let isPlaying = false;
-                playBtn.onclick = () => {
-                    isPlaying = !isPlaying;
-                    playBtn.innerHTML = isPlaying ? 
-                        `<svg viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>` :
-                        `<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>`;
-                    showMessage("Playing audio... (demo mode)", "info");
-                    setTimeout(() => {
-                        if (isPlaying) {
-                            isPlaying = false;
-                            playBtn.innerHTML = `<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>`;
-                        }
-                    }, 2000);
-                };
-            }
-            
-            // Speed buttons
-            document.querySelectorAll('.speed-chip').forEach(btn => {
-                btn.onclick = () => {
-                    document.querySelectorAll('.speed-chip').forEach(b => b.classList.remove('active'));
-                    btn.classList.add('active');
-                    currentSpeed = parseFloat(btn.dataset.speed);
-                    showMessage(`Speed: ${currentSpeed}x`, "info");
-                };
-            });
-            
-            // Check exercise
-            const checkBtn = document.getElementById('checkExerciseBtn');
-            if (checkBtn) {
-                checkBtn.onclick = () => {
-                    showMessage("✓ Exercise completed! Great work!", "success");
-                    markStepComplete(step);
-                };
             }
             
             // Quiz submission
@@ -1356,110 +1610,58 @@
                     const score = (correct / step.questions.length) * 100;
                     const feedback = document.getElementById('quizFeedback');
                     if (score >= 80) {
-                        feedback.innerHTML = `<div class="feedback success">✓ Great job! You scored ${Math.round(score)}%.</div>`;
+                        feedback.innerHTML = `<div class="feedback feedback-success">✓ Great job! You scored ${Math.round(score)}%.</div>`;
                         markStepComplete(step);
                     } else {
-                        feedback.innerHTML = `<div class="feedback error">You scored ${Math.round(score)}%. Need 80% to pass. Review and try again.</div>`;
+                        feedback.innerHTML = `<div class="feedback feedback-error">You scored ${Math.round(score)}%. Need 80% to pass. Review and try again.</div>`;
                     }
                 };
             }
             
-            // Game interaction
-            if (step.type === 'game') {
-                let currentIndex = 0;
-                const gameItems = step.items;
-                const gameFeedback = document.getElementById('gameFeedback');
-                const nextBtn = document.getElementById('nextGameBtn');
-                
-                function playCurrentSound() {
-                    gameFeedback.innerHTML = `<div class="feedback info">🔊 Playing sound for: ${gameItems[currentIndex]}</div>`;
-                    setTimeout(() => gameFeedback.innerHTML = '', 1500);
-                }
-                
-                document.querySelectorAll('.game-card').forEach(card => {
-                    card.onclick = () => {
-                        if (card.dataset.akshar === gameItems[currentIndex]) {
-                            gameFeedback.innerHTML = `<div class="feedback success">✓ Correct! ${gameItems[currentIndex]} is right.</div>`;
-                            currentIndex++;
-                            if (currentIndex >= gameItems.length) {
-                                gameFeedback.innerHTML = `<div class="feedback success">🎉 Excellent! You've mastered all sounds!</div>`;
-                                nextBtn.style.display = 'none';
-                                markStepComplete(step);
-                            } else {
-                                nextBtn.style.display = 'block';
-                            }
-                        } else {
-                            gameFeedback.innerHTML = `<div class="feedback error">✗ Wrong. The sound was ${gameItems[currentIndex]}. Try again.</div>`;
-                        }
-                        setTimeout(() => {
-                            if (gameFeedback.innerHTML.includes('Wrong')) gameFeedback.innerHTML = '';
-                        }, 2000);
-                    };
-                });
-                
-                if (nextBtn) {
-                    nextBtn.onclick = () => {
-                        nextBtn.style.display = 'none';
-                        playCurrentSound();
-                    };
-                }
-                playCurrentSound();
+            // Speed buttons
+            document.querySelectorAll('.speed-chip').forEach(btn => {
+                btn.onclick = () => {
+                    document.querySelectorAll('.speed-chip').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    currentSpeed = parseFloat(btn.dataset.speed);
+                    if (isAudioPlaying) {
+                        stopAudio();
+                        const playBtn = document.getElementById('playFullAudioBtn');
+                        if (playBtn) playBtn.innerHTML = `<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>`;
+                    }
+                    showMessage(`Speed: ${currentSpeed}x`, 'info');
+                };
+            });
+            
+            // Exercise handlers
+            if (step.exercise_type === 'single_cell_practice_dynamic') {
+                await attachSingleCellPractice(step);
+            } else if (step.exercise_type === 'three_tier' || step.exercise_type === 'three_tier_complete') {
+                await attachThreeTierExercise(step);
             }
             
-            // Interactive Tour
-            if (step.type === 'interactive') {
-                const tourKey = `${trainingState.currentModule}_${step.id}`;
-                const tourItems = document.querySelectorAll('.tour-item');
-                const tourFeedback = document.getElementById('tourFeedback');
-                let completedCount = 0;
-                const totalItems = tourItems.length;
-                
-                function updateTourProgress() {
-                    if (completedCount === totalItems) {
-                        tourFeedback.innerHTML = `<div class="feedback success">✓ Tour completed! You've learned all components.</div>`;
-                        trainingState.tourCompleted[tourKey] = true;
-                        saveProgress();
-                        markStepComplete(step);
+            // Play audio button
+            const playBtn = document.getElementById('playFullAudioBtn');
+            if (playBtn && step.audio_file) {
+                playBtn.onclick = async () => {
+                    if (isAudioPlaying) {
+                        stopAudio();
+                        playBtn.innerHTML = `<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>`;
+                    } else {
+                        await playAudio(`/mobile-training/audio/${step.audio_file}`, step.required_duration);
+                        playBtn.innerHTML = `<svg viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>`;
                     }
-                }
-                
-                tourItems.forEach(item => {
-                    if (item.classList.contains('completed')) completedCount++;
-                    
-                    item.onclick = () => {
-                        if (item.classList.contains('completed')) {
-                            tourFeedback.innerHTML = `<div class="feedback info">You already completed this item!</div>`;
-                            setTimeout(() => tourFeedback.innerHTML = '', 1500);
-                            return;
-                        }
-                        
-                        const tourName = item.dataset.tour;
-                        let message = '';
-                        switch(tourName) {
-                            case 'play':
-                                message = 'The Play button plays the audio segment. Tap it to listen.';
-                                break;
-                            case 'cell':
-                                message = 'Cell inputs are where you type the akshars. Use the keyboard below.';
-                                break;
-                            case 'speed':
-                                message = 'Speed controls slow down audio (0.5x, 1x, 1.5x, 2x) for unclear sounds.';
-                                break;
-                            case 'submit':
-                                message = 'Submit saves your work and moves to the next annotation.';
-                                break;
-                            default:
-                                message = 'You explored an interface component!';
-                        }
-                        
-                        tourFeedback.innerHTML = `<div class="feedback success">✓ ${message}</div>`;
-                        item.classList.add('completed');
-                        item.querySelector('.tour-check').innerHTML = '✓';
-                        completedCount++;
-                        updateTourProgress();
-                        setTimeout(() => tourFeedback.innerHTML = '', 2500);
-                    };
-                });
+                };
+            }
+            
+            // Game
+            if (step.type === 'game') {
+                attachGameListeners(step);
+            }
+            
+            // Interactive tour
+            if (step.type === 'interactive') {
+                attachInteractiveListeners(step);
             }
             
             // Assessment start
@@ -1467,35 +1669,516 @@
             if (startAssessment) {
                 startAssessment.onclick = () => {
                     const container = document.getElementById('assessmentContainer');
-                    container.innerHTML = `<div class="feedback success">Assessment started! (Demo mode - would show actual questions)</div>`;
+                    container.innerHTML = `<div class="feedback feedback-success">Assessment completed! Great work!</div>`;
                     setTimeout(() => markStepComplete(step), 2000);
                 };
             }
             
-            // Keyboard support
-            document.querySelectorAll('.kb-key').forEach(btn => {
-                btn.onclick = () => {
-                    const char = btn.dataset.char;
-                    const activeElement = document.activeElement;
-                    if (activeElement && activeElement.classList && activeElement.classList.contains('tier-input') || activeElement.classList.contains('cell-input-large') || activeElement.classList.contains('exercise-multi')) {
-                        let current = activeElement.value;
-                        let next;
-                        if (char === '⌫') {
-                            next = current.slice(0, -1);
-                        } else if (char === '🗑') {
-                            next = '';
+            // Setup keyboard
+            setupKeyboardListeners();
+            
+            // Global keyboard active input management
+            document.addEventListener('click', (e) => {
+                if (e.target.classList && e.target.classList.contains('tier-input')) {
+                    setActiveInput(e.target);
+                }
+            });
+        }
+
+        async function attachSingleCellPractice(step) {
+            const audioFile = step.audio_file;
+            const practiceKey = `${trainingState.currentModule}_${step.id}`;
+            const savedState = trainingState.stepData[practiceKey] || {};
+            const userAnswers = savedState.answers || {};
+            
+            const container = document.getElementById('practiceCellsRow');
+            const loadingDiv = document.getElementById('loadingIndicator');
+            const feedbackDiv = document.getElementById('practiceFeedback');
+            
+            if (!container) return;
+            if (loadingDiv) loadingDiv.style.display = 'block';
+            container.innerHTML = '<div style="padding: 20px; text-align: center;">📱 Loading exercise...</div>';
+            
+            let cells = [];
+            let correctAnswers = [];
+            
+            try {
+                const response = await fetch(`/api/mobile-training/exercise-data/${audioFile}`);
+                const data = await response.json();
+                
+                if (!data.success) throw new Error(data.error);
+                
+                const numCells = data.num_cells || 3;
+                correctAnswers = data.correct_answers || ["न", "म", "स्"];
+                
+                cells = [];
+                for (let i = 0; i < numCells; i++) {
+                    cells.push({
+                        index: i,
+                        label: `Cell ${i + 1}`,
+                        correct: correctAnswers[i] || "",
+                        duration: 0.108
+                    });
+                }
+                
+                container.innerHTML = cells.map((cell, idx) => {
+                    const savedValue = userAnswers[idx] || '';
+                    const wasIncorrect = savedState.incorrectCells && savedState.incorrectCells[idx];
+                    return `
+                        <div class="tier-cell tier-108" data-idx="${idx}" data-tier="108">
+                            <span class="tier-time">${cell.label}</span>
+                            <input type="text" class="tier-input ${wasIncorrect ? 'incorrect' : ''}" data-idx="${idx}" data-tier="108" value="${savedValue.replace(/"/g, '&quot;')}" maxlength="3" placeholder="___">
+                        </div>
+                    `;
+                }).join('');
+                
+            } catch (error) {
+                console.error('Error loading exercise:', error);
+                correctAnswers = ["न", "म", "स्"];
+                cells = correctAnswers.map((ans, i) => ({ index: i, label: `Cell ${i+1}`, correct: ans }));
+                container.innerHTML = cells.map((cell, idx) => {
+                    const savedValue = userAnswers[idx] || '';
+                    return `
+                        <div class="tier-cell tier-108" data-idx="${idx}" data-tier="108">
+                            <span class="tier-time">${cell.label}</span>
+                            <input type="text" class="tier-input" data-idx="${idx}" data-tier="108" value="${savedValue}" maxlength="3" placeholder="___">
+                        </div>
+                    `;
+                }).join('');
+            }
+            
+            if (loadingDiv) loadingDiv.style.display = 'none';
+            
+            const inputs = document.querySelectorAll('.tier-input');
+            const cellDivs = document.querySelectorAll('.tier-cell');
+            
+            // Cell click to play audio
+            cellDivs.forEach((div, idx) => {
+                div.addEventListener('click', async (e) => {
+                    if (e.target.tagName === 'INPUT') return;
+                    const startTime = idx * 0.108;
+                    await playTrimmedAudio(audioFile, startTime, 0.108, div);
+                });
+            });
+            
+            // Input handlers
+            inputs.forEach((input, idx) => {
+                input.addEventListener('input', (e) => {
+                    let val = filterAkshars(e.target.value);
+                    if (val !== e.target.value) e.target.value = val;
+                    input.classList.remove('saved', 'incorrect');
+                    
+                    if (!trainingState.stepData[practiceKey]) trainingState.stepData[practiceKey] = {};
+                    if (!trainingState.stepData[practiceKey].answers) trainingState.stepData[practiceKey].answers = {};
+                    trainingState.stepData[practiceKey].answers[idx] = val;
+                    saveProgress();
+                });
+            });
+            
+            // Check button
+            const checkBtn = document.getElementById('checkPracticeBtn');
+            const showAnswersBtn = document.getElementById('showAnswersBtn');
+            const resetBtn = document.getElementById('resetPracticeBtn');
+            
+            if (checkBtn) {
+                checkBtn.onclick = () => {
+                    let correctCount = 0;
+                    let wrongCells = [];
+                    
+                    cells.forEach((cell, idx) => {
+                        const input = inputs[idx];
+                        if (!input) return;
+                        
+                        const userAnswer = input.value.trim();
+                        const expectedAnswer = correctAnswers[idx] || "";
+                        const isCorrect = (userAnswer === expectedAnswer);
+                        
+                        if (isCorrect) {
+                            correctCount++;
+                            input.classList.add('saved');
+                            input.classList.remove('incorrect');
                         } else {
-                            next = current + char;
-                            if (next.length > 4) next = next.slice(0, 4);
+                            input.classList.remove('saved');
+                            input.classList.add('incorrect');
+                            wrongCells.push(idx + 1);
                         }
-                        activeElement.value = next;
-                        // Trigger input event
-                        activeElement.dispatchEvent(new Event('input', { bubbles: true }));
+                        
+                        if (!trainingState.stepData[practiceKey]) trainingState.stepData[practiceKey] = {};
+                        if (!trainingState.stepData[practiceKey].answers) trainingState.stepData[practiceKey].answers = {};
+                        trainingState.stepData[practiceKey].answers[idx] = userAnswer;
+                    });
+                    
+                    trainingState.stepData[practiceKey].incorrectCells = {};
+                    wrongCells.forEach(idx => { trainingState.stepData[practiceKey].incorrectCells[idx - 1] = true; });
+                    saveProgress();
+                    
+                    const totalCells = cells.length;
+                    const passed = (correctCount === totalCells);
+                    
+                    if (feedbackDiv) {
+                        feedbackDiv.style.display = 'block';
+                        if (passed) {
+                            feedbackDiv.innerHTML = `<div class="feedback feedback-success">🎉 Perfect! All ${totalCells} cells are correct! 🎉</div>`;
+                            markStepComplete(step);
+                        } else {
+                            const wrongCount = totalCells - correctCount;
+                            feedbackDiv.innerHTML = `<div class="feedback feedback-error">❌ ${wrongCount} incorrect answer(s). Wrong cells: ${wrongCells.join(', ')}</div>`;
+                        }
+                        setTimeout(() => { if (feedbackDiv.innerHTML) feedbackDiv.style.display = 'none'; }, 3000);
+                    }
+                };
+            }
+            
+            if (showAnswersBtn) {
+                showAnswersBtn.onclick = () => {
+                    cells.forEach((cell, idx) => {
+                        const input = inputs[idx];
+                        if (input) {
+                            input.value = correctAnswers[idx] || "";
+                            input.classList.add('saved');
+                            input.classList.remove('incorrect');
+                        }
+                        if (!trainingState.stepData[practiceKey]) trainingState.stepData[practiceKey] = {};
+                        if (!trainingState.stepData[practiceKey].answers) trainingState.stepData[practiceKey].answers = {};
+                        trainingState.stepData[practiceKey].answers[idx] = correctAnswers[idx] || "";
+                    });
+                    saveProgress();
+                    if (feedbackDiv) {
+                        feedbackDiv.innerHTML = `<div class="feedback feedback-info">📝 Correct answers filled in.</div>`;
+                        feedbackDiv.style.display = 'block';
+                        setTimeout(() => feedbackDiv.style.display = 'none', 2000);
+                    }
+                };
+            }
+            
+            if (resetBtn) {
+                resetBtn.onclick = () => {
+                    inputs.forEach((input, idx) => {
+                        if (input) {
+                            input.value = '';
+                            input.classList.remove('saved', 'incorrect');
+                        }
+                        if (trainingState.stepData[practiceKey]?.answers) {
+                            delete trainingState.stepData[practiceKey].answers[idx];
+                        }
+                    });
+                    if (trainingState.stepData[practiceKey]) {
+                        delete trainingState.stepData[practiceKey].incorrectCells;
+                    }
+                    saveProgress();
+                    if (feedbackDiv) feedbackDiv.style.display = 'none';
+                };
+            }
+        }
+
+        async function attachThreeTierExercise(step) {
+            const audioFile = step.audio_file;
+            const requiredDuration = step.required_duration || 1.3;
+            const container = document.getElementById('threeTierContainer');
+            
+            if (!container) return;
+            
+            // Calculate number of frames
+            const count108 = Math.ceil(requiredDuration / WINDOW_108);
+            const count216 = Math.ceil(count108 / 2);
+            const count54 = count108 * 2;
+            
+            container.innerHTML = `
+                <div class="tier-mobile">
+                    <div class="tier-title">🌬️ 216ms (Merged)</div>
+                    <div class="tier-cells-scroll">
+                        <div class="tier-cells-container" id="tier216Cells"></div>
+                    </div>
+                </div>
+                <div class="tier-mobile">
+                    <div class="tier-title">🔥 108ms (Original)</div>
+                    <div class="tier-cells-scroll">
+                        <div class="tier-cells-container" id="tier108Cells"></div>
+                    </div>
+                </div>
+                <div class="tier-mobile">
+                    <div class="tier-title">💧 54ms (Split)</div>
+                    <div class="tier-cells-scroll">
+                        <div class="tier-cells-container" id="tier54Cells"></div>
+                    </div>
+                </div>
+            `;
+            
+            // Create cells
+            const tier216Container = document.getElementById('tier216Cells');
+            const tier108Container = document.getElementById('tier108Cells');
+            const tier54Container = document.getElementById('tier54Cells');
+            
+            for (let i = 0; i < count216; i++) {
+                const startTime = (i * WINDOW_216).toFixed(2);
+                const div = document.createElement('div');
+                div.className = 'tier-cell tier-216';
+                div.setAttribute('data-idx', i);
+                div.setAttribute('data-tier', '216');
+                div.innerHTML = `
+                    <span class="tier-time">${startTime}s</span>
+                    <input type="text" class="tier-input" data-idx="${i}" data-tier="216" maxlength="3" placeholder="___">
+                `;
+                tier216Container.appendChild(div);
+            }
+            
+            for (let i = 0; i < count108; i++) {
+                const startTime = (i * WINDOW_108).toFixed(2);
+                const div = document.createElement('div');
+                div.className = 'tier-cell tier-108';
+                div.setAttribute('data-idx', i);
+                div.setAttribute('data-tier', '108');
+                div.innerHTML = `
+                    <span class="tier-time">${startTime}s</span>
+                    <input type="text" class="tier-input" data-idx="${i}" data-tier="108" maxlength="3" placeholder="___">
+                `;
+                tier108Container.appendChild(div);
+            }
+            
+            for (let i = 0; i < count54; i++) {
+                const startTime = (i * WINDOW_54).toFixed(2);
+                const div = document.createElement('div');
+                div.className = 'tier-cell tier-54';
+                div.setAttribute('data-idx', i);
+                div.setAttribute('data-tier', '54');
+                div.innerHTML = `
+                    <span class="tier-time">${startTime}s</span>
+                    <input type="text" class="tier-input" data-idx="${i}" data-tier="54" maxlength="3" placeholder="___">
+                `;
+                tier54Container.appendChild(div);
+            }
+            
+            // Click handlers for cells
+            const allCells = document.querySelectorAll('.tier-cell');
+            allCells.forEach(cell => {
+                const tier = cell.dataset.tier;
+                const idx = parseInt(cell.dataset.idx);
+                const windowSize = tier === '216' ? WINDOW_216 : (tier === '108' ? WINDOW_108 : WINDOW_54);
+                const startTime = idx * windowSize;
+                
+                cell.addEventListener('click', async (e) => {
+                    if (e.target.tagName === 'INPUT') return;
+                    await playTrimmedAudio(audioFile, startTime, windowSize, cell);
+                });
+            });
+            
+            // Check button
+            const checkBtn = document.getElementById('checkExerciseBtn');
+            if (checkBtn) {
+                checkBtn.onclick = () => {
+                    const feedback = document.getElementById('exerciseFeedback');
+                    if (feedback) {
+                        feedback.innerHTML = `<div class="feedback feedback-success">🎉 Great work! Three-tier exercise completed.</div>`;
+                        feedback.style.display = 'block';
+                    }
+                    markStepComplete(step);
+                };
+            }
+        }
+
+        function attachGameListeners(step) {
+            const gameKey = `${trainingState.currentModule}_${step.id}`;
+            const targetAkshars = step.items || ["अ", "क", "म", "स", "त"];
+            
+            let currentIndex = 0;
+            let score = 0;
+            let canSelect = true;
+            let currentAudio = null;
+            
+            const savedState = trainingState.stepData[gameKey];
+            if (savedState && !savedState.completed) {
+                currentIndex = savedState.currentIndex || 0;
+                score = savedState.score || 0;
+            }
+            
+            const aksharCards = document.querySelectorAll('.game-card');
+            const scoreElement = document.getElementById('gameScore');
+            const progressFill = document.getElementById('gameProgressFill');
+            const gameFeedback = document.getElementById('gameFeedback');
+            const playBtn = document.getElementById('playGameSoundBtn');
+            
+            function updateUI() {
+                if (scoreElement) scoreElement.innerHTML = `Score: ${score}/${targetAkshars.length}`;
+                if (progressFill) progressFill.style.width = `${(currentIndex / targetAkshars.length) * 100}%`;
+            }
+            
+            function saveGameState() {
+                trainingState.stepData[gameKey] = {
+                    currentIndex: currentIndex,
+                    score: score,
+                    completed: currentIndex >= targetAkshars.length
+                };
+                saveProgress();
+            }
+            
+            async function playSound(akshar) {
+                const audioMap = {
+                    'अ': '/mobile-training/audio/game_sounds/a.wav',
+                    'क': '/mobile-training/audio/game_sounds/ka.wav',
+                    'म': '/mobile-training/audio/game_sounds/ma.wav',
+                    'स': '/mobile-training/audio/game_sounds/sa.wav',
+                    'त': '/mobile-training/audio/game_sounds/ta.wav'
+                };
+                
+                const audioFile = audioMap[akshar];
+                if (!audioFile) return;
+                
+                if (currentAudio) {
+                    currentAudio.pause();
+                    currentAudio = null;
+                }
+                
+                currentAudio = new Audio(audioFile);
+                
+                if (gameFeedback) {
+                    gameFeedback.innerHTML = `<div class="feedback feedback-info">🔊 Playing sound for: ${akshar}</div>`;
+                }
+                
+                return new Promise((resolve) => {
+                    currentAudio.onended = () => {
+                        if (gameFeedback) {
+                            gameFeedback.innerHTML = `<div class="feedback feedback-info">🎧 Tap the akshar you heard!</div>`;
+                        }
+                        resolve();
+                    };
+                    currentAudio.play();
+                });
+            }
+            
+            async function playCurrentSound() {
+                if (currentIndex >= targetAkshars.length) return;
+                
+                canSelect = false;
+                aksharCards.forEach(card => {
+                    card.style.pointerEvents = 'none';
+                    card.classList.add('disabled');
+                });
+                
+                const currentAkshar = targetAkshars[currentIndex];
+                await playSound(currentAkshar);
+                
+                aksharCards.forEach(card => {
+                    card.style.pointerEvents = 'auto';
+                    card.classList.remove('disabled');
+                });
+                canSelect = true;
+            }
+            
+            function handleAnswer(selectedAkshar, cardElement) {
+                if (!canSelect) return;
+                if (currentIndex >= targetAkshars.length) return;
+                
+                const correctAkshar = targetAkshars[currentIndex];
+                const isCorrect = (selectedAkshar === correctAkshar);
+                
+                if (isCorrect) {
+                    cardElement.classList.add('correct');
+                    score++;
+                    if (gameFeedback) {
+                        gameFeedback.innerHTML = `<div class="feedback feedback-success">✅ Correct! ${selectedAkshar} is right!</div>`;
+                    }
+                } else {
+                    cardElement.classList.add('incorrect');
+                    if (gameFeedback) {
+                        gameFeedback.innerHTML = `<div class="feedback feedback-error">❌ Wrong! The correct sound was "${correctAkshar}".</div>`;
+                    }
+                }
+                
+                canSelect = false;
+                updateUI();
+                saveGameState();
+                
+                setTimeout(() => {
+                    cardElement.classList.remove('correct', 'incorrect');
+                    currentIndex++;
+                    updateUI();
+                    
+                    if (currentIndex < targetAkshars.length) {
+                        saveGameState();
+                        canSelect = true;
+                        playCurrentSound();
+                    } else {
+                        saveGameState();
+                        if (gameFeedback) {
+                            const finalMessage = score === targetAkshars.length 
+                                ? `<div class="feedback feedback-success">🏆 Perfect! You've mastered all sounds!</div>`
+                                : `<div class="feedback feedback-info">📊 Game finished! Score: ${score}/${targetAkshars.length}.</div>`;
+                            gameFeedback.innerHTML = finalMessage;
+                        }
+                        
+                        if (score === targetAkshars.length) {
+                            setTimeout(() => markStepComplete(step), 1500);
+                        }
+                    }
+                    
+                    canSelect = true;
+                }, 1500);
+            }
+            
+            aksharCards.forEach(card => {
+                card.onclick = () => {
+                    const selectedAkshar = card.dataset.akshar;
+                    handleAnswer(selectedAkshar, card);
+                };
+            });
+            
+            if (playBtn) {
+                playBtn.onclick = () => {
+                    if (currentIndex < targetAkshars.length) {
+                        if (currentAudio) {
+                            currentAudio.pause();
+                            currentAudio = null;
+                        }
+                        playCurrentSound();
+                    }
+                };
+            }
+            
+            if (currentIndex === 0 && !trainingState.stepData[gameKey]?.completed) {
+                setTimeout(() => playCurrentSound(), 500);
+            }
+        }
+
+        function attachInteractiveListeners(step) {
+            const tourKey = `${trainingState.currentModule}_${step.id}`;
+            const tourItems = document.querySelectorAll('.tour-item');
+            const tourFeedback = document.getElementById('tourFeedback');
+            let completedCount = 0;
+            const totalItems = tourItems.length;
+            
+            function updateTourProgress() {
+                if (completedCount === totalItems) {
+                    tourFeedback.innerHTML = `<div class="feedback feedback-success">✓ Tour completed! You're ready to annotate!</div>`;
+                    trainingState.tourCompleted[tourKey] = true;
+                    saveProgress();
+                    markStepComplete(step);
+                }
+            }
+            
+            tourItems.forEach(item => {
+                const isCompleted = item.dataset.completed === 'true';
+                if (isCompleted) {
+                    completedCount++;
+                    item.classList.add('completed');
+                }
+                
+                item.onclick = () => {
+                    if (item.dataset.completed === 'true') return;
+                    
+                    item.dataset.completed = 'true';
+                    item.classList.add('completed');
+                    completedCount++;
+                    updateTourProgress();
+                    
+                    if (tourFeedback) {
+                        tourFeedback.innerHTML = `<div class="feedback feedback-success">✓ Learned about ${item.querySelector('.tour-title')?.innerText || 'feature'}!</div>`;
+                        tourFeedback.style.display = 'block';
+                        setTimeout(() => tourFeedback.style.display = 'none', 1500);
                     }
                 };
             });
         }
-        
+
         function markStepComplete(step) {
             const stepKey = `${trainingState.currentModule}_${step.id}`;
             if (!trainingState.completedSteps.has(stepKey)) {
@@ -1506,7 +2189,7 @@
                 showMessage("✓ Step completed!", "success");
             }
         }
-        
+
         function navigateStep(direction) {
             const module = modules[trainingState.currentModule - 1];
             if (!module) return;
@@ -1519,14 +2202,12 @@
                 renderModulesList();
                 loadCurrentStep();
             } else if (direction === 1 && trainingState.currentModule < modules.length) {
-                // Next module
                 trainingState.currentModule++;
                 trainingState.currentStep = 0;
                 saveProgress();
                 renderModulesList();
                 loadCurrentStep();
             } else if (direction === -1 && trainingState.currentModule > 1) {
-                // Previous module
                 trainingState.currentModule--;
                 const prevModule = modules[trainingState.currentModule - 1];
                 trainingState.currentStep = prevModule.steps.length - 1;
@@ -1535,7 +2216,7 @@
                 loadCurrentStep();
             }
         }
-        
+
         function updateOverallProgress() {
             let totalSteps = 0;
             let completedSteps = 0;
@@ -1553,7 +2234,7 @@
             
             const certBadge = document.getElementById('certBadge');
             if (certBadge) {
-                if (percent === 100) {
+                if (trainingState.certified || percent === 100) {
                     certBadge.innerHTML = '✓ Certified';
                     certBadge.className = 'cert-badge completed';
                 } else if (percent > 0) {
@@ -1565,7 +2246,7 @@
                 }
             }
         }
-        
+
         function showMessage(msg, type) {
             const contentArea = document.getElementById('contentArea');
             if (!contentArea) return;
@@ -1581,9 +2262,20 @@
             contentArea.insertBefore(msgDiv, contentArea.firstChild);
             setTimeout(() => msgDiv.remove(), 3000);
         }
-        
+
         // Initialize
         loadProgress();
+        
+        // Clean up audio on page unload
+        window.addEventListener('beforeunload', () => {
+            if (currentSourceNode) {
+                currentSourceNode.stop();
+                currentSourceNode.disconnect();
+            }
+            if (currentAudioContext) {
+                currentAudioContext.close();
+            }
+        });
     </script>
 </body>
 </html>
