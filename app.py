@@ -191,8 +191,6 @@ def delete_from_mobile_training_data(base_filename):
         return []
 
 
-
-
 # ==============================
 # TEXTGRID TIER GENERATION HELPERS
 # ==============================
@@ -2261,7 +2259,7 @@ MOBILE_TRAINING_PROGRESS_FOLDER = "mobile_training_progress"
 MOBILE_TRAINING_AUDIO_FOLDER = "mobile_training_audio"
 MOBILE_TRAINING_VIDEOS_FOLDER = "static/mobile_training_videos"
 
-# Create folders
+# Create folders (if they don't exist)
 os.makedirs(MOBILE_TRAINING_PROGRESS_FOLDER, exist_ok=True)
 os.makedirs(MOBILE_TRAINING_AUDIO_FOLDER, exist_ok=True)
 os.makedirs(MOBILE_TRAINING_VIDEOS_FOLDER, exist_ok=True)
@@ -2404,6 +2402,7 @@ def save_mobile_training_progress():
 @login_required
 def serve_mobile_training_audio(filename):
     """Serve mobile training audio files"""
+    # Try direct path
     filepath = os.path.join(MOBILE_TRAINING_AUDIO_FOLDER, filename)
     if os.path.exists(filepath):
         return send_file(filepath, mimetype='audio/wav')
@@ -2485,6 +2484,190 @@ def get_mobile_training_exercise_data(filename):
         "correct_answers": correct_answers,
         "audio_url": f"/mobile-training/audio/{filename}"
     })
+
+
+# ==================== ADDED: THREE-TIER DATA ROUTE ====================
+
+@app.route('/api/mobile-training/three-tier-data/<filename>')
+@login_required
+def get_mobile_training_three_tier_data(filename):
+    """Get three-tier exercise data for mobile training (matches desktop functionality)"""
+    username = session["username"]
+    
+    # Get audio file path
+    audio_path = os.path.join(MOBILE_TRAINING_AUDIO_FOLDER, filename)
+    if not os.path.exists(audio_path):
+        if not filename.endswith('.wav'):
+            audio_path = os.path.join(MOBILE_TRAINING_AUDIO_FOLDER, f"{filename}.wav")
+        if not os.path.exists(audio_path):
+            return jsonify({"error": f"Audio file not found: {filename}"}), 404
+    
+    # Get audio duration
+    try:
+        import soundfile as sf
+        info = sf.info(audio_path)
+        duration = info.duration
+    except Exception as e:
+        print(f"Error reading audio duration: {e}")
+        duration = 0
+    
+    # Calculate number of cells based on audio duration
+    WINDOW_216 = 0.216
+    WINDOW_108 = 0.108
+    WINDOW_54 = 0.054
+    
+    num_cells_216 = max(1, int(math.ceil(duration / WINDOW_216)))
+    num_cells_108 = max(1, int(math.ceil(duration / WINDOW_108)))
+    num_cells_54 = max(1, int(math.ceil(duration / WINDOW_54)))
+    
+    # Try to load correct answers from JSON file
+    json_path = audio_path.replace('.wav', '.json')
+    correct_216 = []
+    correct_108 = []
+    correct_54 = []
+    sentence = ""
+    
+    if os.path.exists(json_path):
+        try:
+            with open(json_path, 'r', encoding='utf-8') as f:
+                data = json.load(f)
+                
+                frames_216 = data.get('frames_216', [])
+                for frame in frames_216:
+                    correct_216.append(frame.get('text', ''))
+                
+                frames_108 = data.get('frames_108', [])
+                for frame in frames_108:
+                    correct_108.append(frame.get('text', ''))
+                
+                frames_54 = data.get('frames_54', [])
+                for frame in frames_54:
+                    correct_54.append(frame.get('text', ''))
+                
+                sentence = data.get('sentence', data.get('full_sequence', ''))
+        except Exception as e:
+            print(f"Error loading JSON: {e}")
+    
+    while len(correct_216) < num_cells_216:
+        correct_216.append("")
+    while len(correct_108) < num_cells_108:
+        correct_108.append("")
+    while len(correct_54) < num_cells_54:
+        correct_54.append("")
+    
+    return jsonify({
+        "success": True,
+        "filename": filename,
+        "duration": duration,
+        "num_cells_216": num_cells_216,
+        "num_cells_108": num_cells_108,
+        "num_cells_54": num_cells_54,
+        "correct_answers_216": correct_216[:num_cells_216],
+        "correct_answers_108": correct_108[:num_cells_108],
+        "correct_answers_54": correct_54[:num_cells_54],
+        "sentence": sentence,
+        "audio_url": f"/mobile-training/audio/{filename}"
+    })
+
+
+# ==================== ADDED: MULTI-LANGUAGE DATA ROUTE ====================
+
+@app.route('/api/mobile-training/multi-language-data/<language>/<filename>')
+@login_required
+def get_mobile_training_multi_language_data(language, filename):
+    """Get multi-language exercise data for mobile training"""
+    if not require_login():
+        return jsonify({"error": "not logged in"}), 401
+    
+    language_folder_map = {
+        'hindi': 'hindi',
+        'english': 'english',
+        'telugu': 'telugu',
+        'kannada': 'kannada',
+        'marathi': 'marathi',
+        'tamil': 'tamil'
+    }
+    
+    lang_folder = language_folder_map.get(language.lower(), language.lower())
+    
+    audio_path = os.path.join(MOBILE_TRAINING_AUDIO_FOLDER, lang_folder, filename)
+    
+    if not os.path.exists(audio_path):
+        audio_path = os.path.join(MOBILE_TRAINING_AUDIO_FOLDER, filename)
+    
+    if not os.path.exists(audio_path):
+        if not filename.endswith('.wav'):
+            audio_path = os.path.join(MOBILE_TRAINING_AUDIO_FOLDER, lang_folder, f"{filename}.wav")
+        if not os.path.exists(audio_path):
+            return jsonify({"error": f"Audio file not found for language {language}: {filename}"}), 404
+    
+    try:
+        import soundfile as sf
+        info = sf.info(audio_path)
+        duration = info.duration
+    except Exception as e:
+        print(f"Error reading audio duration: {e}")
+        duration = 0
+    
+    WINDOW_216 = 0.216
+    WINDOW_108 = 0.108
+    WINDOW_54 = 0.054
+    
+    num_cells_216 = max(1, int(math.ceil(duration / WINDOW_216)))
+    num_cells_108 = max(1, int(math.ceil(duration / WINDOW_108)))
+    num_cells_54 = max(1, int(math.ceil(duration / WINDOW_54)))
+    
+    json_path = audio_path.replace('.wav', '.json')
+    correct_216 = []
+    correct_108 = []
+    correct_54 = []
+    sentence = ""
+    
+    if os.path.exists(json_path):
+        try:
+            with open(json_path, 'r', encoding='utf-8') as f:
+                data = json.load(f)
+                
+                frames_216 = data.get('frames_216', [])
+                for frame in frames_216:
+                    correct_216.append(frame.get('text', ''))
+                
+                frames_108 = data.get('frames_108', [])
+                for frame in frames_108:
+                    correct_108.append(frame.get('text', ''))
+                
+                frames_54 = data.get('frames_54', [])
+                for frame in frames_54:
+                    correct_54.append(frame.get('text', ''))
+                
+                sentence = data.get('sentence', data.get('full_sequence', ''))
+        except Exception as e:
+            print(f"Error loading JSON for language {language}: {e}")
+    
+    while len(correct_216) < num_cells_216:
+        correct_216.append("")
+    while len(correct_108) < num_cells_108:
+        correct_108.append("")
+    while len(correct_54) < num_cells_54:
+        correct_54.append("")
+    
+    return jsonify({
+        "success": True,
+        "filename": filename,
+        "language": language,
+        "duration": duration,
+        "num_cells_216": num_cells_216,
+        "num_cells_108": num_cells_108,
+        "num_cells_54": num_cells_54,
+        "correct_answers_216": correct_216[:num_cells_216],
+        "correct_answers_108": correct_108[:num_cells_108],
+        "correct_answers_54": correct_54[:num_cells_54],
+        "sentence": sentence,
+        "audio_url": f"/mobile-training/audio/{lang_folder}/{filename}"
+    })
+
+
+# ==================== EXISTING CERTIFY ROUTE ====================
 
 @app.route('/api/mobile-training-certify', methods=['POST'])
 @login_required
