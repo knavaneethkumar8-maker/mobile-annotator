@@ -71,7 +71,7 @@ if BASE_PATH:
 # ==============================
 
 # Base folder for mobile training data
-MOBILE_TRAINING_DATA_BASE_FOLDER = "/mnt/data_disk_2/UI_TRAINING_DATA/MOBILE_DATA/normal_data"
+MOBILE_TRAINING_DATA_BASE_FOLDER = "mnt/data_disk_2/UI_TRAINING_DATA/MOBILE_DATA/normal_data"
 
 # Create the base directory
 os.makedirs(MOBILE_TRAINING_DATA_BASE_FOLDER, exist_ok=True)
@@ -2302,11 +2302,11 @@ def get_mobile_training_modules():
             ]
         },
         {
-            "id": 4, "title": "The Three-Tier System", "estimated_time": "20-25 min",
+            "id": 4, "title": "The Three-Tier System", "estimated_time": "25-30 min",
             "steps": [
                 {"id": "4.1", "type": "video", "title": "Understanding 216ms, 108ms, 54ms", "duration": "3:00"},
-                {"id": "4.2", "type": "exercise", "title": "Practice: 216ms Tier", "exercise_type": "three_tier", "audio_file": "word_3cells.wav", "required_duration": 0.324},
-                {"id": "4.3", "type": "exercise", "title": "Practice: All Three Tiers", "exercise_type": "three_tier_complete", "audio_file": "namaste_full.wav", "required_duration": 1.3}
+                {"id": "4.2", "type": "exercise", "title": "Practice: All Three Tiers", "exercise_type": "three_tier_complete_dynamic", "audio_file": "three_tier_audio.wav"},
+                {"id": "4.3", "type": "exercise", "title": "Practice: Multi-Language Three Tiers", "exercise_type": "multi_language_three_tier", "languages": ["hindi", "english", "telugu", "kannada", "marathi", "tamil"]}
             ]
         },
         {
@@ -2323,27 +2323,42 @@ def get_mobile_training_modules():
             ]
         },
         {
-            "id": 6, "title": "Quality & Speed", "estimated_time": "15-20 min",
+            "id": 6, "title": "Final Assessment", "estimated_time": "30-40 min",
             "steps": [
-                {"id": "6.1", "type": "video", "title": "Quality Standards", "duration": "2:00"},
-                {"id": "6.2", "type": "video", "title": "Keyboard Shortcuts & Tips", "duration": "2:00"},
-                {"id": "6.3", "type": "exercise", "title": "Timed Practice", "exercise_type": "timed", "audio_file": "timed_practice.wav", "required_duration": 30}
+                {"id": "6.1", "type": "assessment", "title": "Assessment: Easy Level", "assessment_type": "three_tier_assessment", "level": "easy", "audio_file": "assessment_easy.wav"},
+                {"id": "6.2", "type": "assessment", "title": "Assessment: Medium Level", "assessment_type": "three_tier_assessment", "level": "medium", "audio_file": "assessment_medium.wav"},
+                {"id": "6.3", "type": "assessment", "title": "Assessment: Hard Level", "assessment_type": "three_tier_assessment", "level": "hard", "audio_file": "assessment_hard.wav"}
             ]
         },
         {
-            "id": 7, "title": "Final Assessment", "estimated_time": "20-30 min",
+            "id": 7, "title": "Certification Exam", "estimated_time": "40-50 min",
             "steps": [
-                {"id": "7.1", "type": "assessment", "title": "Assessment 1: Single Tier (108ms)", "assessment_type": "single_cells", "count": 10},
-                {"id": "7.2", "type": "assessment", "title": "Assessment 2: Words", "assessment_type": "words", "count": 5},
-                {"id": "7.3", "type": "assessment", "title": "Assessment 3: Full Sentences", "assessment_type": "full_three_tier", "count": 2}
-            ]
-        },
-        {
-            "id": 8, "title": "Certification", "estimated_time": "30-40 min",
-            "steps": [
-                {"id": "8.1", "type": "exam", "title": "Exam: Part 1 - Single Tier", "exam_type": "single_cells", "count": 10, "required_score": 85},
-                {"id": "8.2", "type": "exam", "title": "Exam: Part 2 - Words", "exam_type": "words", "count": 5, "required_score": 85},
-                {"id": "8.3", "type": "exam", "title": "Exam: Part 3 - Full Sentences", "exam_type": "full_three_tier", "count": 3, "required_score": 85}
+                {"id": "7.1", "type": "final_exam", "title": "Final Certification Exam (Theory)", "exam_type": "multiple_choice", "required_score": 80,
+                 "questions": [
+                     {"text": "What is the maximum number of akshars that can be entered in a single annotation cell?", "options": ["1", "2", "3", "4"], "correct": 2},
+                     {"text": "Which of the following is a valid akshar in the Devanagari script?", "options": ["अ", "a", "1", "@"], "correct": 0},
+                     {"text": "What is the duration of a standard 108ms tier window?", "options": ["54 milliseconds", "108 milliseconds", "216 milliseconds", "54 seconds"], "correct": 1},
+                     {"text": "How many akshars are there in the complete Akshar Set?", "options": ["10", "20", "30", "40"], "correct": 3},
+                     {"text": "Which of these is a vowel in Devanagari?", "options": ["क", "ख", "ग", "आ"], "correct": 3},
+                     {"text": "What should you do when you hear an unclear sound during annotation?", "options": ["Skip the file", "Use slowed audio playback", "Guess randomly", "Leave it blank"], "correct": 1},
+                     {"text": "Which duration window is used for the 'annotations' tier in the TextGrid?", "options": ["216ms", "108ms", "54ms", "27ms"], "correct": 2},
+                     {"text": "How many tiers are in the verified TextGrid?", "options": ["7", "9", "12", "15"], "correct": 2},
+                     {"text": "Which of the following is NOT a nasal sound (naasika)?", "options": ["म", "न", "ं", "क"], "correct": 3},
+                     {"text": "What is the relationship between 216ms and 108ms windows?", "options": ["1 × 216ms = 2 × 108ms", "2 × 216ms = 1 × 108ms", "They are unrelated", "216ms is slower than 108ms"], "correct": 0},
+                     {"text": "Which file format is used for storing annotations along with timing information?", "options": [".json", ".txt", ".TextGrid", ".csv"], "correct": 2},
+                     {"text": "What does the 'swar' tier in TextGrid represent?", "options": ["Consonants", "Vowels", "Nasal sounds", "Silence"], "correct": 1},
+                     {"text": "How many cells would be created for a 2-second audio file using 108ms windows?", "options": ["~10", "~18", "~25", "~37"], "correct": 1},
+                     {"text": "Which of these is a valid consonant (vyanjan) in Devanagari?", "options": ["अ", "आ", "क", "ओ"], "correct": 2},
+                     {"text": "What is the purpose of the 'verified_by' tier in the TextGrid?", "options": ["To show original annotator", "To show who verified the file", "To show the sentence", "To show timestamp"], "correct": 1},
+                     {"text": "Which speed option is recommended for hard-to-hear sounds?", "options": ["Normal speed", "1.5x speed", "2x slower speed", "4x slower speed"], "correct": 3},
+                     {"text": "What does the `filterAkshars` function do?", "options": ["Removes non-akshar characters", "Converts to uppercase", "Adds spaces", "Doubles the text"], "correct": 0},
+                     {"text": "How many vowel sounds (swar) are in the Akshar Set?", "options": ["6", "8", "10", "12"], "correct": 0},
+                     {"text": "What is the correct way to merge two 54ms windows?", "options": ["Add them mathematically", "Concatenate the akshars", "Take the first one only", "Take the longer one"], "correct": 1},
+                     {"text": "What is the minimum passing score required for the certification exam?", "options": ["50%", "60%", "70%", "80%"], "correct": 3}
+                 ]},
+                {"id": "7.2", "type": "exam_practical", "title": "Annotation Test 1 (Three-Tier)", "assessment_type": "three_tier_assessment", "level": "exam_easy", "audio_file": "exam_three_tier_easy.wav", "exam_name": "Annotation Test 1", "required_score": 85},
+                {"id": "7.3", "type": "exam_practical", "title": "Annotation Test 2 (Three-Tier)", "assessment_type": "three_tier_assessment", "level": "exam_hard", "audio_file": "exam_three_tier_hard.wav", "exam_name": "Annotation Test 2", "required_score": 85},
+                {"id": "7.4", "type": "certificate", "title": "Your Certificate", "step_type": "certificate"}
             ]
         }
     ]
@@ -2383,13 +2398,11 @@ def save_mobile_training_progress():
     data = request.json
     progress_path = get_mobile_training_progress_path(username)
     
-    # Load existing or create new
     progress = {}
     if os.path.exists(progress_path):
         with open(progress_path, 'r', encoding='utf-8') as f:
             progress = json.load(f)
     
-    # Update with new data
     progress.update(data)
     progress["last_updated"] = datetime.now().isoformat()
     
@@ -2402,17 +2415,14 @@ def save_mobile_training_progress():
 @login_required
 def serve_mobile_training_audio(filename):
     """Serve mobile training audio files"""
-    # Try direct path
     filepath = os.path.join(MOBILE_TRAINING_AUDIO_FOLDER, filename)
     if os.path.exists(filepath):
         return send_file(filepath, mimetype='audio/wav')
     
-    # Try with game_sounds subfolder
     filepath = os.path.join(MOBILE_TRAINING_AUDIO_FOLDER, "game_sounds", filename)
     if os.path.exists(filepath):
         return send_file(filepath, mimetype='audio/wav')
     
-    # Try any subfolder
     for root, dirs, files in os.walk(MOBILE_TRAINING_AUDIO_FOLDER):
         if filename in files:
             return send_file(os.path.join(root, filename), mimetype='audio/wav')
@@ -2434,7 +2444,6 @@ def get_mobile_training_exercise_data(filename):
     """Get exercise data: audio duration and correct answers from JSON"""
     username = session["username"]
     
-    # Get audio file path
     audio_path = os.path.join(MOBILE_TRAINING_AUDIO_FOLDER, filename)
     if not os.path.exists(audio_path):
         if not filename.endswith('.wav'):
@@ -2442,7 +2451,6 @@ def get_mobile_training_exercise_data(filename):
         if not os.path.exists(audio_path):
             return jsonify({"error": f"Audio file not found: {filename}"}), 404
     
-    # Get audio duration
     try:
         import soundfile as sf
         info = sf.info(audio_path)
@@ -2451,11 +2459,9 @@ def get_mobile_training_exercise_data(filename):
         print(f"Error reading audio duration: {e}")
         duration = 0
     
-    # Calculate number of 108ms cells
     WINDOW_108 = 0.108
     num_cells = max(1, int(math.ceil(duration / WINDOW_108)))
     
-    # Try to load correct answers from JSON file (optional)
     json_path = os.path.join(MOBILE_TRAINING_AUDIO_FOLDER, filename.replace('.wav', '.json'))
     correct_answers = []
     
@@ -2485,16 +2491,12 @@ def get_mobile_training_exercise_data(filename):
         "audio_url": f"/mobile-training/audio/{filename}"
     })
 
-
-# ==================== ADDED: THREE-TIER DATA ROUTE ====================
-
 @app.route('/api/mobile-training/three-tier-data/<filename>')
 @login_required
 def get_mobile_training_three_tier_data(filename):
-    """Get three-tier exercise data for mobile training (matches desktop functionality)"""
+    """Get three-tier exercise data for mobile training"""
     username = session["username"]
     
-    # Get audio file path
     audio_path = os.path.join(MOBILE_TRAINING_AUDIO_FOLDER, filename)
     if not os.path.exists(audio_path):
         if not filename.endswith('.wav'):
@@ -2502,7 +2504,6 @@ def get_mobile_training_three_tier_data(filename):
         if not os.path.exists(audio_path):
             return jsonify({"error": f"Audio file not found: {filename}"}), 404
     
-    # Get audio duration
     try:
         import soundfile as sf
         info = sf.info(audio_path)
@@ -2511,7 +2512,6 @@ def get_mobile_training_three_tier_data(filename):
         print(f"Error reading audio duration: {e}")
         duration = 0
     
-    # Calculate number of cells based on audio duration
     WINDOW_216 = 0.216
     WINDOW_108 = 0.108
     WINDOW_54 = 0.054
@@ -2520,7 +2520,6 @@ def get_mobile_training_three_tier_data(filename):
     num_cells_108 = max(1, int(math.ceil(duration / WINDOW_108)))
     num_cells_54 = max(1, int(math.ceil(duration / WINDOW_54)))
     
-    # Try to load correct answers from JSON file
     json_path = audio_path.replace('.wav', '.json')
     correct_216 = []
     correct_108 = []
@@ -2569,16 +2568,10 @@ def get_mobile_training_three_tier_data(filename):
         "audio_url": f"/mobile-training/audio/{filename}"
     })
 
-
-# ==================== ADDED: MULTI-LANGUAGE DATA ROUTE ====================
-
 @app.route('/api/mobile-training/multi-language-data/<language>/<filename>')
 @login_required
 def get_mobile_training_multi_language_data(language, filename):
     """Get multi-language exercise data for mobile training"""
-    if not require_login():
-        return jsonify({"error": "not logged in"}), 401
-    
     language_folder_map = {
         'hindi': 'hindi',
         'english': 'english',
@@ -2665,9 +2658,6 @@ def get_mobile_training_multi_language_data(language, filename):
         "sentence": sentence,
         "audio_url": f"/mobile-training/audio/{lang_folder}/{filename}"
     })
-
-
-# ==================== EXISTING CERTIFY ROUTE ====================
 
 @app.route('/api/mobile-training-certify', methods=['POST'])
 @login_required

@@ -890,13 +890,106 @@
         .nav-buttons { display: flex; gap: 10px; }
         .nav-buttons .btn { flex: 1; padding: 11px 14px; font-size: 0.82rem; }
 
-        /* ===== ASSESSMENT ===== */
+        /* ===== ASSESSMENT & EXAM ===== */
         .assessment-card { background: white; border-radius: 14px; padding: 16px; border: 1.5px solid #E2E8F0; text-align: center; }
         .assessment-icon { font-size: 2.2rem; margin-bottom: 10px; }
         .assessment-title { font-weight: 700; font-size: 0.95rem; color: #1C1C1A; margin-bottom: 5px; }
         .assessment-desc { font-size: 0.76rem; color: #6C7A89; margin-bottom: 16px; line-height: 1.5; }
 
-        /* ===== RESPONSIVE ===== */
+        /* ===== CERTIFICATE STYLES ===== */
+        .certificate-container {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            border-radius: 20px;
+            padding: 20px;
+            margin: 16px 0;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        .certificate-card {
+            background: white;
+            border-radius: 16px;
+            padding: 24px 20px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+        .certificate-card h1 {
+            font-size: 1.3rem;
+            color: #2d3748;
+            margin-bottom: 8px;
+            font-weight: 700;
+            letter-spacing: 2px;
+        }
+        .certificate-card h2 {
+            font-size: 1.1rem;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-family: 'Georgia', serif;
+            border-bottom: 2px solid #e2e8f0;
+            display: inline-block;
+            padding-bottom: 5px;
+        }
+        .certificate-card h3 {
+            font-size: 0.95rem;
+            color: #667eea;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+        .grade-badge {
+            display: inline-block;
+            padding: 8px 20px;
+            border-radius: 50px;
+            margin: 10px 0;
+        }
+        .grade-text {
+            color: white;
+            font-size: 0.85rem;
+            font-weight: bold;
+        }
+        .score-section {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 15px 0;
+            flex-wrap: wrap;
+        }
+        .score-box {
+            text-align: center;
+            background: #f7f9fc;
+            padding: 8px;
+            border-radius: 10px;
+            min-width: 70px;
+        }
+        .score-value {
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+        .score-label {
+            font-size: 0.6rem;
+            color: #718096;
+        }
+        .certificate-footer {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+            padding-top: 15px;
+            font-size: 0.6rem;
+            color: #a0aec0;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        /* ===== CERTIFICATION BUTTON ===== */
+        .certify-btn {
+            background: linear-gradient(135deg, #f5af19, #f12711);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
         @media (max-width: 390px) {
             .kb-key { min-width: 33px; height: 38px; font-size: 12px; }
             .kb-key-special { min-width: 48px; font-size: 9px; }
@@ -1033,7 +1126,7 @@
         "6.2": "/mobile-training/videos/tut_10.mp4"
     };
 
-    // ==================== MODULES STRUCTURE ====================
+    // ==================== MODULES STRUCTURE with FINAL ASSESSMENT & CERTIFICATION ====================
     
     const modules = [
         {
@@ -1086,27 +1179,92 @@
             ]
         },
         {
-            id: 6, title: "Quality & Speed", estimated_time: "15-20 min",
+            id: 6, title: "Final Assessment", estimated_time: "30-40 min",
             steps: [
-                { id: "6.1", type: "video", title: "Quality Standards", duration: "2:00" },
-                { id: "6.2", type: "video", title: "Keyboard Shortcuts & Tips", duration: "2:00" },
-                { id: "6.3", type: "exercise", title: "Timed Practice", exercise_type: "timed", audio_file: "timed_practice.wav", required_duration: 30 }
+                { 
+                    id: "6.1", 
+                    type: "assessment", 
+                    title: "Assessment: Easy Level", 
+                    assessment_type: "three_tier_assessment",
+                    level: "easy",
+                    audio_file: "assessment_easy.wav"
+                },
+                { 
+                    id: "6.2", 
+                    type: "assessment", 
+                    title: "Assessment: Medium Level", 
+                    assessment_type: "three_tier_assessment",
+                    level: "medium",
+                    audio_file: "assessment_medium.wav"
+                },
+                { 
+                    id: "6.3", 
+                    type: "assessment", 
+                    title: "Assessment: Hard Level", 
+                    assessment_type: "three_tier_assessment",
+                    level: "hard",
+                    audio_file: "assessment_hard.wav"
+                }
             ]
         },
         {
-            id: 7, title: "Final Assessment", estimated_time: "20-30 min",
+            id: 7, title: "Certification Exam", estimated_time: "40-50 min",
             steps: [
-                { id: "7.1", type: "assessment", title: "Assessment 1: Single Tier (108ms)", assessment_type: "single_cells", count: 10 },
-                { id: "7.2", type: "assessment", title: "Assessment 2: Words", assessment_type: "words", count: 5 },
-                { id: "7.3", type: "assessment", title: "Assessment 3: Full Sentences", assessment_type: "full_three_tier", count: 2 }
-            ]
-        },
-        {
-            id: 8, title: "Certification Exam", estimated_time: "30-40 min",
-            steps: [
-                { id: "8.1", type: "exam", title: "Exam: Part 1 - Single Tier (108ms)", exam_type: "single_cells", count: 10, required_score: 85 },
-                { id: "8.2", type: "exam", title: "Exam: Part 2 - Words", exam_type: "words", count: 5, required_score: 85 },
-                { id: "8.3", type: "exam", title: "Exam: Part 3 - Full Sentences", exam_type: "full_three_tier", count: 3, required_score: 85 }
+                { 
+                    id: "7.1", 
+                    type: "final_exam", 
+                    title: "Final Certification Exam (Theory)", 
+                    exam_type: "multiple_choice",
+                    required_score: 80,
+                    questions: [
+                        { text: "What is the maximum number of akshars that can be entered in a single annotation cell?", options: ["1", "2", "3", "4"], correct: 2 },
+                        { text: "Which of the following is a valid akshar in the Devanagari script?", options: ["अ", "a", "1", "@"], correct: 0 },
+                        { text: "What is the duration of a standard 108ms tier window?", options: ["54 milliseconds", "108 milliseconds", "216 milliseconds", "54 seconds"], correct: 1 },
+                        { text: "How many akshars are there in the complete Akshar Set?", options: ["10", "20", "30", "40"], correct: 3 },
+                        { text: "Which of these is a vowel in Devanagari?", options: ["क", "ख", "ग", "आ"], correct: 3 },
+                        { text: "What should you do when you hear an unclear sound during annotation?", options: ["Skip the file", "Use slowed audio playback", "Guess randomly", "Leave it blank"], correct: 1 },
+                        { text: "Which duration window is used for the 'annotations' tier in the TextGrid?", options: ["216ms", "108ms", "54ms", "27ms"], correct: 2 },
+                        { text: "How many tiers are in the verified TextGrid?", options: ["7", "9", "12", "15"], correct: 2 },
+                        { text: "Which of the following is NOT a nasal sound (naasika)?", options: ["म", "न", "ं", "क"], correct: 3 },
+                        { text: "What is the relationship between 216ms and 108ms windows?", options: ["1 × 216ms = 2 × 108ms", "2 × 216ms = 1 × 108ms", "They are unrelated", "216ms is slower than 108ms"], correct: 0 },
+                        { text: "Which file format is used for storing annotations along with timing information?", options: [".json", ".txt", ".TextGrid", ".csv"], correct: 2 },
+                        { text: "What does the 'swar' tier in TextGrid represent?", options: ["Consonants", "Vowels", "Nasal sounds", "Silence"], correct: 1 },
+                        { text: "How many cells would be created for a 2-second audio file using 108ms windows?", options: ["~10", "~18", "~25", "~37"], correct: 1 },
+                        { text: "Which of these is a valid consonant (vyanjan) in Devanagari?", options: ["अ", "आ", "क", "ओ"], correct: 2 },
+                        { text: "What is the purpose of the 'verified_by' tier in the TextGrid?", options: ["To show original annotator", "To show who verified the file", "To show the sentence", "To show timestamp"], correct: 1 },
+                        { text: "Which speed option is recommended for hard-to-hear sounds?", options: ["Normal speed", "1.5x speed", "2x slower speed", "4x slower speed"], correct: 3 },
+                        { text: "What does the `filterAkshars` function do?", options: ["Removes non-akshar characters", "Converts to uppercase", "Adds spaces", "Doubles the text"], correct: 0 },
+                        { text: "How many vowel sounds (swar) are in the Akshar Set?", options: ["6", "8", "10", "12"], correct: 0 },
+                        { text: "What is the correct way to merge two 54ms windows?", options: ["Add them mathematically", "Concatenate the akshars", "Take the first one only", "Take the longer one"], correct: 1 },
+                        { text: "What is the minimum passing score required for the certification exam?", options: ["50%", "60%", "70%", "80%"], correct: 3 }
+                    ]
+                },
+                { 
+                    id: "7.2", 
+                    type: "exam_practical",
+                    title: "Annotation Test 1 (Three-Tier)", 
+                    assessment_type: "three_tier_assessment",
+                    level: "exam_easy",
+                    audio_file: "exam_three_tier_easy.wav",
+                    exam_name: "Annotation Test 1",
+                    required_score: 85
+                },
+                { 
+                    id: "7.3", 
+                    type: "exam_practical",
+                    title: "Annotation Test 2 (Three-Tier)", 
+                    assessment_type: "three_tier_assessment",
+                    level: "exam_hard",
+                    audio_file: "exam_three_tier_hard.wav",
+                    exam_name: "Annotation Test 2",
+                    required_score: 85
+                },
+                { 
+                    id: "7.4", 
+                    type: "certificate",
+                    title: "Your Certificate", 
+                    step_type: "certificate"
+                }
             ]
         }
     ];
@@ -1300,7 +1458,6 @@
         const module = modules[trainingState.currentModule - 1];
         if (!module) return;
 
-        // Update header title
         const headerTitle = document.getElementById('headerModuleTitle');
         if (headerTitle) headerTitle.textContent = `M${module.id}: ${module.title.substring(0, 22)}${module.title.length > 22 ? '…' : ''}`;
 
@@ -1310,7 +1467,6 @@
             stepBarInfo.textContent = `${step.id} · ${step.title}`;
         }
 
-        // Render step dots
         const dotsEl = document.getElementById('navStepDots');
         if (dotsEl) {
             dotsEl.innerHTML = module.steps.map((s, idx) => {
@@ -1358,7 +1514,7 @@
                             const stepCompleted = trainingState.completedSteps.has(`${module.id}_${step.id}`);
                             const isCurrentStep = trainingState.currentModule === module.id && trainingState.currentStep === idx;
                             const iconClass = stepCompleted ? 'completed' : (isCurrentStep ? 'active' : '');
-                            const stepTypeIcon = step.type === 'video' ? '▶' : step.type === 'quiz' ? '?' : step.type === 'game' ? '🎮' : step.type === 'exam' ? '📋' : '●';
+                            const stepTypeIcon = step.type === 'video' ? '▶' : step.type === 'quiz' ? '?' : step.type === 'game' ? '🎮' : step.type === 'exam' ? '📋' : step.type === 'final_exam' ? '🏆' : step.type === 'exam_practical' ? '📝' : step.type === 'certificate' ? '🎓' : '●';
                             return `
                                 <div class="step-item ${isCurrentStep ? 'current-step' : ''}" data-module="${module.id}" data-step="${idx}">
                                     <div class="step-icon ${iconClass}">
@@ -1412,7 +1568,6 @@
         const contentArea = document.getElementById('contentArea');
         if (!contentArea) return;
 
-        // Scroll content area to top
         contentArea.scrollTop = 0;
 
         const stepTypeLabel = {
@@ -1422,7 +1577,9 @@
             game: '🎮 Game',
             interactive: '🖱️ Interactive',
             assessment: '📋 Assessment',
-            exam: '🏆 Exam'
+            final_exam: '🏆 Final Exam',
+            exam_practical: '📝 Practical Exam',
+            certificate: '🎓 Certificate'
         }[step.type] || step.type;
         
         let html = `
@@ -1455,8 +1612,14 @@
             html += renderGameContent(step);
         } else if (step.type === 'interactive') {
             html += renderInteractiveContent(step);
-        } else if (step.type === 'assessment' || step.type === 'exam') {
+        } else if (step.type === 'assessment') {
             html += renderAssessmentContent(step);
+        } else if (step.type === 'final_exam') {
+            html += renderFinalExamContent(step);
+        } else if (step.type === 'exam_practical') {
+            html += renderExamPracticalContent(step);
+        } else if (step.type === 'certificate') {
+            html += renderCertificateContent();
         }
         
         html += `
@@ -1799,13 +1962,348 @@
     }
 
     function renderAssessmentContent(step) {
+        const assessmentKey = `${trainingState.currentModule}_${step.id}`;
+        const savedState = trainingState.stepData[assessmentKey] || {};
+        const isCompleted = savedState.completed || false;
+        const score = savedState.score || null;
+        const level = step.level || "assessment";
+        
+        // If already completed and passed
+        if (isCompleted && score !== null && score >= 85) {
+            return `
+                <div class="exercise-area">
+                    <div class="feedback feedback-success" style="padding: 20px; text-align: center;">
+                        <h3>✓ Assessment Completed!</h3>
+                        <p>Your score: ${score}%</p>
+                        <p>Great job! You passed this assessment.</p>
+                    </div>
+                </div>
+            `;
+        }
+        
+        // If failed but previously attempted (show retry button)
+        if (savedState.attempted && score !== null && score < 85) {
+            return `
+                <div class="exercise-area">
+                    <div class="assessment-header" style="margin-bottom: 20px;">
+                        <h3>${step.title}</h3>
+                        <p>Complete all three tiers (216ms, 108ms, 54ms) for this assessment. You need 85% to pass.</p>
+                        <p><strong>Level: ${level.charAt(0).toUpperCase() + level.slice(1)}</strong></p>
+                        <p>⚠️ You previously scored ${score}%. You can retry.</p>
+                    </div>
+                    
+                    <div class="audio-player-card">
+                        <button class="play-circle" id="playFullAudioBtn">
+                            <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                        </button>
+                        <div class="speed-group">
+                            <button class="speed-chip" data-speed="0.5">0.5x</button>
+                            <button class="speed-chip active" data-speed="1">1x</button>
+                            <button class="speed-chip" data-speed="1.5">1.5x</button>
+                            <button class="speed-chip" data-speed="2">2x</button>
+                        </div>
+                    </div>
+                    
+                    <div class="three-tier-mobile" id="threeTierSection">
+                        <div class="tier-mobile">
+                            <div class="tier-title">🌬️ 216ms (Merged)</div>
+                            <div class="tier-cells-scroll">
+                                <div class="tier-cells-container" id="tier216Row"></div>
+                            </div>
+                        </div>
+                        <div class="tier-mobile">
+                            <div class="tier-title">🔥 108ms (Original)</div>
+                            <div class="tier-cells-scroll">
+                                <div class="tier-cells-container" id="tier108Row"></div>
+                            </div>
+                        </div>
+                        <div class="tier-mobile">
+                            <div class="tier-title">💧 54ms (Split)</div>
+                            <div class="tier-cells-scroll">
+                                <div class="tier-cells-container" id="tier54Row"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; gap: 8px; justify-content: center; margin-top: 14px; flex-wrap: wrap;">
+                        <button class="btn btn-primary" id="submitAssessmentBtn">✓ Submit Assessment</button>
+                        <button class="btn btn-secondary" id="resetAssessmentBtn">🗑 Reset All</button>
+                    </div>
+                    <div id="assessmentFeedback" style="display: none;"></div>
+                    <div id="loadingIndicator" style="text-align: center; padding: 16px; display: none;">Loading assessment data...</div>
+                </div>
+                ${renderMobileKeyboard()}
+            `;
+        }
+        
+        // First time - show assessment
         return `
-            <div class="assessment-card">
-                <div class="assessment-icon">${step.type === 'exam' ? '🏆' : '📋'}</div>
-                <div class="assessment-title">${step.title}</div>
-                <div class="assessment-desc">Complete this ${step.type} to proceed. You need ${step.required_score || 90}% to pass.</div>
-                <button class="btn btn-primary" id="startAssessmentBtn" style="width:100%;">Start ${step.type === 'exam' ? 'Exam' : 'Assessment'}</button>
-                <div id="assessmentContainer"></div>
+            <div class="exercise-area">
+                <div class="assessment-header" style="margin-bottom: 20px;">
+                    <h3>${step.title}</h3>
+                    <p>Complete all three tiers (216ms, 108ms, 54ms) for this assessment. You need 85% to pass.</p>
+                    <p><strong>Level: ${level.charAt(0).toUpperCase() + level.slice(1)}</strong></p>
+                </div>
+                
+                <div class="audio-player-card">
+                    <button class="play-circle" id="playFullAudioBtn">
+                        <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                    </button>
+                    <div class="speed-group">
+                        <button class="speed-chip" data-speed="0.5">0.5x</button>
+                        <button class="speed-chip active" data-speed="1">1x</button>
+                        <button class="speed-chip" data-speed="1.5">1.5x</button>
+                        <button class="speed-chip" data-speed="2">2x</button>
+                    </div>
+                </div>
+                
+                <div class="three-tier-mobile" id="threeTierSection">
+                    <div class="tier-mobile">
+                        <div class="tier-title">🌬️ 216ms (Merged)</div>
+                        <div class="tier-cells-scroll">
+                            <div class="tier-cells-container" id="tier216Row"></div>
+                        </div>
+                    </div>
+                    <div class="tier-mobile">
+                        <div class="tier-title">🔥 108ms (Original)</div>
+                        <div class="tier-cells-scroll">
+                            <div class="tier-cells-container" id="tier108Row"></div>
+                        </div>
+                    </div>
+                    <div class="tier-mobile">
+                        <div class="tier-title">💧 54ms (Split)</div>
+                        <div class="tier-cells-scroll">
+                            <div class="tier-cells-container" id="tier54Row"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="display: flex; gap: 8px; justify-content: center; margin-top: 14px; flex-wrap: wrap;">
+                    <button class="btn btn-primary" id="submitAssessmentBtn">✓ Submit Assessment</button>
+                    <button class="btn btn-secondary" id="resetAssessmentBtn">🗑 Reset All</button>
+                </div>
+                <div id="assessmentFeedback" style="display: none;"></div>
+                <div id="loadingIndicator" style="text-align: center; padding: 16px; display: none;">Loading assessment data...</div>
+            </div>
+            ${renderMobileKeyboard()}
+        `;
+    }
+
+    function renderFinalExamContent(step) {
+        const examKey = `${trainingState.currentModule}_${step.id}`;
+        const savedState = trainingState.stepData[examKey] || {};
+        const isCompleted = savedState.completed || false;
+        const score = savedState.score || null;
+        const answers = savedState.answers || {};
+        const questions = step.questions;
+        
+        // If already completed, show results (no retry - single attempt)
+        if (isCompleted) {
+            const passed = score >= step.required_score;
+            return `
+                <div class="exercise-area">
+                    <div class="${passed ? 'feedback-success' : 'feedback-error'}" style="padding: 20px; text-align: center;">
+                        <h3>${passed ? '✓ Exam Completed!' : '✗ Exam Completed'}</h3>
+                        <p>Your score: ${score}% (${Math.round(score * questions.length / 100)}/${questions.length} correct)</p>
+                        <p>Required: ${step.required_score}% | Status: ${passed ? 'PASSED' : 'FAILED'}</p>
+                        ${passed ? '<p>🎉 Congratulations! You have completed the certification exam!</p>' : '<p>⚠️ You did not meet the passing criteria. Please contact your administrator.</p>'}
+                    </div>
+                </div>
+            `;
+        }
+        
+        // Render the exam questions
+        return `
+            <div class="exercise-area">
+                <div class="exam-header" style="margin-bottom: 20px;">
+                    <h3>${step.title}</h3>
+                    <p>This is the final certification exam. You have <strong>ONE ATTEMPT</strong>. Please answer all questions carefully.</p>
+                    <p>Required passing score: ${step.required_score}%</p>
+                    <p><strong>Total Questions: ${questions.length}</strong></p>
+                </div>
+                
+                <div class="exam-questions-container" id="examQuestionsContainer">
+                    ${questions.map((q, qIdx) => `
+                        <div class="quiz-question">
+                            <div class="quiz-question-text">${qIdx + 1}. ${q.text}</div>
+                            <div class="quiz-options">
+                                ${q.options.map((opt, optIdx) => `
+                                    <label class="quiz-option">
+                                        <input type="radio" name="exam_q${qIdx}" value="${optIdx}" ${answers[qIdx] == optIdx ? 'checked' : ''}>
+                                        <span>${String.fromCharCode(65+optIdx)}. ${opt}</span>
+                                    </label>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+                
+                <div style="display: flex; gap: 8px; justify-content: center; margin-top: 14px; flex-wrap: wrap;">
+                    <button class="btn btn-primary" id="submitExamBtn">✓ Submit Exam</button>
+                    <button class="btn btn-secondary" id="resetExamBtn">🗑 Reset All Answers</button>
+                </div>
+                <div id="examFeedback" style="display: none;"></div>
+            </div>
+            ${renderMobileKeyboard()}
+        `;
+    }
+
+    function renderExamPracticalContent(step) {
+        const examKey = `${trainingState.currentModule}_${step.id}`;
+        const savedState = trainingState.stepData[examKey] || {};
+        const isCompleted = savedState.completed || false;
+        const score = savedState.score || null;
+        const requiredScore = step.required_score || 85;
+        const examName = step.exam_name || step.title;
+        
+        // If already completed, show results (NO RETRY)
+        if (isCompleted) {
+            const passed = score >= requiredScore;
+            return `
+                <div class="exercise-area">
+                    <div class="${passed ? 'feedback-success' : 'feedback-error'}" style="padding: 20px; text-align: center;">
+                        <h3>${passed ? '✓ Exam Test Completed!' : '✗ Exam Test Completed'}</h3>
+                        <p><strong>${examName}</strong></p>
+                        <p>Your score: ${score}%</p>
+                        <p>Required: ${requiredScore}% | Status: ${passed ? 'PASSED' : 'FAILED'}</p>
+                        ${passed ? '<p>🎉 You have passed this annotation test!</p>' : '<p>⚠️ You did not meet the passing criteria. No retry allowed.</p>'}
+                    </div>
+                </div>
+            `;
+        }
+        
+        // First time - show assessment (like Module 6)
+        return `
+            <div class="exercise-area">
+                <div class="exam-header" style="margin-bottom: 20px; padding: 12px; background: #FEF3C7; border-radius: 12px;">
+                    <h3>⚠️ IMPORTANT: This is an Exam</h3>
+                    <p><strong>${examName}</strong></p>
+                    <p>You have <strong>ONE ATTEMPT</strong> only. No retry allowed.</p>
+                    <p>Required passing score: ${requiredScore}%</p>
+                    <p>Complete all three tiers (216ms, 108ms, 54ms) accurately.</p>
+                </div>
+                
+                <div class="audio-player-card">
+                    <button class="play-circle" id="playFullAudioBtn">
+                        <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                    </button>
+                    <div class="speed-group">
+                        <button class="speed-chip" data-speed="0.5">0.5x</button>
+                        <button class="speed-chip active" data-speed="1">1x</button>
+                        <button class="speed-chip" data-speed="1.5">1.5x</button>
+                        <button class="speed-chip" data-speed="2">2x</button>
+                    </div>
+                </div>
+                
+                <div class="sentence-input-container">
+                    <input type="text" id="sentenceInput" class="sentence-input-field" placeholder="Reference sentence (optional)" autocomplete="off">
+                </div>
+                
+                <div class="three-tier-mobile" id="threeTierSection">
+                    <div class="tier-mobile">
+                        <div class="tier-title">🌬️ 216ms (Merged)</div>
+                        <div class="tier-cells-scroll">
+                            <div class="tier-cells-container" id="tier216Row"></div>
+                        </div>
+                    </div>
+                    <div class="tier-mobile">
+                        <div class="tier-title">🔥 108ms (Original)</div>
+                        <div class="tier-cells-scroll">
+                            <div class="tier-cells-container" id="tier108Row"></div>
+                        </div>
+                    </div>
+                    <div class="tier-mobile">
+                        <div class="tier-title">💧 54ms (Split)</div>
+                        <div class="tier-cells-scroll">
+                            <div class="tier-cells-container" id="tier54Row"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="display: flex; gap: 8px; justify-content: center; margin-top: 14px; flex-wrap: wrap;">
+                    <button class="btn btn-primary" id="submitExamPracticalBtn">✓ Submit Exam Test</button>
+                    <button class="btn btn-secondary" id="resetExamPracticalBtn">🗑 Reset All</button>
+                </div>
+                <div id="examPracticalFeedback" style="display: none;"></div>
+                <div id="loadingIndicator" style="text-align: center; padding: 16px; display: none;">Loading exam data...</div>
+            </div>
+            ${renderMobileKeyboard()}
+        `;
+    }
+
+    function renderCertificateContent() {
+        const gradeData = calculateFinalGrade();
+        
+        if (!gradeData.completed) {
+            return `
+                <div class="exercise-area" style="text-align: center;">
+                    <div class="feedback-info" style="padding: 20px;">
+                        <h3>🎓 Course Completion</h3>
+                        <p>Please complete all Module 7 exams to receive your certificate:</p>
+                        <ul style="text-align: left; display: inline-block; margin-top: 15px;">
+                            <li>✓ 7.1 Final Certification Exam (Theory)</li>
+                            <li>✓ 7.2 Annotation Test 1 (Three-Tier)</li>
+                            <li>✓ 7.3 Annotation Test 2 (Three-Tier)</li>
+                        </ul>
+                        <p style="margin-top: 15px;">Complete all three exams to unlock your certificate.</p>
+                    </div>
+                </div>
+            `;
+        }
+        
+        const currentDate = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+        const certificateId = 'AKS-' + Math.random().toString(36).substr(2, 8).toUpperCase();
+        
+        return `
+            <div class="certificate-container" id="certificateContainer">
+                <div class="certificate-card">
+                    <h1>CERTIFICATE OF COMPLETION</h1>
+                    <p style="color: #718096; margin-bottom: 15px; font-size: 0.7rem;">This certificate is proudly presented to</p>
+                    <h2 id="certificateUserName">Loading...</h2>
+                    <p style="font-size: 0.85rem; color: #4a5568; margin: 10px 0;">for successfully completing the</p>
+                    <h3>Akshar Annotation Training Program</h3>
+                    
+                    <div class="grade-badge" style="background: ${gradeData.badgeColor}">
+                        <span class="grade-text">${gradeData.gradeBadge}</span>
+                    </div>
+                    
+                    <div class="score-section">
+                        <div class="score-box">
+                            <div class="score-value" style="color: #667eea;">${gradeData.theoryScore}%</div>
+                            <div class="score-label">Theory Exam</div>
+                        </div>
+                        <div class="score-box">
+                            <div class="score-value" style="color: #48bb78;">${gradeData.practical1Score}%</div>
+                            <div class="score-label">Test 1</div>
+                        </div>
+                        <div class="score-box">
+                            <div class="score-value" style="color: #48bb78;">${gradeData.practical2Score}%</div>
+                            <div class="score-label">Test 2</div>
+                        </div>
+                        <div class="score-box">
+                            <div class="score-value" style="color: #ed8936;">${gradeData.percentage}%</div>
+                            <div class="score-label">Overall</div>
+                        </div>
+                    </div>
+                    
+                    <p style="color: #4a5568; font-size: 0.75rem; margin: 12px auto; line-height: 1.5;">${gradeData.description}</p>
+                    
+                    <div style="margin-top: 20px; padding-top: 12px; border-top: 1px solid #e2e8f0;">
+                        <div style="text-align: center;">
+                            <div style="font-size: 0.7rem; color: #2d3748;">Shunyavignan Pvt Ltd</div>
+                            <div style="font-size: 0.6rem; color: #718096;">Issuing Authority</div>
+                        </div>
+                    </div>
+                    
+                    <div class="certificate-footer">
+                        <span>ID: ${certificateId}</span>
+                        <span>${currentDate}</span>
+                    </div>
+                </div>
+                
+                <div style="display: flex; justify-content: center; gap: 10px; margin-top: 15px;">
+                    <button class="btn btn-primary" id="printCertificateBtn" style="padding: 8px 16px; font-size: 0.75rem;">🖨️ Print Certificate</button>
+                </div>
             </div>
         `;
     }
@@ -1995,13 +2493,20 @@
             attachInteractiveListeners(step);
         }
         
-        const startAssessment = document.getElementById('startAssessmentBtn');
-        if (startAssessment) {
-            startAssessment.onclick = () => {
-                const container = document.getElementById('assessmentContainer');
-                container.innerHTML = `<div class="feedback feedback-success">Assessment completed! Great work!</div>`;
-                setTimeout(() => markStepComplete(step), 2000);
-            };
+        if (step.type === 'assessment') {
+            attachAssessmentListeners(step);
+        }
+        
+        if (step.type === 'final_exam') {
+            attachFinalExamListeners(step);
+        }
+        
+        if (step.type === 'exam_practical') {
+            attachExamPracticalListeners(step);
+        }
+        
+        if (step.type === 'certificate') {
+            attachCertificateListeners();
         }
         
         setupKeyboardListeners();
@@ -2018,6 +2523,840 @@
         
         document.getElementById('bottomPrevBtn').onclick = () => navigateStep(-1);
         document.getElementById('bottomNextBtn').onclick = () => navigateStep(1);
+    }
+
+    // ==================== ASSESSMENT FUNCTIONS ====================
+    
+    async function attachAssessmentListeners(step) {
+        const audioFile = step.audio_file;
+        const assessmentKey = `${trainingState.currentModule}_${step.id}`;
+        const savedState = trainingState.stepData[assessmentKey] || {};
+        const level = step.level || "assessment";
+
+        if (savedState.completed && savedState.score >= 85) return;
+
+        const container216 = document.getElementById('tier216Row');
+        const container108 = document.getElementById('tier108Row');
+        const container54  = document.getElementById('tier54Row');
+        const sentenceInput = document.getElementById('sentenceInput');
+        const loadingDiv    = document.getElementById('loadingIndicator');
+        const feedbackDiv   = document.getElementById('assessmentFeedback');
+
+        if (!container216 || !container108 || !container54) return;
+
+        if (loadingDiv) loadingDiv.style.display = 'block';
+        container216.innerHTML = '<div style="padding: 16px; text-align: center;">Loading 216ms tier...</div>';
+        container108.innerHTML = '<div style="padding: 16px; text-align: center;">Loading 108ms tier...</div>';
+        container54.innerHTML  = '<div style="padding: 16px; text-align: center;">Loading 54ms tier...</div>';
+
+        let correct216 = [], correct108 = [], correct54 = [];
+        let numCells216 = 0, numCells108 = 0, numCells54 = 0;
+        let sentence = "", durationAudio = 0;
+
+        try {
+            const response = await fetch(`/api/mobile-training/three-tier-data/${audioFile}`);
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            const data = await response.json();
+            if (!data.success) throw new Error(data.error || 'Failed to load assessment data');
+
+            numCells216  = data.num_cells_216  || 0;
+            numCells108  = data.num_cells_108  || 0;
+            numCells54   = data.num_cells_54   || 0;
+            correct216   = data.correct_answers_216 || [];
+            correct108   = data.correct_answers_108 || [];
+            correct54    = data.correct_answers_54  || [];
+            sentence     = data.sentence || "";
+            durationAudio = data.duration || 0;
+
+            const userAnswers216 = savedState.answers216 || {};
+            const userAnswers108 = savedState.answers108 || {};
+            const userAnswers54  = savedState.answers54  || {};
+
+            if (sentenceInput) {
+                sentenceInput.value = savedState.sentence || sentence || '';
+            }
+
+            // Render 216ms tier
+            if (numCells216 > 0) {
+                container216.innerHTML = '';
+                for (let idx = 0; idx < numCells216; idx++) {
+                    const savedValue = userAnswers216[idx] || '';
+                    const wasIncorrect = savedState.incorrectCells216 && savedState.incorrectCells216[idx];
+                    container216.innerHTML += `
+                        <div class="tier-cell tier-216" data-idx="${idx}" data-tier="216">
+                            <span class="tier-time">${(idx * 0.216).toFixed(2)}s</span>
+                            <input type="text" class="tier-input ${wasIncorrect ? 'incorrect' : ''}" data-idx="${idx}" data-tier="216" value="${(savedValue || '').replace(/"/g, '&quot;')}" maxlength="3" placeholder="___">
+                        </div>
+                    `;
+                }
+            }
+
+            // Render 108ms tier
+            if (numCells108 > 0) {
+                container108.innerHTML = '';
+                for (let idx = 0; idx < numCells108; idx++) {
+                    const savedValue = userAnswers108[idx] || '';
+                    const wasIncorrect = savedState.incorrectCells108 && savedState.incorrectCells108[idx];
+                    container108.innerHTML += `
+                        <div class="tier-cell tier-108" data-idx="${idx}" data-tier="108">
+                            <span class="tier-time">${(idx * 0.108).toFixed(2)}s</span>
+                            <input type="text" class="tier-input ${wasIncorrect ? 'incorrect' : ''}" data-idx="${idx}" data-tier="108" value="${(savedValue || '').replace(/"/g, '&quot;')}" maxlength="3" placeholder="___">
+                        </div>
+                    `;
+                }
+            }
+
+            // Render 54ms tier
+            if (numCells54 > 0) {
+                container54.innerHTML = '';
+                for (let idx = 0; idx < numCells54; idx++) {
+                    const savedValue = userAnswers54[idx] || '';
+                    const wasIncorrect = savedState.incorrectCells54 && savedState.incorrectCells54[idx];
+                    container54.innerHTML += `
+                        <div class="tier-cell tier-54" data-idx="${idx}" data-tier="54">
+                            <span class="tier-time">${(idx * 0.054).toFixed(2)}s</span>
+                            <input type="text" class="tier-input ${wasIncorrect ? 'incorrect' : ''}" data-idx="${idx}" data-tier="54" value="${(savedValue || '').replace(/"/g, '&quot;')}" maxlength="3" placeholder="___">
+                        </div>
+                    `;
+                }
+            }
+
+        } catch (error) {
+            console.error('Error loading assessment:', error);
+            if (loadingDiv) loadingDiv.style.display = 'none';
+            if (feedbackDiv) {
+                feedbackDiv.style.display = 'block';
+                feedbackDiv.innerHTML = `<div class="feedback feedback-error">❌ Failed to load assessment data. Please check that "${audioFile}" exists.</div>`;
+            }
+            return;
+        }
+
+        if (loadingDiv) loadingDiv.style.display = 'none';
+
+        const inputs216 = document.querySelectorAll('#tier216Row .tier-input');
+        const inputs108 = document.querySelectorAll('#tier108Row .tier-input');
+        const inputs54 = document.querySelectorAll('#tier54Row .tier-input');
+        const cellDivs216 = document.querySelectorAll('#tier216Row .tier-cell');
+        const cellDivs108 = document.querySelectorAll('#tier108Row .tier-cell');
+        const cellDivs54 = document.querySelectorAll('#tier54Row .tier-cell');
+
+        // Sentence input handler
+        if (sentenceInput) {
+            const newSentenceInput = sentenceInput.cloneNode(true);
+            sentenceInput.parentNode.replaceChild(newSentenceInput, sentenceInput);
+            const finalSentenceInput = document.getElementById('sentenceInput');
+            if (finalSentenceInput) {
+                finalSentenceInput.addEventListener('focus', () => { setActiveInput(null); isActiveInputSentence = true; });
+                finalSentenceInput.addEventListener('input', (e) => {
+                    if (!trainingState.stepData[assessmentKey]) trainingState.stepData[assessmentKey] = {};
+                    trainingState.stepData[assessmentKey].sentence = e.target.value;
+                    saveProgress();
+                });
+            }
+        }
+
+        // Cell click handlers
+        cellDivs216.forEach((div, idx) => {
+            div.addEventListener('click', async (e) => {
+                if (e.target === inputs216[idx]) return;
+                await playTrimmedAudio(audioFile, idx * 0.216, 0.216, div);
+            });
+        });
+
+        cellDivs108.forEach((div, idx) => {
+            div.addEventListener('click', async (e) => {
+                if (e.target === inputs108[idx]) return;
+                await playTrimmedAudio(audioFile, idx * 0.108, 0.108, div);
+            });
+        });
+
+        cellDivs54.forEach((div, idx) => {
+            div.addEventListener('click', async (e) => {
+                if (e.target === inputs54[idx]) return;
+                await playTrimmedAudio(audioFile, idx * 0.054, 0.054, div);
+            });
+        });
+
+        // Input handlers
+        function setupInputHandlers(inputs, tier, answersObj) {
+            inputs.forEach((input, idx) => {
+                input.addEventListener('focus', () => setActiveInput(input));
+                input.addEventListener('click', (e) => { e.stopPropagation(); setActiveInput(input); });
+                input.addEventListener('input', (e) => {
+                    let val = filterAkshars(e.target.value);
+                    if (val !== e.target.value) e.target.value = val;
+                    input.classList.remove('saved', 'incorrect');
+                    
+                    if (!trainingState.stepData[assessmentKey]) trainingState.stepData[assessmentKey] = {};
+                    if (!trainingState.stepData[assessmentKey][answersObj]) trainingState.stepData[assessmentKey][answersObj] = {};
+                    trainingState.stepData[assessmentKey][answersObj][idx] = val;
+                    saveProgress();
+                });
+            });
+        }
+
+        setupInputHandlers(inputs216, '216', 'answers216');
+        setupInputHandlers(inputs108, '108', 'answers108');
+        setupInputHandlers(inputs54, '54', 'answers54');
+
+        const submitBtn = document.getElementById('submitAssessmentBtn');
+        if (submitBtn) {
+            const newSubmitBtn = submitBtn.cloneNode(true);
+            submitBtn.parentNode.replaceChild(newSubmitBtn, submitBtn);
+            
+            newSubmitBtn.onclick = () => {
+                const inputs216Now = document.querySelectorAll('#tier216Row .tier-input');
+                const inputs108Now = document.querySelectorAll('#tier108Row .tier-input');
+                const inputs54Now = document.querySelectorAll('#tier54Row .tier-input');
+                
+                let totalCorrect = 0, totalCells = 0;
+                let wrongCells = [];
+
+                inputs216Now.forEach((input, idx) => {
+                    const userAnswer = input.value.trim();
+                    const expectedAnswer = (idx < correct216.length) ? (correct216[idx] || "") : "";
+                    totalCells++;
+                    if (userAnswer === expectedAnswer) {
+                        totalCorrect++;
+                        input.classList.add('saved');
+                        input.classList.remove('incorrect');
+                    } else {
+                        input.classList.remove('saved');
+                        input.classList.add('incorrect');
+                        wrongCells.push(`216ms-${idx+1}`);
+                    }
+                });
+
+                inputs108Now.forEach((input, idx) => {
+                    const userAnswer = input.value.trim();
+                    const expectedAnswer = (idx < correct108.length) ? (correct108[idx] || "") : "";
+                    totalCells++;
+                    if (userAnswer === expectedAnswer) {
+                        totalCorrect++;
+                        input.classList.add('saved');
+                        input.classList.remove('incorrect');
+                    } else {
+                        input.classList.remove('saved');
+                        input.classList.add('incorrect');
+                        wrongCells.push(`108ms-${idx+1}`);
+                    }
+                });
+
+                inputs54Now.forEach((input, idx) => {
+                    const userAnswer = input.value.trim();
+                    const expectedAnswer = (idx < correct54.length) ? (correct54[idx] || "") : "";
+                    totalCells++;
+                    if (userAnswer === expectedAnswer) {
+                        totalCorrect++;
+                        input.classList.add('saved');
+                        input.classList.remove('incorrect');
+                    } else {
+                        input.classList.remove('saved');
+                        input.classList.add('incorrect');
+                        wrongCells.push(`54ms-${idx+1}`);
+                    }
+                });
+
+                const percentage = totalCells > 0 ? (totalCorrect / totalCells) * 100 : 0;
+                const passed = percentage >= 85;
+
+                trainingState.stepData[assessmentKey] = trainingState.stepData[assessmentKey] || {};
+                trainingState.stepData[assessmentKey].score = Math.round(percentage);
+                trainingState.stepData[assessmentKey].completed = passed;
+                trainingState.stepData[assessmentKey].attempted = true;
+                saveProgress();
+
+                if (feedbackDiv) {
+                    feedbackDiv.style.display = 'block';
+                    if (passed && totalCells > 0) {
+                        feedbackDiv.innerHTML = `<div class="feedback feedback-success">🎉 Assessment Passed! Score: ${Math.round(percentage)}% (${totalCorrect}/${totalCells})</div>`;
+                        markStepComplete(step);
+                        setTimeout(() => loadCurrentStep(), 2000);
+                    } else if (totalCells > 0) {
+                        feedbackDiv.innerHTML = `<div class="feedback feedback-error">❌ Assessment Failed. Score: ${Math.round(percentage)}% (${totalCorrect}/${totalCells})<br>Wrong: ${wrongCells.join(', ')}<br><button class="btn btn-primary" id="retryAssessmentBtn" style="margin-top: 10px;">Try Again</button></div>`;
+                        const retryBtn = document.getElementById('retryAssessmentBtn');
+                        if (retryBtn) {
+                            retryBtn.onclick = () => {
+                                if (trainingState.stepData[assessmentKey]) {
+                                    trainingState.stepData[assessmentKey].attempted = false;
+                                }
+                                saveProgress();
+                                loadCurrentStep();
+                            };
+                        }
+                    }
+                }
+            };
+        }
+
+        const resetBtn = document.getElementById('resetAssessmentBtn');
+        if (resetBtn) {
+            const newResetBtn = resetBtn.cloneNode(true);
+            resetBtn.parentNode.replaceChild(newResetBtn, resetBtn);
+            
+            newResetBtn.onclick = () => {
+                inputs216.forEach(input => { input.value = ''; input.classList.remove('saved', 'incorrect'); });
+                inputs108.forEach(input => { input.value = ''; input.classList.remove('saved', 'incorrect'); });
+                inputs54.forEach(input => { input.value = ''; input.classList.remove('saved', 'incorrect'); });
+                if (sentenceInput) sentenceInput.value = '';
+                
+                if (trainingState.stepData[assessmentKey]) {
+                    delete trainingState.stepData[assessmentKey].answers216;
+                    delete trainingState.stepData[assessmentKey].answers108;
+                    delete trainingState.stepData[assessmentKey].answers54;
+                    delete trainingState.stepData[assessmentKey].sentence;
+                }
+                saveProgress();
+                
+                if (feedbackDiv) {
+                    feedbackDiv.style.display = 'block';
+                    feedbackDiv.innerHTML = `<div class="feedback feedback-info">🗑 Assessment reset. You can try again.</div>`;
+                    setTimeout(() => feedbackDiv.style.display = 'none', 2000);
+                }
+            };
+        }
+    }
+
+    // ==================== FINAL EXAM FUNCTIONS ====================
+    
+    async function attachFinalExamListeners(step) {
+        const examKey = `${trainingState.currentModule}_${step.id}`;
+        const savedState = trainingState.stepData[examKey] || {};
+        const questions = step.questions;
+        const requiredScore = step.required_score || 70;
+        
+        if (savedState.completed) return;
+        
+        const feedbackDiv = document.getElementById('examFeedback');
+        const savedAnswers = savedState.answers || {};
+        
+        // Restore saved answers
+        for (let qIdx = 0; qIdx < questions.length; qIdx++) {
+            if (savedAnswers[qIdx] !== undefined) {
+                const radio = document.querySelector(`input[name="exam_q${qIdx}"][value="${savedAnswers[qIdx]}"]`);
+                if (radio) radio.checked = true;
+            }
+        }
+        
+        // Save answer when user selects
+        for (let qIdx = 0; qIdx < questions.length; qIdx++) {
+            const radios = document.querySelectorAll(`input[name="exam_q${qIdx}"]`);
+            radios.forEach(radio => {
+                radio.addEventListener('change', (e) => {
+                    if (!trainingState.stepData[examKey]) trainingState.stepData[examKey] = {};
+                    if (!trainingState.stepData[examKey].answers) trainingState.stepData[examKey].answers = {};
+                    trainingState.stepData[examKey].answers[qIdx] = parseInt(e.target.value);
+                    saveProgress();
+                });
+            });
+        }
+        
+        const submitBtn = document.getElementById('submitExamBtn');
+        if (submitBtn) {
+            submitBtn.onclick = () => {
+                let correctCount = 0;
+                let userAnswers = {};
+                
+                for (let qIdx = 0; qIdx < questions.length; qIdx++) {
+                    const selected = document.querySelector(`input[name="exam_q${qIdx}"]:checked`);
+                    if (selected) {
+                        const answer = parseInt(selected.value);
+                        userAnswers[qIdx] = answer;
+                        if (answer === questions[qIdx].correct) correctCount++;
+                    }
+                }
+                
+                const percentage = (correctCount / questions.length) * 100;
+                const passed = percentage >= requiredScore;
+                
+                trainingState.stepData[examKey] = {
+                    answers: userAnswers,
+                    score: Math.round(percentage),
+                    correct_count: correctCount,
+                    total_questions: questions.length,
+                    completed: true,
+                    passed: passed,
+                    submitted_at: new Date().toISOString()
+                };
+                saveProgress();
+                
+                if (feedbackDiv) {
+                    feedbackDiv.style.display = 'block';
+                    if (passed) {
+                        feedbackDiv.innerHTML = `<div class="feedback feedback-success"><strong>🎉 Congratulations! Exam Passed!</strong><br>Your score: ${Math.round(percentage)}% (${correctCount}/${questions.length} correct)<br>Required: ${requiredScore}% | Status: PASSED</div>`;
+                        markStepComplete(step);
+                        setTimeout(() => loadCurrentStep(), 3000);
+                    } else {
+                        feedbackDiv.innerHTML = `<div class="feedback feedback-error"><strong>✗ Exam Failed</strong><br>Your score: ${Math.round(percentage)}% (${correctCount}/${questions.length} correct)<br>Required: ${requiredScore}% | Status: FAILED<br><br>⚠️ This was your only attempt.</div>`;
+                        markStepComplete(step);
+                    }
+                }
+            };
+        }
+        
+        const resetBtn = document.getElementById('resetExamBtn');
+        if (resetBtn) {
+            resetBtn.onclick = () => {
+                for (let qIdx = 0; qIdx < questions.length; qIdx++) {
+                    const radios = document.querySelectorAll(`input[name="exam_q${qIdx}"]`);
+                    radios.forEach(radio => radio.checked = false);
+                }
+                if (trainingState.stepData[examKey]) {
+                    delete trainingState.stepData[examKey].answers;
+                }
+                saveProgress();
+                if (feedbackDiv) {
+                    feedbackDiv.style.display = 'block';
+                    feedbackDiv.innerHTML = `<div class="feedback feedback-info">All answers have been reset.</div>`;
+                    setTimeout(() => feedbackDiv.style.display = 'none', 2000);
+                }
+            };
+        }
+    }
+
+    // ==================== EXAM PRACTICAL FUNCTIONS ====================
+    
+    async function attachExamPracticalListeners(step) {
+        const audioFile = step.audio_file;
+        const examKey = `${trainingState.currentModule}_${step.id}`;
+        const savedState = trainingState.stepData[examKey] || {};
+        const requiredScore = step.required_score || 85;
+        const examName = step.exam_name || step.title;
+
+        if (savedState.completed) return;
+
+        const container216 = document.getElementById('tier216Row');
+        const container108 = document.getElementById('tier108Row');
+        const container54 = document.getElementById('tier54Row');
+        const sentenceInput = document.getElementById('sentenceInput');
+        const loadingDiv = document.getElementById('loadingIndicator');
+        const feedbackDiv = document.getElementById('examPracticalFeedback');
+
+        if (!container216 || !container108 || !container54) return;
+
+        if (loadingDiv) loadingDiv.style.display = 'block';
+        container216.innerHTML = '<div style="padding: 16px; text-align: center;">Loading 216ms tier...</div>';
+        container108.innerHTML = '<div style="padding: 16px; text-align: center;">Loading 108ms tier...</div>';
+        container54.innerHTML = '<div style="padding: 16px; text-align: center;">Loading 54ms tier...</div>';
+
+        let correct216 = [], correct108 = [], correct54 = [];
+        let numCells216 = 0, numCells108 = 0, numCells54 = 0;
+        let sentence = "", durationAudio = 0;
+
+        try {
+            const response = await fetch(`/api/mobile-training/three-tier-data/${audioFile}`);
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            const data = await response.json();
+            if (!data.success) throw new Error(data.error || 'Failed to load exam data');
+
+            numCells216 = data.num_cells_216 || 0;
+            numCells108 = data.num_cells_108 || 0;
+            numCells54 = data.num_cells_54 || 0;
+            correct216 = data.correct_answers_216 || [];
+            correct108 = data.correct_answers_108 || [];
+            correct54 = data.correct_answers_54 || [];
+            sentence = data.sentence || "";
+            durationAudio = data.duration || 0;
+
+            const userAnswers216 = savedState.answers216 || {};
+            const userAnswers108 = savedState.answers108 || {};
+            const userAnswers54 = savedState.answers54 || {};
+
+            if (sentenceInput) {
+                sentenceInput.value = savedState.sentence || sentence || '';
+            }
+
+            // Render 216ms tier
+            if (numCells216 > 0) {
+                container216.innerHTML = '';
+                for (let idx = 0; idx < numCells216; idx++) {
+                    const savedValue = userAnswers216[idx] || '';
+                    container216.innerHTML += `
+                        <div class="tier-cell tier-216" data-idx="${idx}" data-tier="216">
+                            <span class="tier-time">${(idx * 0.216).toFixed(2)}s</span>
+                            <input type="text" class="tier-input" data-idx="${idx}" data-tier="216" value="${(savedValue || '').replace(/"/g, '&quot;')}" maxlength="3" placeholder="___">
+                        </div>
+                    `;
+                }
+            }
+
+            // Render 108ms tier
+            if (numCells108 > 0) {
+                container108.innerHTML = '';
+                for (let idx = 0; idx < numCells108; idx++) {
+                    const savedValue = userAnswers108[idx] || '';
+                    container108.innerHTML += `
+                        <div class="tier-cell tier-108" data-idx="${idx}" data-tier="108">
+                            <span class="tier-time">${(idx * 0.108).toFixed(2)}s</span>
+                            <input type="text" class="tier-input" data-idx="${idx}" data-tier="108" value="${(savedValue || '').replace(/"/g, '&quot;')}" maxlength="3" placeholder="___">
+                        </div>
+                    `;
+                }
+            }
+
+            // Render 54ms tier
+            if (numCells54 > 0) {
+                container54.innerHTML = '';
+                for (let idx = 0; idx < numCells54; idx++) {
+                    const savedValue = userAnswers54[idx] || '';
+                    container54.innerHTML += `
+                        <div class="tier-cell tier-54" data-idx="${idx}" data-tier="54">
+                            <span class="tier-time">${(idx * 0.054).toFixed(2)}s</span>
+                            <input type="text" class="tier-input" data-idx="${idx}" data-tier="54" value="${(savedValue || '').replace(/"/g, '&quot;')}" maxlength="3" placeholder="___">
+                        </div>
+                    `;
+                }
+            }
+
+        } catch (error) {
+            console.error('Error loading exam:', error);
+            if (loadingDiv) loadingDiv.style.display = 'none';
+            if (feedbackDiv) {
+                feedbackDiv.style.display = 'block';
+                feedbackDiv.innerHTML = `<div class="feedback feedback-error">❌ Failed to load exam data. Please check that "${audioFile}" exists.</div>`;
+            }
+            return;
+        }
+
+        if (loadingDiv) loadingDiv.style.display = 'none';
+
+        const inputs216 = document.querySelectorAll('#tier216Row .tier-input');
+        const inputs108 = document.querySelectorAll('#tier108Row .tier-input');
+        const inputs54 = document.querySelectorAll('#tier54Row .tier-input');
+        const cellDivs216 = document.querySelectorAll('#tier216Row .tier-cell');
+        const cellDivs108 = document.querySelectorAll('#tier108Row .tier-cell');
+        const cellDivs54 = document.querySelectorAll('#tier54Row .tier-cell');
+
+        // Sentence input handler
+        if (sentenceInput) {
+            const newSentenceInput = sentenceInput.cloneNode(true);
+            sentenceInput.parentNode.replaceChild(newSentenceInput, sentenceInput);
+            const finalSentenceInput = document.getElementById('sentenceInput');
+            if (finalSentenceInput) {
+                finalSentenceInput.addEventListener('focus', () => { setActiveInput(null); isActiveInputSentence = true; });
+                finalSentenceInput.addEventListener('input', (e) => {
+                    if (!trainingState.stepData[examKey]) trainingState.stepData[examKey] = {};
+                    trainingState.stepData[examKey].sentence = e.target.value;
+                    saveProgress();
+                });
+            }
+        }
+
+        // Cell click handlers
+        cellDivs216.forEach((div, idx) => {
+            div.addEventListener('click', async (e) => {
+                if (e.target === inputs216[idx]) return;
+                await playTrimmedAudio(audioFile, idx * 0.216, 0.216, div);
+            });
+        });
+
+        cellDivs108.forEach((div, idx) => {
+            div.addEventListener('click', async (e) => {
+                if (e.target === inputs108[idx]) return;
+                await playTrimmedAudio(audioFile, idx * 0.108, 0.108, div);
+            });
+        });
+
+        cellDivs54.forEach((div, idx) => {
+            div.addEventListener('click', async (e) => {
+                if (e.target === inputs54[idx]) return;
+                await playTrimmedAudio(audioFile, idx * 0.054, 0.054, div);
+            });
+        });
+
+        function setupInputHandlers(inputs, tier, answersObj) {
+            inputs.forEach((input, idx) => {
+                input.addEventListener('focus', () => setActiveInput(input));
+                input.addEventListener('click', (e) => { e.stopPropagation(); setActiveInput(input); });
+                input.addEventListener('input', (e) => {
+                    let val = filterAkshars(e.target.value);
+                    if (val !== e.target.value) e.target.value = val;
+                    input.classList.remove('saved', 'incorrect');
+                    
+                    if (!trainingState.stepData[examKey]) trainingState.stepData[examKey] = {};
+                    if (!trainingState.stepData[examKey][answersObj]) trainingState.stepData[examKey][answersObj] = {};
+                    trainingState.stepData[examKey][answersObj][idx] = val;
+                    saveProgress();
+                });
+            });
+        }
+
+        setupInputHandlers(inputs216, '216', 'answers216');
+        setupInputHandlers(inputs108, '108', 'answers108');
+        setupInputHandlers(inputs54, '54', 'answers54');
+
+        const submitBtn = document.getElementById('submitExamPracticalBtn');
+        if (submitBtn) {
+            const newSubmitBtn = submitBtn.cloneNode(true);
+            submitBtn.parentNode.replaceChild(newSubmitBtn, submitBtn);
+            
+            newSubmitBtn.onclick = () => {
+                const inputs216Now = document.querySelectorAll('#tier216Row .tier-input');
+                const inputs108Now = document.querySelectorAll('#tier108Row .tier-input');
+                const inputs54Now = document.querySelectorAll('#tier54Row .tier-input');
+                
+                let totalCorrect = 0, totalCells = 0;
+                let breakdown = { t216: {c:0,t:0}, t108: {c:0,t:0}, t54: {c:0,t:0} };
+
+                inputs216Now.forEach((input, idx) => {
+                    const userAnswer = input.value.trim();
+                    const expectedAnswer = (idx < correct216.length) ? (correct216[idx] || "") : "";
+                    const ok = (userAnswer === expectedAnswer);
+                    totalCells++;
+                    breakdown.t216.t++;
+                    if (ok) { 
+                        totalCorrect++; 
+                        breakdown.t216.c++; 
+                        input.classList.add('saved'); 
+                        input.classList.remove('incorrect'); 
+                    } else { 
+                        input.classList.remove('saved'); 
+                        input.classList.add('incorrect'); 
+                    }
+                });
+
+                inputs108Now.forEach((input, idx) => {
+                    const userAnswer = input.value.trim();
+                    const expectedAnswer = (idx < correct108.length) ? (correct108[idx] || "") : "";
+                    const ok = (userAnswer === expectedAnswer);
+                    totalCells++;
+                    breakdown.t108.t++;
+                    if (ok) { 
+                        totalCorrect++; 
+                        breakdown.t108.c++; 
+                        input.classList.add('saved'); 
+                        input.classList.remove('incorrect'); 
+                    } else { 
+                        input.classList.remove('saved'); 
+                        input.classList.add('incorrect'); 
+                    }
+                });
+
+                inputs54Now.forEach((input, idx) => {
+                    const userAnswer = input.value.trim();
+                    const expectedAnswer = (idx < correct54.length) ? (correct54[idx] || "") : "";
+                    const ok = (userAnswer === expectedAnswer);
+                    totalCells++;
+                    breakdown.t54.t++;
+                    if (ok) { 
+                        totalCorrect++; 
+                        breakdown.t54.c++; 
+                        input.classList.add('saved'); 
+                        input.classList.remove('incorrect'); 
+                    } else { 
+                        input.classList.remove('saved'); 
+                        input.classList.add('incorrect'); 
+                    }
+                });
+
+                const percentage = totalCells > 0 ? (totalCorrect / totalCells) * 100 : 0;
+                const passed = percentage >= requiredScore;
+
+                trainingState.stepData[examKey] = trainingState.stepData[examKey] || {};
+                trainingState.stepData[examKey].score = Math.round(percentage);
+                trainingState.stepData[examKey].completed = true;
+                trainingState.stepData[examKey].attempted = true;
+                trainingState.stepData[examKey].passed = passed;
+                saveProgress();
+
+                if (feedbackDiv) {
+                    feedbackDiv.style.display = 'block';
+                    if (passed && totalCells > 0) {
+                        feedbackDiv.innerHTML = `<div class="feedback feedback-success"><strong>✓ ${examName} Passed!</strong><br>Score: ${Math.round(percentage)}% (${totalCorrect}/${totalCells})<br>216ms: ${breakdown.t216.c}/${breakdown.t216.t} | 108ms: ${breakdown.t108.c}/${breakdown.t108.t} | 54ms: ${breakdown.t54.c}/${breakdown.t54.t}</div>`;
+                        markStepComplete(step);
+                        setTimeout(() => loadCurrentStep(), 3000);
+                    } else if (totalCells > 0) {
+                        feedbackDiv.innerHTML = `<div class="feedback feedback-error"><strong>✗ ${examName} Failed</strong><br>Score: ${Math.round(percentage)}% (${totalCorrect}/${totalCells}) — need ${requiredScore}%<br>⚠️ This was your only attempt. No retry allowed.</div>`;
+                        markStepComplete(step);
+                        setTimeout(() => loadCurrentStep(), 3000);
+                    }
+                }
+            };
+        }
+
+        const resetBtn = document.getElementById('resetExamPracticalBtn');
+        if (resetBtn) {
+            const newResetBtn = resetBtn.cloneNode(true);
+            resetBtn.parentNode.replaceChild(newResetBtn, resetBtn);
+            
+            newResetBtn.onclick = () => {
+                inputs216.forEach(input => { input.value = ''; input.classList.remove('saved', 'incorrect'); });
+                inputs108.forEach(input => { input.value = ''; input.classList.remove('saved', 'incorrect'); });
+                inputs54.forEach(input => { input.value = ''; input.classList.remove('saved', 'incorrect'); });
+                if (sentenceInput) sentenceInput.value = '';
+                
+                if (trainingState.stepData[examKey]) {
+                    delete trainingState.stepData[examKey].answers216;
+                    delete trainingState.stepData[examKey].answers108;
+                    delete trainingState.stepData[examKey].answers54;
+                    delete trainingState.stepData[examKey].sentence;
+                }
+                saveProgress();
+            };
+        }
+    }
+
+    // ==================== CERTIFICATE FUNCTIONS ====================
+    
+    function calculateFinalGrade() {
+        const exam7_1 = trainingState.stepData['7_7.1'] || {};
+        const exam7_2 = trainingState.stepData['7_7.2'] || {};
+        const exam7_3 = trainingState.stepData['7_7.3'] || {};
+        
+        const theoryScore = exam7_1.score || 0;
+        const practical1Score = exam7_2.score || 0;
+        const practical2Score = exam7_3.score || 0;
+        
+        const allCompleted = exam7_1.completed && exam7_2.completed && exam7_3.completed;
+        
+        if (!allCompleted) {
+            return { grade: null, percentage: 0, completed: false };
+        }
+        
+        const weightedScore = (theoryScore * 0.4) + (practical1Score * 0.3) + (practical2Score * 0.3);
+        
+        let grade = '', gradeBadge = '', description = '', badgeColor = '';
+        
+        if (weightedScore >= 90) {
+            grade = 'Professional';
+            gradeBadge = 'PROFESSIONAL';
+            description = 'Outstanding performance! You have demonstrated expert-level proficiency in audio annotation.';
+            badgeColor = 'linear-gradient(135deg, #f5af19, #f12711)';
+        } else if (weightedScore >= 80) {
+            grade = 'Good';
+            gradeBadge = 'GOOD';
+            description = 'Excellent work! You have shown strong understanding of the annotation process.';
+            badgeColor = 'linear-gradient(135deg, #11998e, #38ef7d)';
+        } else if (weightedScore >= 70) {
+            grade = 'Average';
+            gradeBadge = 'AVERAGE';
+            description = 'Satisfactory performance. You have met the basic requirements.';
+            badgeColor = 'linear-gradient(135deg, #4facfe, #00f2fe)';
+        } else {
+            grade = 'Needs Improvement';
+            gradeBadge = 'NEEDS IMPROVEMENT';
+            description = 'You have completed the course but need more practice.';
+            badgeColor = 'linear-gradient(135deg, #bdc3c7, #2c3e50)';
+        }
+        
+        return {
+            grade: grade,
+            gradeBadge: gradeBadge,
+            description: description,
+            badgeColor: badgeColor,
+            percentage: Math.round(weightedScore),
+            theoryScore: theoryScore,
+            practical1Score: practical1Score,
+            practical2Score: practical2Score,
+            completed: true,
+            certified: weightedScore >= 70
+        };
+    }
+
+    async function attachCertificateListeners() {
+        const printBtn = document.getElementById('printCertificateBtn');
+        
+        // Fetch username
+        try {
+            const response = await fetch('/api/current-user');
+            if (response.ok) {
+                const data = await response.json();
+                const usernameSpan = document.getElementById('certificateUserName');
+                if (usernameSpan) {
+                    usernameSpan.textContent = data.username || 'Candidate';
+                }
+            }
+        } catch (e) {
+            const usernameSpan = document.getElementById('certificateUserName');
+            if (usernameSpan) usernameSpan.textContent = 'Candidate';
+        }
+        
+        // Mark certification as complete when viewing certificate
+        markCertificationComplete();
+        
+        if (printBtn) {
+            printBtn.onclick = () => {
+                const certificateContainer = document.getElementById('certificateContainer');
+                if (!certificateContainer) return;
+                
+                const printWindow = window.open('', '_blank');
+                const certificateHTML = certificateContainer.cloneNode(true);
+                const buttons = certificateHTML.querySelectorAll('.btn-primary');
+                buttons.forEach(btn => btn.remove());
+                
+                printWindow.document.write(`
+                    <!DOCTYPE html>
+                    <html>
+                    <head>
+                        <title>Akshar Annotation Certificate</title>
+                        <meta charset="UTF-8">
+                        <style>
+                            * { margin: 0; padding: 0; box-sizing: border-box; }
+                            body {
+                                font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+                                background: white;
+                                padding: 40px;
+                                display: flex;
+                                justify-content: center;
+                                align-items: center;
+                                min-height: 100vh;
+                            }
+                            @media print {
+                                body { padding: 0; margin: 0; }
+                                .certificate-card { box-shadow: none; border: 1px solid #e2e8f0; }
+                            }
+                            .certificate-card {
+                                max-width: 800px;
+                                width: 100%;
+                                margin: 0 auto;
+                                background: white;
+                                border-radius: 16px;
+                                padding: 30px;
+                                text-align: center;
+                                box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+                            }
+                            h1 { font-size: 1.5rem; color: #2d3748; margin-bottom: 8px; }
+                            h2 { font-size: 1.2rem; color: #2c3e50; margin: 15px 0; }
+                            h3 { font-size: 1rem; color: #667eea; margin-bottom: 15px; }
+                            .grade-badge { display: inline-block; padding: 6px 20px; border-radius: 50px; margin: 10px 0; }
+                            .score-section { display: flex; justify-content: center; gap: 15px; margin: 15px 0; flex-wrap: wrap; }
+                            .score-box { text-align: center; background: #f7f9fc; padding: 6px; border-radius: 8px; min-width: 60px; }
+                            .score-value { font-size: 1rem; font-weight: bold; }
+                            .score-label { font-size: 0.55rem; color: #718096; }
+                            .certificate-footer { display: flex; justify-content: space-between; margin-top: 20px; padding-top: 12px; font-size: 0.6rem; color: #a0aec0; border-top: 1px solid #e2e8f0; }
+                        </style>
+                    </head>
+                    <body>
+                        ${certificateHTML.innerHTML}
+                        <script>
+                            window.onload = function() { setTimeout(function() { window.print(); }, 500); };
+                            window.onafterprint = function() { window.close(); };
+                        <\/script>
+                    </body>
+                    </html>
+                `);
+                printWindow.document.close();
+            };
+        }
+    }
+
+    function markCertificationComplete() {
+        const gradeData = calculateFinalGrade();
+        if (gradeData.completed && !trainingState.certified) {
+            trainingState.certified = true;
+            trainingState.certificationGrade = gradeData.grade;
+            trainingState.certificationPercentage = gradeData.percentage;
+            trainingState.certificationBadge = gradeData.gradeBadge;
+            trainingState.certified_at = new Date().toISOString();
+            saveProgress();
+            updateOverallProgress();
+            
+            const certBadge = document.getElementById('certBadge');
+            if (certBadge) {
+                certBadge.innerHTML = '✓ Certified';
+                certBadge.className = 'cert-badge completed';
+            }
+        }
     }
 
     // ==================== SINGLE CELL PRACTICE ====================
@@ -2329,9 +3668,7 @@
         
         try {
             const response = await fetch(`/api/mobile-training/three-tier-data/${audioFile}`);
-            
             if (!response.ok) throw new Error(`HTTP ${response.status}`);
-            
             const data = await response.json();
             if (!data.success) throw new Error(data.error || 'Failed to load exercise data');
             
