@@ -655,7 +655,7 @@ audio {
 
 <script>
 const BASE_PATH = "{{ base_path }}";
-const AKSHAR_SET = ["अ","आ","इ","उ","ए","ओ","क","ख","ग","घ","च","छ","ज","झ","ट","ठ","ड","ढ","त","थ","द","ध","प","फ","ब","भ","न","म","य","र","ल","व","स","ह","०"];
+const AKSHAR_SET = ["अ","आ","इ","उ","ए","ओ","क","ख","ग","घ","च","छ","ज","झ","ट","ठ","ड","ढ","त","थ","द","ध","प","फ","ब","भ","न","म","य","ر","ل","व","س","ह","०"];
 
 let currentData = null, currentAudio = null, currentPlayTimeout = null, audioContext = null, gainNode = null;
 let currentVolume = 1.0, audioUnlocked = false, playbackSpeed = 1.0, isFullAudioPlaying = false, fullAudioProgressInterval = null;
@@ -874,8 +874,9 @@ function playNextInQueue(){
   multiPlayTimeout=setTimeout(()=>{ multiPlayIndex++; playNextInQueue(); }, (frame.end_ms-frame.start_ms)/playbackSpeed);
 }
 
+// ========== FIXED: generateAllTiersFromFrames - properly splits text between 54ms cells ==========
 function generateAllTiersFromFrames(frames, durationMs){
-  if(!frames || frames.length===0){
+  if(!frames || frames.length === 0){
     frames = [];
     const num = Math.ceil(durationMs / 108);
     for(let i=0;i<num;i++){
@@ -895,22 +896,53 @@ function generateAllTiersFromFrames(frames, durationMs){
   }
   
   const tier54 = [];
-  for(let i=0;i<frames.length;i++){
+  for(let i = 0; i < frames.length; i++){
     const f = frames[i];
-    const half = (f.end_ms - f.start_ms)/2;
-    const txt = f.text||"";
-    tier54.push({index:tier54.length, start_ms:f.start_ms, end_ms:f.start_ms+half, text:txt.substring(0,2)});
-    tier54.push({index:tier54.length, start_ms:f.start_ms+half, end_ms:f.end_ms, text:txt.substring(2,4)});
+    const half = (f.end_ms - f.start_ms) / 2;
+    const text = f.text || "";
+    
+    // Split the text between the two 54ms cells
+    // For 4 akshars: first 2 go to first cell, next 2 to second cell
+    // For less than 2 akshars: all go to first cell
+    const splitPoint = Math.min(2, text.length);
+    const firstHalf = text.substring(0, splitPoint);
+    const secondHalf = text.substring(splitPoint, 4);
+    
+    tier54.push({
+      index: tier54.length, 
+      start_ms: f.start_ms, 
+      end_ms: f.start_ms + half, 
+      text: firstHalf
+    });
+    tier54.push({
+      index: tier54.length, 
+      start_ms: f.start_ms + half, 
+      end_ms: f.end_ms, 
+      text: secondHalf
+    });
   }
   
   return {tier_216:tier216, tier_108:tier108, tier_54:tier54};
 }
 
+// ========== UPDATED: loadDataIntoTiers - uses existing 3-tier data if available ==========
 function loadDataIntoTiers(audioData){
-  let frames = audioData.frames_108 || audioData.frames || [];
-  const durationMs = audioData.duration_ms || 5000;
-  const allTiers = generateAllTiersFromFrames(frames, durationMs);
-  framesData = allTiers;
+  // Check if we already have 3-tier data from the server
+  if (audioData.frames_54 && audioData.frames_108 && audioData.frames_216) {
+    // Use existing 3-tier data directly - no generation needed
+    framesData = {
+      tier_216: audioData.frames_216.map((f, idx) => ({...f, index: idx})),
+      tier_108: audioData.frames_108.map((f, idx) => ({...f, index: idx})),
+      tier_54: audioData.frames_54.map((f, idx) => ({...f, index: idx}))
+    };
+  } else {
+    // Generate from frames_108 or frames
+    let frames = audioData.frames_108 || audioData.frames || [];
+    const durationMs = audioData.duration_ms || 5000;
+    const allTiers = generateAllTiersFromFrames(frames, durationMs);
+    framesData = allTiers;
+  }
+  
   renderThreeTierGrid();
   
   if(currentAudio){
