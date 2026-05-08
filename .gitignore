@@ -14,5 +14,10 @@ mnt/
 .DS_Store/
 .DS_Store
 self_recordings/
-
 static/mobile_training_videos/*.mp4
+mobile_training_audio/
+
+# Track JSON + WAV inside mobile_training_audio
+!mobile_training_audio/
+!mobile_training_audio/**/*.json
+!mobile_training_audio/**/*.wav
