@@ -15,3 +15,4 @@ mnt/
 .DS_Store
 self_recordings/
 
+static/mobile_training_videos/*.mp4
