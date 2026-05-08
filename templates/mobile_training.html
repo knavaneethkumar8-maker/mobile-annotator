@@ -1,0 +1,3105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>Mobile Training · Akshar Certification</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* ===== ROOT: MOBILE SHELL ===== */
+        html, body {
+            height: 100%;
+            background: #1a1a2e;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        #appShell {
+            width: 100%;
+            max-width: 430px;
+            min-height: 100vh;
+            height: 100%;
+            background: #F0F4F8;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            box-shadow: 0 0 60px rgba(0,0,0,0.5);
+        }
+
+        /* ===== HEADER ===== */
+        .mobile-header {
+            background: linear-gradient(135deg, #1B4332 0%, #2C6E49 100%);
+            position: relative;
+            z-index: 200;
+            padding: 12px 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 2px 12px rgba(44,110,73,0.3);
+            flex-shrink: 0;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex: 1;
+            min-width: 0;
+        }
+
+        .menu-btn {
+            background: rgba(255,255,255,0.15);
+            border: 1px solid rgba(255,255,255,0.25);
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            flex-shrink: 0;
+            transition: background 0.2s;
+        }
+
+        .menu-btn:active { background: rgba(255,255,255,0.28); }
+
+        .menu-btn span {
+            display: block;
+            width: 16px;
+            height: 2px;
+            background: white;
+            border-radius: 2px;
+            transition: all 0.25s;
+        }
+
+        .menu-btn.open span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+        .menu-btn.open span:nth-child(2) { opacity: 0; }
+        .menu-btn.open span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+
+        .logo-text {
+            min-width: 0;
+        }
+
+        .logo-text h1 {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #fff;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .logo-text p {
+            font-size: 0.6rem;
+            color: rgba(255,255,255,0.6);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 1px;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-shrink: 0;
+        }
+
+        .cert-badge {
+            font-size: 0.65rem;
+            padding: 4px 10px;
+            border-radius: 20px;
+            background: rgba(255,255,255,0.18);
+            color: white;
+            font-weight: 600;
+            border: 1px solid rgba(255,255,255,0.28);
+        }
+
+        .cert-badge.in-progress { background: rgba(74,111,165,0.7); border-color: rgba(74,111,165,0.5); }
+        .cert-badge.completed { background: rgba(255,255,255,0.9); color: #1B4332; border-color: white; }
+
+        .back-btn {
+            background: rgba(255,255,255,0.15);
+            border: 1px solid rgba(255,255,255,0.28);
+            padding: 5px 10px;
+            border-radius: 30px;
+            font-size: 0.68rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            color: white;
+        }
+
+        /* ===== STEP BREADCRUMB BAR ===== */
+        .step-bar {
+            background: white;
+            padding: 8px 14px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid #E8F0EC;
+            flex-shrink: 0;
+            z-index: 10;
+        }
+
+        .step-bar-info {
+            font-size: 0.72rem;
+            color: #1B4332;
+            font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            flex: 1;
+            min-width: 0;
+            padding-right: 8px;
+        }
+
+        .step-bar-dots {
+            display: flex;
+            gap: 4px;
+            align-items: center;
+            flex-shrink: 0;
+        }
+
+        .nav-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #E2E8F0;
+            transition: all 0.2s;
+        }
+
+        .nav-dot.active {
+            background: #2C6E49;
+            width: 16px;
+            border-radius: 3px;
+        }
+
+        .nav-dot.completed { background: #86EFAC; }
+
+        /* ===== PROGRESS BAR STRIP ===== */
+        .progress-strip {
+            height: 3px;
+            background: #E8F5EE;
+            flex-shrink: 0;
+        }
+
+        .progress-strip-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #2C6E49, #40B974);
+            transition: width 0.5s cubic-bezier(0.4,0,0.2,1);
+            width: 0%;
+        }
+
+        /* ===== DRAWER OVERLAY ===== */
+        .drawer-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 150;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+
+        .drawer-overlay.open {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        /* ===== DRAWER ===== */
+        .nav-drawer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            width: 88%;
+            max-width: 360px;
+            background: white;
+            z-index: 160;
+            transform: translateX(-100%);
+            transition: transform 0.32s cubic-bezier(0.4,0,0.2,1);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .nav-drawer.open {
+            transform: translateX(0);
+        }
+
+        .drawer-header {
+            background: linear-gradient(135deg, #1B4332 0%, #2C6E49 100%);
+            padding: 16px 16px;
+            flex-shrink: 0;
+        }
+
+        .drawer-header h2 {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 10px;
+        }
+
+        .drawer-progress {
+            background: rgba(255,255,255,0.15);
+            border-radius: 8px;
+            padding: 8px 12px;
+        }
+
+        .drawer-progress-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.7rem;
+            color: rgba(255,255,255,0.85);
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+
+        .drawer-progress-bar {
+            height: 5px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .drawer-progress-fill {
+            height: 100%;
+            background: #40B974;
+            border-radius: 4px;
+            transition: width 0.5s;
+        }
+
+        .drawer-scroll {
+            flex: 1;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            padding: 8px 0 20px;
+        }
+
+        /* ===== MODULE ACCORDION IN DRAWER ===== */
+        .module-accordion {
+            border-bottom: 1px solid #F0F4F8;
+        }
+
+        .module-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 16px;
+            cursor: pointer;
+            background: white;
+            transition: background 0.15s;
+        }
+
+        .module-header:active { background: #F0F9F4; }
+
+        .module-num {
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            background: #E8F5EE;
+            color: #2C6E49;
+            font-size: 0.68rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .module-num.completed { background: #2C6E49; color: white; }
+        .module-num.active { background: #1B4332; color: white; }
+
+        .module-title {
+            flex: 1;
+            font-weight: 600;
+            font-size: 0.84rem;
+            color: #1C1C1A;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .module-meta {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-shrink: 0;
+        }
+
+        .module-badge {
+            font-size: 0.62rem;
+            padding: 2px 7px;
+            border-radius: 10px;
+            background: #F0F4F8;
+            color: #6C7A89;
+            font-weight: 600;
+        }
+
+        .module-badge.completed { background: #E0F4EC; color: #2C6E49; }
+        .module-badge.active { background: #E8EFF9; color: #4A6FA5; }
+
+        .module-arrow {
+            font-size: 0.7rem;
+            color: #9CA3AF;
+            transition: transform 0.25s;
+        }
+
+        .module-accordion.open .module-arrow { transform: rotate(180deg); }
+
+        .module-steps {
+            display: none;
+            background: #FAFCFB;
+        }
+
+        .module-accordion.open .module-steps { display: block; }
+
+        .step-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 16px 10px 22px;
+            border-bottom: 1px solid #F0F4F8;
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+
+        .step-item:last-child { border-bottom: none; }
+        .step-item:active { background: #F0F9F4; }
+
+        .step-item.current-step {
+            background: #EDF7F2;
+            border-left: 3px solid #2C6E49;
+            padding-left: 19px;
+        }
+
+        .step-icon {
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            background: #F0F4F8;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.72rem;
+            flex-shrink: 0;
+            color: #9CA3AF;
+        }
+
+        .step-icon.completed { background: #2C6E49; color: white; }
+        .step-icon.active { background: #1B4332; color: white; box-shadow: 0 0 0 3px rgba(44,110,73,0.2); }
+
+        .step-info { flex: 1; min-width: 0; }
+
+        .step-title {
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: #1C1C1A;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .step-desc { font-size: 0.62rem; color: #9CA3AF; margin-top: 1px; }
+
+        .step-status { font-size: 0.62rem; color: #2C6E49; font-weight: 600; flex-shrink: 0; }
+
+        /* ===== MAIN CONTENT AREA ===== */
+        #contentArea {
+            flex: 1;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            padding: 14px 14px 6px;
+        }
+
+        .content-card {
+            background: white;
+            border-radius: 20px;
+            border: none;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            overflow: hidden;
+            margin-bottom: 12px;
+        }
+
+        .content-header {
+            padding: 14px 16px;
+            border-bottom: 1px solid #F0F4F8;
+            background: linear-gradient(135deg, #F8FBF9 0%, #F0F9F4 100%);
+        }
+
+        .content-step-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            background: #E0F4EC;
+            color: #2C6E49;
+            font-size: 0.62rem;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 20px;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            margin-bottom: 6px;
+        }
+
+        .content-step-title {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #1C1C1A;
+            margin-bottom: 2px;
+            line-height: 1.3;
+        }
+
+        .content-step-meta { font-size: 0.65rem; color: #9CA3AF; }
+
+        .content-body { padding: 16px; }
+
+        /* ===== VIDEO ===== */
+        .video-container {
+            background: #0F1923;
+            border-radius: 14px;
+            overflow: hidden;
+            margin-bottom: 14px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+        }
+
+        .video-container video { width: 100%; display: block; }
+
+        /* ===== EXERCISE AREA ===== */
+        .exercise-area {
+            background: #F8FBF9;
+            border-radius: 16px;
+            padding: 14px;
+            margin: 12px 0;
+            border: 1px solid #E8F5EE;
+        }
+
+        /* ===== AUDIO PLAYER ===== */
+        .audio-player-card {
+            background: white;
+            border-radius: 50px;
+            padding: 7px 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 14px;
+            border: 1px solid #E8F0EC;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .play-circle {
+            background: linear-gradient(135deg, #2C6E49, #40B974);
+            border: none;
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            box-shadow: 0 3px 10px rgba(44,110,73,0.35);
+            flex-shrink: 0;
+        }
+
+        .play-circle:active { transform: scale(0.93); }
+        .play-circle svg { width: 18px; height: 18px; fill: white; }
+
+        .speed-group { display: flex; gap: 5px; flex-wrap: wrap; }
+
+        .speed-chip {
+            padding: 4px 10px;
+            border-radius: 30px;
+            border: 1.5px solid #E2E8F0;
+            background: white;
+            font-size: 0.65rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.15s;
+            color: #6C7A89;
+        }
+
+        .speed-chip.active {
+            background: #2C6E49;
+            border-color: #2C6E49;
+            color: white;
+            box-shadow: 0 2px 6px rgba(44,110,73,0.3);
+        }
+
+        /* ===== LANGUAGE SELECTOR ===== */
+        .language-selector {
+            margin-bottom: 14px;
+            padding: 12px;
+            background: white;
+            border-radius: 14px;
+            text-align: center;
+            border: 1px solid #E8F0EC;
+        }
+
+        .language-selector label {
+            font-weight: 700;
+            font-size: 0.74rem;
+            color: #1B4332;
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .lang-select-btn {
+            padding: 6px 12px;
+            margin: 3px;
+            border-radius: 30px;
+            border: 1.5px solid #E2E8F0;
+            background: #F8FBF9;
+            font-size: 0.7rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.15s;
+            color: #6C7A89;
+        }
+
+        .lang-select-btn.active {
+            background: #2C6E49;
+            border-color: #2C6E49;
+            color: white;
+        }
+
+        /* ===== SENTENCE INPUT ===== */
+        .sentence-input-container { margin-bottom: 14px; }
+
+        .sentence-input-field {
+            width: 100%;
+            padding: 10px 12px;
+            font-size: 0.9rem;
+            border: 2px solid #E2E8F0;
+            border-radius: 12px;
+            font-family: 'Noto Sans Devanagari', monospace;
+            background: white;
+            transition: border-color 0.2s;
+        }
+
+        .sentence-input-field:focus {
+            outline: none;
+            border-color: #2C6E49;
+            box-shadow: 0 0 0 3px rgba(44,110,73,0.12);
+        }
+
+        /* ===== THREE TIER ===== */
+        .three-tier-mobile { margin: 12px 0; }
+
+        .tier-mobile {
+            margin-bottom: 10px;
+            background: white;
+            border-radius: 12px;
+            border: 1px solid #E8F0EC;
+            overflow: hidden;
+        }
+
+        .tier-title {
+            background: linear-gradient(135deg, #F0F9F4, #E8F5EE);
+            padding: 7px 12px;
+            font-weight: 700;
+            font-size: 0.68rem;
+            color: #1B4332;
+            border-bottom: 1px solid #E8F0EC;
+        }
+
+        .tier-cells-scroll {
+            overflow-x: auto;
+            white-space: nowrap;
+            padding: 8px;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .tier-cells-container { display: inline-flex; gap: 6px; }
+
+        .tier-cell {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            background: #F8FBF9;
+            border-radius: 10px;
+            padding: 7px;
+            min-width: 76px;
+            border: 1.5px solid #E8F0EC;
+            cursor: pointer;
+            transition: all 0.1s ease;
+        }
+
+        .tier-cell:active { background: #E0F4EC; border-color: #2C6E49; }
+
+        .tier-cell.playing {
+            background: #E0F4EC;
+            border-color: #10b981;
+            animation: pulse 0.3s ease;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.85; transform: scale(0.98); }
+        }
+
+        .tier-cell.tier-216 { min-width: 96px; }
+        .tier-cell.tier-108 { min-width: 72px; }
+        .tier-cell.tier-54 { min-width: 56px; }
+
+        .tier-time { font-size: 0.56rem; color: #9CA3AF; white-space: nowrap; font-weight: 500; }
+
+        .tier-input {
+            width: 100%;
+            text-align: center;
+            font-family: 'Noto Sans Devanagari', monospace;
+            font-size: 0.82rem;
+            padding: 6px;
+            border: 1.5px solid #E2E8F0;
+            border-radius: 8px;
+            background: white;
+            transition: all 0.15s;
+        }
+
+        .tier-input:focus { outline: none; border-color: #2C6E49; box-shadow: 0 0 0 2px rgba(44,110,73,0.12); }
+        .tier-input.saved { border-color: #2C6E49; background: #E0F4EC; }
+        .tier-input.incorrect { border-color: #e67e22 !important; background: #fef3e0 !important; }
+        .tier-input.kb-active { border-color: #10b981; box-shadow: 0 0 0 2px rgba(16,185,129,0.2); }
+
+        /* ===== QUIZ ===== */
+        .quiz-question {
+            margin-bottom: 16px;
+            padding: 14px;
+            background: #F8FBF9;
+            border-radius: 14px;
+            border: 1px solid #E8F0EC;
+        }
+
+        .quiz-question-text { font-weight: 700; margin-bottom: 10px; font-size: 0.84rem; color: #1C1C1A; line-height: 1.4; }
+
+        .quiz-options { display: flex; flex-direction: column; gap: 7px; }
+
+        .quiz-option {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 9px 11px;
+            border-radius: 10px;
+            background: white;
+            cursor: pointer;
+            border: 1.5px solid #E2E8F0;
+            transition: all 0.15s;
+        }
+
+        .quiz-option:active { background: #F0F9F4; border-color: #2C6E49; }
+        .quiz-option input { width: 16px; height: 16px; accent-color: #2C6E49; }
+
+        /* ===== GAME ===== */
+        .game-grid { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin: 14px 0; }
+
+        .game-card {
+            width: 62px;
+            height: 62px;
+            background: white;
+            border: 2px solid #E2E8F0;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            font-family: 'Noto Sans Devanagari', monospace;
+            cursor: pointer;
+            transition: all 0.15s;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .game-card:active { transform: scale(0.93); background: #E0F4EC; border-color: #2C6E49; }
+        .game-card.correct { background: #E0F4EC; border-color: #2C6E49; box-shadow: 0 0 0 3px rgba(44,110,73,0.15); }
+        .game-card.incorrect { background: #FEF3E0; border-color: #e67e22; }
+        .game-card.disabled { pointer-events: none; opacity: 0.55; }
+
+        .game-progress { margin: 12px 0; }
+
+        .game-progress-bar { width: 100%; height: 6px; background: #E8F0EC; border-radius: 4px; overflow: hidden; margin-top: 6px; }
+
+        .game-progress-fill { height: 100%; background: linear-gradient(90deg, #2C6E49, #40B974); border-radius: 4px; transition: width 0.4s ease; }
+
+        .game-score { font-size: 0.9rem; font-weight: 700; color: #2C6E49; margin-bottom: 12px; padding: 10px; background: linear-gradient(135deg, #F0F9F4, #E8F5EE); border-radius: 12px; text-align: center; border: 1px solid #D1EAD9; }
+
+        .play-sound-btn {
+            background: linear-gradient(135deg, #2C6E49, #40B974);
+            color: white;
+            border: none;
+            padding: 9px 20px;
+            border-radius: 30px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin: 8px 0;
+            box-shadow: 0 3px 10px rgba(44,110,73,0.3);
+        }
+
+        .play-sound-btn:active { transform: scale(0.96); }
+
+        /* ===== TOUR ===== */
+        .tour-items { display: flex; flex-direction: column; gap: 8px; }
+
+        .tour-item {
+            padding: 11px 12px;
+            background: white;
+            border-radius: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border: 1.5px solid #E2E8F0;
+        }
+
+        .tour-item:active { background: #F0F9F4; border-color: #2C6E49; }
+        .tour-item.completed { background: #F0F9F4; border-color: #2C6E49; }
+
+        .tour-icon {
+            font-size: 1.1rem;
+            width: 32px;
+            height: 32px;
+            background: #F0F4F8;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .tour-item.completed .tour-icon { background: #E0F4EC; }
+
+        .tour-text { flex: 1; }
+        .tour-title { font-weight: 700; font-size: 0.8rem; color: #1C1C1A; }
+        .tour-desc { font-size: 0.64rem; color: #9CA3AF; margin-top: 1px; }
+        .tour-check { color: #2C6E49; font-size: 0.9rem; font-weight: 700; }
+
+        /* ===== KEYBOARD ===== */
+        .mobile-keyboard {
+            background: linear-gradient(180deg, #1e293b 0%, #0F172A 100%);
+            border-radius: 18px;
+            padding: 10px 8px;
+            margin: 12px 0;
+        }
+
+        .kb-status-bar {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 5px;
+            margin-bottom: 8px;
+            font-size: 10px;
+            color: #64748B;
+            padding: 0 2px;
+        }
+
+        .kb-target-name { color: #10b981; font-weight: 700; }
+        .kb-target-name.none { color: #475569; }
+        .kb-mode-badge { background: rgba(255,255,255,0.08); padding: 2px 7px; border-radius: 8px; font-size: 9px; color: #64748B; }
+
+        .kb-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px; margin-bottom: 4px; }
+
+        .kb-key {
+            min-width: 38px;
+            height: 42px;
+            background: #2D3B55;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            font-family: 'Noto Sans Devanagari', monospace;
+            color: white;
+            border: 1px solid rgba(255,255,255,0.06);
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.06s linear;
+            box-shadow: 0 2px 0 rgba(0,0,0,0.3);
+        }
+
+        .kb-key:active { transform: translateY(1px); background: #4f46e5; box-shadow: none; }
+
+        .kb-key-special { background: #1e3a6e; font-size: 10px; font-weight: 700; min-width: 58px; }
+        .kb-key-special.del { background: #7f1d1d; }
+        .kb-key-special.clr { background: #78350f; }
+
+        /* ===== BUTTONS ===== */
+        .btn {
+            padding: 11px 18px;
+            border: none;
+            border-radius: 60px;
+            font-size: 0.84rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+            letter-spacing: 0.1px;
+        }
+
+        .btn-primary { background: linear-gradient(135deg, #2C6E49, #1B4332); color: white; box-shadow: 0 3px 12px rgba(44,110,73,0.3); }
+        .btn-primary:active { transform: scale(0.97); }
+        .btn-secondary { background: #F0F4F8; color: #2C6E49; border: 1.5px solid #D1EAD9; }
+        .btn-secondary:active { background: #E0F4EC; }
+        .btn-warning { background: linear-gradient(135deg, #e67e22, #d35400); color: white; box-shadow: 0 3px 10px rgba(230,126,34,0.3); }
+        .btn-warning:active { transform: scale(0.97); }
+
+        .button-group { display: flex; gap: 8px; margin: 14px 0; flex-wrap: wrap; }
+        .button-group .btn { flex: 1; min-width: 90px; padding: 9px 10px; font-size: 0.76rem; }
+
+        /* ===== FEEDBACK ===== */
+        .feedback {
+            padding: 11px 13px;
+            border-radius: 12px;
+            margin: 12px 0;
+            font-size: 0.8rem;
+            font-weight: 500;
+            line-height: 1.5;
+        }
+
+        .feedback-success { background: #E8F5EE; color: #1B4332; border-left: 4px solid #2C6E49; }
+        .feedback-error { background: #FDE9E7; color: #991B1B; border-left: 4px solid #DC2626; }
+        .feedback-info { background: #EFF6FF; color: #1E40AF; border-left: 4px solid #3B82F6; }
+
+        /* ===== LOADING ===== */
+        .loading { text-align: center; padding: 40px 20px; color: #9CA3AF; }
+        .loading::before { content: '📚'; display: block; font-size: 2.2rem; margin-bottom: 10px; }
+
+        /* ===== BOTTOM NAV ===== */
+        .bottom-nav {
+            background: white;
+            border-top: 1px solid #F0F4F8;
+            padding: 10px 14px;
+            padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.08);
+            flex-shrink: 0;
+            z-index: 10;
+        }
+
+        .nav-buttons { display: flex; gap: 10px; }
+        .nav-buttons .btn { flex: 1; padding: 11px 14px; font-size: 0.82rem; }
+
+        /* ===== ASSESSMENT ===== */
+        .assessment-card { background: white; border-radius: 14px; padding: 16px; border: 1.5px solid #E2E8F0; text-align: center; }
+        .assessment-icon { font-size: 2.2rem; margin-bottom: 10px; }
+        .assessment-title { font-weight: 700; font-size: 0.95rem; color: #1C1C1A; margin-bottom: 5px; }
+        .assessment-desc { font-size: 0.76rem; color: #6C7A89; margin-bottom: 16px; line-height: 1.5; }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 390px) {
+            .kb-key { min-width: 33px; height: 38px; font-size: 12px; }
+            .kb-key-special { min-width: 48px; font-size: 9px; }
+            .game-card { width: 54px; height: 54px; font-size: 1.1rem; }
+        }
+    </style>
+</head>
+<body>
+<div id="appShell">
+    <!-- HEADER -->
+    <div class="mobile-header">
+        <div class="header-left">
+            <button class="menu-btn" id="menuBtn" aria-label="Open modules">
+                <span></span><span></span><span></span>
+            </button>
+            <div class="logo-text">
+                <h1 id="headerModuleTitle">Akshar Training</h1>
+                <p>Mobile Certification</p>
+            </div>
+        </div>
+        <div class="header-right">
+            <span class="cert-badge pending" id="certBadge">Training</span>
+            <a href="/" class="back-btn">← Back</a>
+        </div>
+    </div>
+
+    <!-- STEP BAR -->
+    <div class="step-bar">
+        <div class="step-bar-info" id="stepBarInfo">Select a module to begin</div>
+        <div class="step-bar-dots" id="navStepDots"></div>
+    </div>
+
+    <!-- PROGRESS STRIP -->
+    <div class="progress-strip">
+        <div class="progress-strip-fill" id="overallFill"></div>
+    </div>
+
+    <!-- DRAWER OVERLAY -->
+    <div class="drawer-overlay" id="drawerOverlay"></div>
+
+    <!-- NAV DRAWER -->
+    <div class="nav-drawer" id="navDrawer">
+        <div class="drawer-header">
+            <h2>📚 All Modules</h2>
+            <div class="drawer-progress">
+                <div class="drawer-progress-row">
+                    <span>Overall Progress</span>
+                    <span id="drawerPercent">0%</span>
+                </div>
+                <div class="drawer-progress-bar">
+                    <div class="drawer-progress-fill" id="drawerFill"></div>
+                </div>
+            </div>
+        </div>
+        <div class="drawer-scroll">
+            <div id="modulesList"></div>
+        </div>
+    </div>
+
+    <!-- CONTENT AREA -->
+    <div id="contentArea">
+        <div class="loading">Tap ☰ to select a module</div>
+    </div>
+
+    <!-- BOTTOM NAV -->
+    <div class="bottom-nav">
+        <div class="nav-buttons">
+            <button class="btn btn-secondary" id="bottomPrevBtn">← Prev</button>
+            <button class="btn btn-primary" id="bottomNextBtn">Next →</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ==================== CONSTANTS AND UTILITIES ====================
+    
+    const WINDOW_216 = 0.216;
+    const WINDOW_108 = 0.108;
+    const WINDOW_54 = 0.054;
+
+    const AKSHAR_SET = new Set([
+        "अ", "आ", "इ", "उ", "ए", "ओ", "क", "ख", "ग", "घ", "च", "छ", "ज", "झ",
+        "ट", "ठ", "ड", "ढ", "त", "थ", "द", "ध", "प", "फ", "ब", "भ", "न", "म",
+        "य", "र", "ल", "व", "स", "ह", "ं", "ँ", "ॉ", "०"
+    ]);
+
+    function isValidAkshar(char) { return AKSHAR_SET.has(char); }
+
+    function filterAkshars(text) {
+        let out = '';
+        for (let ch of text) {
+            if (AKSHAR_SET.has(ch)) out += ch;
+        }
+        return out.slice(0, 3);
+    }
+
+    // ==================== DRAWER ====================
+
+    const menuBtn = document.getElementById('menuBtn');
+    const navDrawer = document.getElementById('navDrawer');
+    const drawerOverlay = document.getElementById('drawerOverlay');
+
+    function openDrawer() {
+        navDrawer.classList.add('open');
+        drawerOverlay.classList.add('open');
+        menuBtn.classList.add('open');
+    }
+
+    function closeDrawer() {
+        navDrawer.classList.remove('open');
+        drawerOverlay.classList.remove('open');
+        menuBtn.classList.remove('open');
+    }
+
+    menuBtn.addEventListener('click', () => {
+        if (navDrawer.classList.contains('open')) closeDrawer();
+        else openDrawer();
+    });
+
+    drawerOverlay.addEventListener('click', closeDrawer);
+
+    // ==================== VIDEO MAPPING ====================
+    
+    const videoMapping = {
+        "1.1": "/mobile-training/videos/tut_1.mp4",
+        "1.3": "/mobile-training/videos/tut_2.mp4",
+        "2.1": "/mobile-training/videos/tut_3.mp4",
+        "2.3": "/mobile-training/videos/tut_4.mp4",
+        "3.1": "/mobile-training/videos/tut_5.mp4",
+        "3.3": "/mobile-training/videos/tut_6.mp4",
+        "4.1": "/mobile-training/videos/tut_7.mp4",
+        "5.1": "/mobile-training/videos/tut_8.mp4",
+        "6.1": "/mobile-training/videos/tut_9.mp4",
+        "6.2": "/mobile-training/videos/tut_10.mp4"
+    };
+
+    // ==================== MODULES STRUCTURE ====================
+    
+    const modules = [
+        {
+            id: 1, title: "Introduction to Audio Annotation", estimated_time: "5-10 min",
+            steps: [
+                { id: "1.1", type: "video", title: "What is Audio Annotation?", duration: "2:30" },
+                { id: "1.2", type: "quiz", title: "Check Your Understanding", 
+                  questions: [{ text: "What is the main purpose of audio annotation?", options: ["Speech recognition training", "Music analysis", "Background noise removal", "Audio compression"], correct: 0 }] },
+                { id: "1.3", type: "video", title: "Platform Overview", duration: "2:00" },
+                { id: "1.4", type: "interactive", title: "Interface Tour", interactive_type: "tour" }
+            ]
+        },
+        {
+            id: 2, title: "Understanding Akshars", estimated_time: "10-15 min",
+            steps: [
+                { id: "2.1", type: "video", title: "What are Akshars? The 40 Characters", duration: "3:00" },
+                { id: "2.2", type: "game", title: "Match the Sound", game_type: "flashcard", items: ["अ", "क", "म", "स", "त"] },
+                { id: "2.3", type: "video", title: "Vowels vs Consonants", duration: "2:30" },
+                { id: "2.4", type: "quiz", title: "Akshar Recognition", 
+                  questions: [{ text: "Which of these is a vowel?", options: ["क", "त", "अ", "म"], correct: 2 }] }
+            ]
+        },
+        {
+            id: 3, title: "Single Tier Annotation", estimated_time: "15-20 min",
+            steps: [
+                { id: "3.1", type: "video", title: "108ms Tier = One Sound Unit", duration: "2:00" },
+                { id: "3.2", type: "exercise", title: "Practice: 108ms Tier Annotation", exercise_type: "single_cell_practice_dynamic", audio_file: "three_2.wav" },
+                { id: "3.3", type: "video", title: "Using Slowed Audio for Clarity", duration: "1:30" }
+            ]
+        },
+        {
+            id: 4, title: "The Three-Tier System", estimated_time: "25-30 min",
+            steps: [
+                { id: "4.1", type: "video", title: "Understanding 216ms, 108ms, 54ms", duration: "3:00" },
+                { id: "4.2", type: "exercise", title: "Practice: All Three Tiers", exercise_type: "three_tier_complete_dynamic", audio_file: "three_tier_audio.wav" },
+                { id: "4.3", type: "exercise", title: "Practice: Multi-Language Three Tiers", exercise_type: "multi_language_three_tier", languages: ["hindi", "english", "telugu", "kannada", "marathi", "tamil"] }
+            ]
+        },
+        {
+            id: 5, title: "Practice & Mastery", estimated_time: "30-40 min",
+            steps: [
+                { id: "5.1", type: "video", title: "Common Mistakes", duration: "2:30" },
+                { id: "5.2", type: "exercise", title: "Practice: Short Sentence", exercise_type: "three_tier_complete", audio_file: "short_sentence.wav", required_duration: 0.54 },
+                { id: "5.3", type: "exercise", title: "Practice: Medium Sentence", exercise_type: "three_tier_complete", audio_file: "medium_sentence.wav", required_duration: 0.86 },
+                { id: "5.4", type: "quiz", title: "Scenario Questions", 
+                  questions: [
+                    { text: "What should you do when you hear an unclear sound?", options: ["Skip the file", "Use slowed audio", "Guess randomly", "Leave it blank"], correct: 1 },
+                    { text: "How many akshars maximum per cell?", options: ["1", "2", "3", "4"], correct: 2 }
+                  ] }
+            ]
+        },
+        {
+            id: 6, title: "Quality & Speed", estimated_time: "15-20 min",
+            steps: [
+                { id: "6.1", type: "video", title: "Quality Standards", duration: "2:00" },
+                { id: "6.2", type: "video", title: "Keyboard Shortcuts & Tips", duration: "2:00" },
+                { id: "6.3", type: "exercise", title: "Timed Practice", exercise_type: "timed", audio_file: "timed_practice.wav", required_duration: 30 }
+            ]
+        },
+        {
+            id: 7, title: "Final Assessment", estimated_time: "20-30 min",
+            steps: [
+                { id: "7.1", type: "assessment", title: "Assessment 1: Single Tier (108ms)", assessment_type: "single_cells", count: 10 },
+                { id: "7.2", type: "assessment", title: "Assessment 2: Words", assessment_type: "words", count: 5 },
+                { id: "7.3", type: "assessment", title: "Assessment 3: Full Sentences", assessment_type: "full_three_tier", count: 2 }
+            ]
+        },
+        {
+            id: 8, title: "Certification Exam", estimated_time: "30-40 min",
+            steps: [
+                { id: "8.1", type: "exam", title: "Exam: Part 1 - Single Tier (108ms)", exam_type: "single_cells", count: 10, required_score: 85 },
+                { id: "8.2", type: "exam", title: "Exam: Part 2 - Words", exam_type: "words", count: 5, required_score: 85 },
+                { id: "8.3", type: "exam", title: "Exam: Part 3 - Full Sentences", exam_type: "full_three_tier", count: 3, required_score: 85 }
+            ]
+        }
+    ];
+
+    // ==================== TRAINING STATE ====================
+    
+    let trainingState = {
+        currentModule: 1,
+        currentStep: 0,
+        completedSteps: new Set(),
+        stepData: {},
+        certified: false,
+        tourCompleted: {}
+    };
+
+    // ==================== AUDIO VARIABLES ====================
+    
+    let currentAudioContext = null;
+    let currentSourceNode = null;
+    let isAudioPlaying = false;
+    let currentPlayingCell = null;
+    let currentSpeed = 1;
+    let activeInputElement = null;
+    let isActiveInputSentence = false;
+    let playbackInterval = null;
+
+    // ==================== AUDIO FUNCTIONS ====================
+    
+    async function initAudioContext() {
+        if (!currentAudioContext) {
+            currentAudioContext = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        if (currentAudioContext.state === 'suspended') {
+            await currentAudioContext.resume();
+        }
+        return currentAudioContext;
+    }
+
+    async function playAudio(audioUrl, duration = null, cellElement = null) {
+        try {
+            if (currentSourceNode) {
+                currentSourceNode.stop();
+                currentSourceNode.disconnect();
+                currentSourceNode = null;
+            }
+
+            if (currentPlayingCell && currentPlayingCell !== cellElement) {
+                currentPlayingCell.classList.remove('playing');
+            }
+
+            if (cellElement) {
+                currentPlayingCell = cellElement;
+                cellElement.classList.add('playing');
+            }
+
+            const audioContext = await initAudioContext();
+            const response = await fetch(audioUrl);
+            const arrayBuffer = await response.arrayBuffer();
+            const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+
+            currentSourceNode = audioContext.createBufferSource();
+            currentSourceNode.buffer = audioBuffer;
+            currentSourceNode.playbackRate.value = currentSpeed;
+            currentSourceNode.connect(audioContext.destination);
+
+            const playDuration = duration ? Math.min(duration, audioBuffer.duration) : audioBuffer.duration;
+            currentSourceNode.start(0, 0, playDuration);
+            isAudioPlaying = true;
+
+            currentSourceNode.onended = () => {
+                isAudioPlaying = false;
+                currentSourceNode = null;
+                if (cellElement) {
+                    cellElement.classList.remove('playing');
+                }
+                currentPlayingCell = null;
+            };
+
+            return true;
+        } catch (error) {
+            console.error('Audio error:', error);
+            if (cellElement) {
+                cellElement.classList.remove('playing');
+            }
+            return false;
+        }
+    }
+
+    async function playTrimmedAudio(audioFile, startSec, durationSec, cellElement = null) {
+        try {
+            if (currentSourceNode) {
+                currentSourceNode.stop();
+                currentSourceNode.disconnect();
+                currentSourceNode = null;
+            }
+
+            if (currentPlayingCell && currentPlayingCell !== cellElement) {
+                currentPlayingCell.classList.remove('playing');
+            }
+
+            if (cellElement) {
+                currentPlayingCell = cellElement;
+                cellElement.classList.add('playing');
+            }
+
+            const audioContext = await initAudioContext();
+            const response = await fetch(`/mobile-training/audio/${audioFile}`);
+            const arrayBuffer = await response.arrayBuffer();
+            const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+
+            currentSourceNode = audioContext.createBufferSource();
+            currentSourceNode.buffer = audioBuffer;
+            currentSourceNode.playbackRate.value = currentSpeed;
+            currentSourceNode.connect(audioContext.destination);
+
+            const actualDuration = Math.min(durationSec, audioBuffer.duration - startSec);
+            currentSourceNode.start(0, startSec, actualDuration);
+            isAudioPlaying = true;
+
+            currentSourceNode.onended = () => {
+                isAudioPlaying = false;
+                currentSourceNode = null;
+                if (cellElement) {
+                    cellElement.classList.remove('playing');
+                }
+                currentPlayingCell = null;
+            };
+
+            return true;
+        } catch (error) {
+            console.error('Audio error:', error);
+            if (cellElement) {
+                cellElement.classList.remove('playing');
+            }
+            return false;
+        }
+    }
+
+    function stopAudio() {
+        if (currentSourceNode) {
+            currentSourceNode.stop();
+            currentSourceNode.disconnect();
+            currentSourceNode = null;
+        }
+        isAudioPlaying = false;
+        if (currentPlayingCell) {
+            currentPlayingCell.classList.remove('playing');
+            currentPlayingCell = null;
+        }
+    }
+
+    // ==================== PROGRESS FUNCTIONS ====================
+    
+    async function loadProgress() {
+        try {
+            const response = await fetch(`/api/mobile-training-progress`);
+            if (response.ok) {
+                const data = await response.json();
+                trainingState.completedSteps = new Set(data.completed_steps || []);
+                trainingState.stepData = data.step_data || {};
+                trainingState.certified = data.certified || false;
+                trainingState.tourCompleted = data.tour_completed || {};
+                if (data.current_module) trainingState.currentModule = data.current_module;
+                if (data.current_step !== undefined) trainingState.currentStep = data.current_step;
+            }
+        } catch(e) { console.log("No saved progress"); }
+        renderModulesList();
+        loadCurrentStep();
+        updateOverallProgress();
+        updateStepBar();
+    }
+
+    async function saveProgress() {
+        try {
+            await fetch(`/api/mobile-training-progress`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    completed_steps: Array.from(trainingState.completedSteps),
+                    step_data: trainingState.stepData,
+                    current_module: trainingState.currentModule,
+                    current_step: trainingState.currentStep,
+                    certified: trainingState.certified,
+                    tour_completed: trainingState.tourCompleted
+                })
+            });
+        } catch(e) { console.error("Save error:", e); }
+    }
+
+    function updateStepBar() {
+        const module = modules[trainingState.currentModule - 1];
+        if (!module) return;
+
+        // Update header title
+        const headerTitle = document.getElementById('headerModuleTitle');
+        if (headerTitle) headerTitle.textContent = `M${module.id}: ${module.title.substring(0, 22)}${module.title.length > 22 ? '…' : ''}`;
+
+        const step = module.steps[trainingState.currentStep];
+        const stepBarInfo = document.getElementById('stepBarInfo');
+        if (stepBarInfo && step) {
+            stepBarInfo.textContent = `${step.id} · ${step.title}`;
+        }
+
+        // Render step dots
+        const dotsEl = document.getElementById('navStepDots');
+        if (dotsEl) {
+            dotsEl.innerHTML = module.steps.map((s, idx) => {
+                const isDone = trainingState.completedSteps.has(`${module.id}_${s.id}`);
+                const isActive = idx === trainingState.currentStep;
+                let cls = 'nav-dot';
+                if (isActive) cls += ' active';
+                else if (isDone) cls += ' completed';
+                return `<div class="${cls}"></div>`;
+            }).join('');
+        }
+    }
+
+    // ==================== RENDER MODULES LIST ====================
+    
+    function renderModulesList() {
+        const container = document.getElementById('modulesList');
+        if (!container) return;
+        
+        container.innerHTML = modules.map(module => {
+            const stepsCompleted = module.steps.filter((step) => 
+                trainingState.completedSteps.has(`${module.id}_${step.id}`)
+            ).length;
+            const totalSteps = module.steps.length;
+            const isCompleted = stepsCompleted === totalSteps;
+            const isActive = trainingState.currentModule === module.id;
+            
+            let badgeClass = 'module-badge';
+            let numClass = 'module-num';
+            if (isCompleted) { badgeClass += ' completed'; numClass += ' completed'; }
+            else if (isActive) { badgeClass += ' active'; numClass += ' active'; }
+            
+            return `
+                <div class="module-accordion ${isActive ? 'open' : ''}" data-module="${module.id}">
+                    <div class="module-header">
+                        <div class="${numClass}">${isCompleted ? '✓' : module.id}</div>
+                        <span class="module-title">${module.title}</span>
+                        <div class="module-meta">
+                            <span class="${badgeClass}">${stepsCompleted}/${totalSteps}</span>
+                            <span class="module-arrow">▼</span>
+                        </div>
+                    </div>
+                    <div class="module-steps">
+                        ${module.steps.map((step, idx) => {
+                            const stepCompleted = trainingState.completedSteps.has(`${module.id}_${step.id}`);
+                            const isCurrentStep = trainingState.currentModule === module.id && trainingState.currentStep === idx;
+                            const iconClass = stepCompleted ? 'completed' : (isCurrentStep ? 'active' : '');
+                            const stepTypeIcon = step.type === 'video' ? '▶' : step.type === 'quiz' ? '?' : step.type === 'game' ? '🎮' : step.type === 'exam' ? '📋' : '●';
+                            return `
+                                <div class="step-item ${isCurrentStep ? 'current-step' : ''}" data-module="${module.id}" data-step="${idx}">
+                                    <div class="step-icon ${iconClass}">
+                                        ${stepCompleted ? '✓' : stepTypeIcon}
+                                    </div>
+                                    <div class="step-info">
+                                        <div class="step-title">${step.id} ${step.title}</div>
+                                        <div class="step-desc">${step.type} · ${step.duration || 'Interactive'}</div>
+                                    </div>
+                                    <div class="step-status">${stepCompleted ? '✓' : (isCurrentStep ? '▶' : '')}</div>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                </div>
+            `;
+        }).join('');
+        
+        document.querySelectorAll('.module-accordion').forEach(el => {
+            const header = el.querySelector('.module-header');
+            header.addEventListener('click', (e) => {
+                if (e.target.closest('.step-item')) return;
+                el.classList.toggle('open');
+            });
+        });
+        
+        document.querySelectorAll('.step-item').forEach(el => {
+            el.addEventListener('click', () => {
+                const moduleId = parseInt(el.dataset.module);
+                const stepIdx = parseInt(el.dataset.step);
+                trainingState.currentModule = moduleId;
+                trainingState.currentStep = stepIdx;
+                saveProgress();
+                renderModulesList();
+                loadCurrentStep();
+                updateStepBar();
+                closeDrawer();
+            });
+        });
+    }
+
+    // ==================== LOAD CURRENT STEP ====================
+    
+    async function loadCurrentStep() {
+        const module = modules[trainingState.currentModule - 1];
+        if (!module) return;
+        
+        const step = module.steps[trainingState.currentStep];
+        if (!step) return;
+        
+        const contentArea = document.getElementById('contentArea');
+        if (!contentArea) return;
+
+        // Scroll content area to top
+        contentArea.scrollTop = 0;
+
+        const stepTypeLabel = {
+            video: '🎬 Video',
+            quiz: '❓ Quiz',
+            exercise: '✏️ Exercise',
+            game: '🎮 Game',
+            interactive: '🖱️ Interactive',
+            assessment: '📋 Assessment',
+            exam: '🏆 Exam'
+        }[step.type] || step.type;
+        
+        let html = `
+            <div class="content-card">
+                <div class="content-header">
+                    <div class="content-step-badge">${stepTypeLabel}</div>
+                    <div class="content-step-title">${step.title}</div>
+                    <div class="content-step-meta">${module.title} · ${step.duration || 'Interactive'}</div>
+                </div>
+                <div class="content-body" id="stepContent">
+        `;
+        
+        if (step.type === 'video') {
+            html += renderVideoContent(step);
+        } else if (step.type === 'quiz') {
+            html += renderQuizContent(step);
+        } else if (step.type === 'exercise') {
+            if (step.exercise_type === 'single_cell_practice_dynamic') {
+                html += renderSingleCellPracticeDynamic(step);
+            } else if (step.exercise_type === 'three_tier' || step.exercise_type === 'three_tier_complete') {
+                html += renderThreeTierExercise(step);
+            } else if (step.exercise_type === 'three_tier_complete_dynamic') {
+                html += renderThreeTierExerciseDynamic(step);
+            } else if (step.exercise_type === 'multi_language_three_tier') {
+                html += renderMultiLanguageThreeTierExercise(step);
+            } else {
+                html += renderSimpleExercise(step);
+            }
+        } else if (step.type === 'game') {
+            html += renderGameContent(step);
+        } else if (step.type === 'interactive') {
+            html += renderInteractiveContent(step);
+        } else if (step.type === 'assessment' || step.type === 'exam') {
+            html += renderAssessmentContent(step);
+        }
+        
+        html += `
+                </div>
+            </div>
+        `;
+        
+        contentArea.innerHTML = html;
+        
+        attachStepEvents(step);
+    }
+
+    // ==================== RENDER FUNCTIONS ====================
+    
+    function renderVideoContent(step) {
+        const videoUrl = videoMapping[step.id] || `/mobile-training/videos/tut_${step.id.split('.')[0]}.mp4`;
+        return `
+            <div class="video-container">
+                <video id="stepVideo" controls width="100%" playsinline>
+                    <source src="${videoUrl}" type="video/mp4">
+                </video>
+            </div>
+            <div class="feedback feedback-info">Watch the video, then tap the button when done.</div>
+            <button class="btn btn-primary" id="markCompleteBtn" style="width: 100%;">✓ Mark as Complete</button>
+        `;
+    }
+
+    function renderQuizContent(step) {
+        return `
+            <div id="quizContainer">
+                ${step.questions.map((q, idx) => `
+                    <div class="quiz-question">
+                        <div class="quiz-question-text">${idx + 1}. ${q.text}</div>
+                        <div class="quiz-options">
+                            ${q.options.map((opt, optIdx) => `
+                                <label class="quiz-option">
+                                    <input type="radio" name="q${idx}" value="${optIdx}">
+                                    <span>${String.fromCharCode(65+optIdx)}. ${opt}</span>
+                                </label>
+                            `).join('')}
+                        </div>
+                    </div>
+                `).join('')}
+                <button class="btn btn-primary" id="submitQuizBtn" style="width: 100%;">Submit Answers</button>
+                <div id="quizFeedback"></div>
+            </div>
+        `;
+    }
+
+    function renderSingleCellPracticeDynamic(step) {
+        return `
+            <div class="exercise-area">
+                <div class="audio-player-card">
+                    <button class="play-circle" id="playFullAudioBtn">
+                        <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                    </button>
+                    <div class="speed-group">
+                        <button class="speed-chip" data-speed="0.5">0.5x</button>
+                        <button class="speed-chip active" data-speed="1">1x</button>
+                        <button class="speed-chip" data-speed="1.5">1.5x</button>
+                        <button class="speed-chip" data-speed="2">2x</button>
+                    </div>
+                </div>
+                
+                <div class="three-tier-mobile">
+                    <div class="tier-mobile">
+                        <div class="tier-title">Cells (108ms each)</div>
+                        <div class="tier-cells-scroll">
+                            <div class="tier-cells-container" id="practiceCellsRow"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="display: flex; gap: 8px; justify-content: center; margin-top: 14px; flex-wrap: wrap;">
+                    <button class="btn btn-primary" id="checkPracticeBtn">✓ Check</button>
+                    <button class="btn btn-warning" id="showAnswersBtn">📖 Answers</button>
+                    <button class="btn btn-secondary" id="resetPracticeBtn">↺ Reset</button>
+                </div>
+                <div id="practiceFeedback" style="display: none;"></div>
+                <div id="loadingIndicator" style="text-align: center; padding: 16px; display: none;">Loading exercise...</div>
+            </div>
+            ${renderMobileKeyboard()}
+        `;
+    }
+
+    function renderThreeTierExercise(step) {
+        return `
+            <div class="exercise-area">
+                <div class="audio-player-card">
+                    <button class="play-circle" id="playFullAudioBtn">
+                        <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                    </button>
+                    <div class="speed-group">
+                        <button class="speed-chip" data-speed="0.5">0.5x</button>
+                        <button class="speed-chip active" data-speed="1">1x</button>
+                        <button class="speed-chip" data-speed="1.5">1.5x</button>
+                        <button class="speed-chip" data-speed="2">2x</button>
+                    </div>
+                </div>
+                
+                <div class="three-tier-mobile" id="threeTierContainer"></div>
+                
+                <button class="btn btn-primary" id="checkExerciseBtn">✓ Check All Answers</button>
+                <div id="exerciseFeedback" style="display: none;"></div>
+            </div>
+            ${renderMobileKeyboard()}
+        `;
+    }
+
+    function renderThreeTierExerciseDynamic(step) {
+        return `
+            <div class="exercise-area">
+                <div class="audio-player-card">
+                    <button class="play-circle" id="playFullAudioBtn">
+                        <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                    </button>
+                    <div class="speed-group">
+                        <button class="speed-chip" data-speed="0.5">0.5x</button>
+                        <button class="speed-chip active" data-speed="1">1x</button>
+                        <button class="speed-chip" data-speed="1.5">1.5x</button>
+                        <button class="speed-chip" data-speed="2">2x</button>
+                    </div>
+                </div>
+                
+                <div class="sentence-input-container">
+                    <input type="text" id="sentenceInput" class="sentence-input-field" placeholder="Enter the sentence you hear..." autocomplete="off">
+                </div>
+                
+                <div class="three-tier-mobile" id="threeTierSection">
+                    <div class="tier-mobile">
+                        <div class="tier-title">🌬️ 216ms (Merged)</div>
+                        <div class="tier-cells-scroll">
+                            <div class="tier-cells-container" id="tier216Row"></div>
+                        </div>
+                    </div>
+                    <div class="tier-mobile">
+                        <div class="tier-title">🔥 108ms (Original)</div>
+                        <div class="tier-cells-scroll">
+                            <div class="tier-cells-container" id="tier108Row"></div>
+                        </div>
+                    </div>
+                    <div class="tier-mobile">
+                        <div class="tier-title">💧 54ms (Split)</div>
+                        <div class="tier-cells-scroll">
+                            <div class="tier-cells-container" id="tier54Row"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="display: flex; gap: 8px; justify-content: center; margin-top: 14px; flex-wrap: wrap;">
+                    <button class="btn btn-primary" id="checkAllTiersBtn">✓ Check</button>
+                    <button class="btn btn-warning" id="showAllAnswersBtn">📝 Answers</button>
+                    <button class="btn btn-secondary" id="resetAllTiersBtn">🗑 Reset</button>
+                </div>
+                <div id="exerciseFeedback" style="display: none;"></div>
+                <div id="loadingIndicator" style="text-align: center; padding: 16px; display: none;">Loading exercise data...</div>
+            </div>
+            ${renderMobileKeyboard()}
+        `;
+    }
+
+    function renderMultiLanguageThreeTierExercise(step) {
+        const languages = step.languages || ["hindi", "english", "telugu", "kannada", "marathi", "tamil"];
+        
+        const languageOptions = languages.map(lang => {
+            const displayName = lang.charAt(0).toUpperCase() + lang.slice(1);
+            return `<button class="lang-select-btn" data-lang="${lang}">${displayName}</button>`;
+        }).join('');
+        
+        return `
+            <div class="exercise-area">
+                <div class="audio-player-card">
+                    <button class="play-circle" id="playFullAudioBtn">
+                        <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                    </button>
+                    <div class="speed-group">
+                        <button class="speed-chip" data-speed="0.5">0.5x</button>
+                        <button class="speed-chip active" data-speed="1">1x</button>
+                        <button class="speed-chip" data-speed="1.5">1.5x</button>
+                        <button class="speed-chip" data-speed="2">2x</button>
+                    </div>
+                </div>
+                
+                <div class="language-selector">
+                    <label>🌐 Select Language</label>
+                    <div style="display: flex; gap: 5px; flex-wrap: wrap; justify-content: center;">
+                        ${languageOptions}
+                    </div>
+                    <div id="selectedLanguageDisplay" style="margin-top: 7px; font-size: 0.72rem; color: #2C6E49; font-weight: 600;"></div>
+                </div>
+                
+                <div class="sentence-input-container">
+                    <input type="text" id="sentenceInput" class="sentence-input-field" placeholder="Enter the sentence you hear..." autocomplete="off">
+                </div>
+                
+                <div class="three-tier-mobile" id="threeTierSection">
+                    <div class="tier-mobile">
+                        <div class="tier-title">🌬️ 216ms (Merged)</div>
+                        <div class="tier-cells-scroll">
+                            <div class="tier-cells-container" id="tier216Row"></div>
+                        </div>
+                    </div>
+                    <div class="tier-mobile">
+                        <div class="tier-title">🔥 108ms (Original)</div>
+                        <div class="tier-cells-scroll">
+                            <div class="tier-cells-container" id="tier108Row"></div>
+                        </div>
+                    </div>
+                    <div class="tier-mobile">
+                        <div class="tier-title">💧 54ms (Split)</div>
+                        <div class="tier-cells-scroll">
+                            <div class="tier-cells-container" id="tier54Row"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="display: flex; gap: 8px; justify-content: center; margin-top: 14px; flex-wrap: wrap;">
+                    <button class="btn btn-primary" id="checkAllTiersBtn">✓ Check</button>
+                    <button class="btn btn-warning" id="showAllAnswersBtn">📝 Answers</button>
+                    <button class="btn btn-secondary" id="resetAllTiersBtn">🗑 Reset</button>
+                </div>
+                <div id="exerciseFeedback" style="display: none;"></div>
+                <div id="loadingIndicator" style="text-align: center; padding: 16px; display: none;">Loading exercise data...</div>
+            </div>
+            ${renderMobileKeyboard()}
+        `;
+    }
+
+    function renderSimpleExercise(step) {
+        return `
+            <div class="exercise-area">
+                <div class="audio-player-card">
+                    <button class="play-circle" id="playExerciseAudio">
+                        <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                    </button>
+                    <div class="speed-group">
+                        <button class="speed-chip" data-speed="0.5">0.5x</button>
+                        <button class="speed-chip active" data-speed="1">1x</button>
+                        <button class="speed-chip" data-speed="1.5">1.5x</button>
+                        <button class="speed-chip" data-speed="2">2x</button>
+                    </div>
+                </div>
+                <div style="text-align: center; margin: 22px 0;">
+                    <input type="text" id="exerciseAnswer" class="tier-input" style="width: 110px; font-size: 1.4rem; text-align: center;" placeholder="अ" maxlength="3">
+                </div>
+                <button class="btn btn-primary" id="checkExerciseBtn">Check Answer</button>
+                <div id="exerciseFeedback" style="display: none;"></div>
+            </div>
+            ${renderMobileKeyboard()}
+        `;
+    }
+
+    function renderGameContent(step) {
+        const allAkshars = ["अ", "आ", "इ", "उ", "ए", "ओ", "क", "ख", "ग", "घ", "च", "छ", "ज", "झ", "ट", "ठ", "ड", "ढ", "त", "थ", "द", "ध", "प", "फ", "ब", "भ", "न", "म", "य", "र", "ल", "व", "स", "ह"];
+        const targetAkshars = step.items || ["अ", "क", "म", "स", "त"];
+        
+        const otherAkshars = allAkshars.filter(a => !targetAkshars.includes(a));
+        const shuffledOthers = [...otherAkshars].sort(() => 0.5 - Math.random());
+        const displayAkshars = [...targetAkshars, ...shuffledOthers.slice(0, 5)];
+        const shuffledDisplay = [...displayAkshars].sort(() => 0.5 - Math.random());
+        
+        return `
+            <div class="exercise-area" id="gameContainer">
+                <div class="game-score" id="gameScore">Score: 0/5</div>
+                <div class="game-progress">
+                    <div class="game-current-sound" id="currentSoundLabel" style="font-size:0.78rem; font-weight:600; color:#6C7A89;">Sound 1 of 5</div>
+                    <div class="game-progress-bar">
+                        <div class="game-progress-fill" id="gameProgressFill" style="width: 0%"></div>
+                    </div>
+                </div>
+                <div style="text-align: center; margin: 14px 0;">
+                    <button class="play-sound-btn" id="playGameSoundBtn">▶ Play Current Sound</button>
+                </div>
+                <div class="game-grid" id="gameAksharGrid">
+                    ${shuffledDisplay.map(akshar => `
+                        <div class="game-card" data-akshar="${akshar}">${akshar}</div>
+                    `).join('')}
+                </div>
+                <div id="gameMessage" style="text-align: center; margin-top: 14px; min-height: 44px;"></div>
+            </div>
+        `;
+    }
+
+    function renderInteractiveContent(step) {
+        const tourKey = `${trainingState.currentModule}_${step.id}`;
+        const isTourCompleted = trainingState.tourCompleted[tourKey] || false;
+        
+        if (isTourCompleted) {
+            return `<div class="feedback feedback-success">✓ Tour completed! You've learned about all interface components.</div>`;
+        }
+        
+        return `
+            <div class="exercise-area">
+                <p style="margin-bottom: 12px; font-size:0.8rem; color:#4B5563;">Tap each item to learn what it does. Complete all to finish the tour.</p>
+                <div class="tour-items" id="tourItems">
+                    <div class="tour-item" data-tour="play">
+                        <div class="tour-icon">▶️</div>
+                        <div class="tour-text">
+                            <div class="tour-title">Play Button</div>
+                            <div class="tour-desc">Tap to play/pause audio</div>
+                        </div>
+                        <div class="tour-check"></div>
+                    </div>
+                    <div class="tour-item" data-tour="cell">
+                        <div class="tour-icon">📝</div>
+                        <div class="tour-text">
+                            <div class="tour-title">Cell Input</div>
+                            <div class="tour-desc">Type akshars here (max 3)</div>
+                        </div>
+                        <div class="tour-check"></div>
+                    </div>
+                    <div class="tour-item" data-tour="speed">
+                        <div class="tour-icon">⚡</div>
+                        <div class="tour-text">
+                            <div class="tour-title">Speed Control</div>
+                            <div class="tour-desc">Slow down audio for clarity</div>
+                        </div>
+                        <div class="tour-check"></div>
+                    </div>
+                    <div class="tour-item" data-tour="keyboard">
+                        <div class="tour-icon">⌨️</div>
+                        <div class="tour-text">
+                            <div class="tour-title">Akshar Keyboard</div>
+                            <div class="tour-desc">Tap to type Devanagari characters</div>
+                        </div>
+                        <div class="tour-check"></div>
+                    </div>
+                    <div class="tour-item" data-tour="submit">
+                        <div class="tour-icon">✓</div>
+                        <div class="tour-text">
+                            <div class="tour-title">Submit Button</div>
+                            <div class="tour-desc">Save and continue</div>
+                        </div>
+                        <div class="tour-check"></div>
+                    </div>
+                </div>
+                <div id="tourFeedback"></div>
+            </div>
+        `;
+    }
+
+    function renderAssessmentContent(step) {
+        return `
+            <div class="assessment-card">
+                <div class="assessment-icon">${step.type === 'exam' ? '🏆' : '📋'}</div>
+                <div class="assessment-title">${step.title}</div>
+                <div class="assessment-desc">Complete this ${step.type} to proceed. You need ${step.required_score || 90}% to pass.</div>
+                <button class="btn btn-primary" id="startAssessmentBtn" style="width:100%;">Start ${step.type === 'exam' ? 'Exam' : 'Assessment'}</button>
+                <div id="assessmentContainer"></div>
+            </div>
+        `;
+    }
+
+    function renderMobileKeyboard() {
+        const rows = [
+            ["अ", "आ", "इ", "उ", "ए", "ओ", "ं", "ँ", "ॉ"],
+            ["क", "ख", "ग", "घ", "च", "छ", "ज", "झ", "ट"],
+            ["ठ", "ड", "ढ", "त", "थ", "द", "ध", "प", "फ"],
+            ["ब", "भ", "म", "य", "र", "ल", "व", "स", "ह"],
+            ["⌫", "🗑"]
+        ];
+        
+        return `
+            <div class="mobile-keyboard">
+                <div class="kb-status-bar">
+                    <div>
+                        <span style="color:#475569;">🎯 Typing into: </span>
+                        <span class="kb-target-name none" id="kbTargetName">— tap a cell —</span>
+                    </div>
+                    <div class="kb-mode-badge">Max 3 akshars</div>
+                </div>
+                ${rows.map(row => `
+                    <div class="kb-row">
+                        ${row.map(char => `
+                            <button class="kb-key ${char === '⌫' || char === '🗑' ? 'kb-key-special ' + (char === '⌫' ? 'del' : 'clr') : ''}" data-char="${char}">${char}</button>
+                        `).join('')}
+                    </div>
+                `).join('')}
+            </div>
+        `;
+    }
+
+    // ==================== KEYBOARD FUNCTIONS ====================
+    
+    function setActiveInput(inputEl) {
+        if (activeInputElement) {
+            activeInputElement.classList.remove('kb-active');
+        }
+        activeInputElement = inputEl;
+        if (activeInputElement) {
+            activeInputElement.classList.add('kb-active');
+        }
+        updateKbIndicator();
+    }
+
+    function updateKbIndicator() {
+        const nameEl = document.getElementById('kbTargetName');
+        if (!nameEl) return;
+        if (!activeInputElement) {
+            nameEl.textContent = '— tap a cell first —';
+            nameEl.className = 'kb-target-name none';
+        } else {
+            const idx = activeInputElement.getAttribute('data-idx');
+            const tier = activeInputElement.getAttribute('data-tier');
+            nameEl.textContent = `Cell ${tier ? tier + 'ms' : ''} · #${idx}`;
+            nameEl.className = 'kb-target-name';
+        }
+    }
+
+    function typeIntoActive(char) {
+        if (!activeInputElement) {
+            const feedback = document.getElementById('practiceFeedback') || document.getElementById('exerciseFeedback');
+            if (feedback) {
+                feedback.innerHTML = `<div class="feedback feedback-info">Tap a cell first, then use keyboard!</div>`;
+                feedback.style.display = 'block';
+                setTimeout(() => feedback.style.display = 'none', 1500);
+            }
+            return;
+        }
+        
+        let cur = activeInputElement.value || '';
+        let next;
+        
+        if (char === '⌫') {
+            next = cur.slice(0, -1);
+        } else if (char === '🗑') {
+            next = '';
+        } else {
+            let filtered = filterAkshars(cur + char);
+            if (filtered.length > 3) {
+                const feedback = document.getElementById('practiceFeedback') || document.getElementById('exerciseFeedback');
+                if (feedback) {
+                    feedback.innerHTML = `<div class="feedback feedback-error">Max 3 akshars per cell!</div>`;
+                    feedback.style.display = 'block';
+                    setTimeout(() => feedback.style.display = 'none', 1000);
+                }
+                return;
+            }
+            next = filtered;
+        }
+        
+        activeInputElement.value = next;
+        activeInputElement.classList.remove('saved');
+        
+        const inputEvent = new Event('input', { bubbles: true });
+        activeInputElement.dispatchEvent(inputEvent);
+    }
+
+    function setupKeyboardListeners() {
+        const keys = document.querySelectorAll('.kb-key');
+        keys.forEach(btn => {
+            const newBtn = btn.cloneNode(true);
+            btn.parentNode.replaceChild(newBtn, btn);
+            newBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                const char = newBtn.getAttribute('data-char');
+                typeIntoActive(char);
+            });
+        });
+    }
+
+    // ==================== ATTACH STEP EVENTS ====================
+    
+    async function attachStepEvents(step) {
+        const markBtn = document.getElementById('markCompleteBtn');
+        if (markBtn) {
+            markBtn.onclick = () => markStepComplete(step);
+        }
+        
+        const quizBtn = document.getElementById('submitQuizBtn');
+        if (quizBtn && step.questions) {
+            quizBtn.onclick = () => {
+                let correct = 0;
+                step.questions.forEach((q, idx) => {
+                    const selected = document.querySelector(`input[name="q${idx}"]:checked`);
+                    if (selected && parseInt(selected.value) === q.correct) correct++;
+                });
+                const score = (correct / step.questions.length) * 100;
+                const feedback = document.getElementById('quizFeedback');
+                if (feedback) {
+                    if (score >= 80) {
+                        feedback.innerHTML = `<div class="feedback feedback-success">✓ Great job! You scored ${Math.round(score)}%.</div>`;
+                        markStepComplete(step);
+                    } else {
+                        feedback.innerHTML = `<div class="feedback feedback-error">You scored ${Math.round(score)}%. Need 80% to pass. Review and try again.</div>`;
+                    }
+                }
+            };
+        }
+        
+        document.querySelectorAll('.speed-chip').forEach(btn => {
+            btn.onclick = () => {
+                document.querySelectorAll('.speed-chip').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentSpeed = parseFloat(btn.dataset.speed);
+                if (isAudioPlaying) {
+                    stopAudio();
+                    const playBtn = document.getElementById('playFullAudioBtn');
+                    if (playBtn) playBtn.innerHTML = `<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>`;
+                }
+                showMessage(`Speed: ${currentSpeed}x`, 'info');
+            };
+        });
+        
+        if (step.exercise_type === 'single_cell_practice_dynamic') {
+            await attachSingleCellPractice(step);
+        } else if (step.exercise_type === 'three_tier' || step.exercise_type === 'three_tier_complete') {
+            await attachThreeTierExercise(step);
+        } else if (step.exercise_type === 'three_tier_complete_dynamic') {
+            await attachThreeTierExerciseDynamic(step);
+        } else if (step.exercise_type === 'multi_language_three_tier') {
+            await attachMultiLanguageThreeTier(step);
+        } else if (step.type === 'exercise' && step.correct_answer) {
+            attachSimpleExerciseListeners(step);
+        }
+        
+        const playBtn = document.getElementById('playFullAudioBtn') || document.getElementById('playExerciseAudio');
+        if (playBtn && step.audio_file) {
+            playBtn.onclick = async () => {
+                if (isAudioPlaying) {
+                    stopAudio();
+                    playBtn.innerHTML = `<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>`;
+                } else {
+                    await playAudio(`/mobile-training/audio/${step.audio_file}`, step.required_duration);
+                    playBtn.innerHTML = `<svg viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>`;
+                }
+            };
+        }
+        
+        if (step.type === 'game') {
+            attachGameListeners(step);
+        }
+        
+        if (step.type === 'interactive') {
+            attachInteractiveListeners(step);
+        }
+        
+        const startAssessment = document.getElementById('startAssessmentBtn');
+        if (startAssessment) {
+            startAssessment.onclick = () => {
+                const container = document.getElementById('assessmentContainer');
+                container.innerHTML = `<div class="feedback feedback-success">Assessment completed! Great work!</div>`;
+                setTimeout(() => markStepComplete(step), 2000);
+            };
+        }
+        
+        setupKeyboardListeners();
+        
+        document.addEventListener('click', (e) => {
+            if (e.target.classList && e.target.classList.contains('tier-input')) {
+                setActiveInput(e.target);
+            }
+            if (e.target.classList && e.target.classList.contains('sentence-input-field')) {
+                setActiveInput(null);
+                isActiveInputSentence = true;
+            }
+        });
+        
+        document.getElementById('bottomPrevBtn').onclick = () => navigateStep(-1);
+        document.getElementById('bottomNextBtn').onclick = () => navigateStep(1);
+    }
+
+    // ==================== SINGLE CELL PRACTICE ====================
+    
+    async function attachSingleCellPractice(step) {
+        const audioFile = step.audio_file;
+        const practiceKey = `${trainingState.currentModule}_${step.id}`;
+        const savedState = trainingState.stepData[practiceKey] || {};
+        const userAnswers = savedState.answers || {};
+        
+        const container = document.getElementById('practiceCellsRow');
+        const loadingDiv = document.getElementById('loadingIndicator');
+        const feedbackDiv = document.getElementById('practiceFeedback');
+        
+        if (!container) return;
+        if (loadingDiv) loadingDiv.style.display = 'block';
+        container.innerHTML = '<div style="padding: 16px; text-align: center;">📱 Loading exercise...</div>';
+        
+        let cells = [];
+        let correctAnswers = [];
+        
+        try {
+            const response = await fetch(`/api/mobile-training/exercise-data/${audioFile}`);
+            const data = await response.json();
+            
+            if (!data.success) throw new Error(data.error);
+            
+            const numCells = data.num_cells || 3;
+            correctAnswers = data.correct_answers || ["न", "म", "स्"];
+            
+            cells = [];
+            for (let i = 0; i < numCells; i++) {
+                cells.push({ index: i, label: `Cell ${i + 1}`, correct: correctAnswers[i] || "", duration: 0.108 });
+            }
+            
+            container.innerHTML = cells.map((cell, idx) => {
+                const savedValue = userAnswers[idx] || '';
+                const wasIncorrect = savedState.incorrectCells && savedState.incorrectCells[idx];
+                return `
+                    <div class="tier-cell tier-108" data-idx="${idx}" data-tier="108">
+                        <span class="tier-time">${cell.label}</span>
+                        <input type="text" class="tier-input ${wasIncorrect ? 'incorrect' : ''}" data-idx="${idx}" data-tier="108" value="${savedValue.replace(/"/g, '&quot;')}" maxlength="3" placeholder="___">
+                    </div>
+                `;
+            }).join('');
+            
+        } catch (error) {
+            console.error('Error loading exercise:', error);
+            correctAnswers = ["न", "म", "स्"];
+            cells = correctAnswers.map((ans, i) => ({ index: i, label: `Cell ${i+1}`, correct: ans }));
+            container.innerHTML = cells.map((cell, idx) => {
+                const savedValue = userAnswers[idx] || '';
+                return `
+                    <div class="tier-cell tier-108" data-idx="${idx}" data-tier="108">
+                        <span class="tier-time">${cell.label}</span>
+                        <input type="text" class="tier-input" data-idx="${idx}" data-tier="108" value="${savedValue}" maxlength="3" placeholder="___">
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        if (loadingDiv) loadingDiv.style.display = 'none';
+        
+        const inputs = document.querySelectorAll('#practiceCellsRow .tier-input');
+        const cellDivs = document.querySelectorAll('#practiceCellsRow .tier-cell');
+        
+        cellDivs.forEach((div, idx) => {
+            div.addEventListener('click', async (e) => {
+                if (e.target.tagName === 'INPUT') return;
+                const startTime = idx * 0.108;
+                await playTrimmedAudio(audioFile, startTime, 0.108, div);
+            });
+        });
+        
+        inputs.forEach((input, idx) => {
+            input.addEventListener('input', (e) => {
+                let val = filterAkshars(e.target.value);
+                if (val !== e.target.value) e.target.value = val;
+                input.classList.remove('saved', 'incorrect');
+                
+                if (!trainingState.stepData[practiceKey]) trainingState.stepData[practiceKey] = {};
+                if (!trainingState.stepData[practiceKey].answers) trainingState.stepData[practiceKey].answers = {};
+                trainingState.stepData[practiceKey].answers[idx] = val;
+                saveProgress();
+            });
+        });
+        
+        const checkBtn = document.getElementById('checkPracticeBtn');
+        const showAnswersBtn = document.getElementById('showAnswersBtn');
+        const resetBtn = document.getElementById('resetPracticeBtn');
+        
+        if (checkBtn) {
+            checkBtn.onclick = () => {
+                let correctCount = 0;
+                let wrongCells = [];
+                
+                cells.forEach((cell, idx) => {
+                    const input = inputs[idx];
+                    if (!input) return;
+                    
+                    const userAnswer = input.value.trim();
+                    const expectedAnswer = correctAnswers[idx] || "";
+                    const isCorrect = (userAnswer === expectedAnswer);
+                    
+                    if (isCorrect) {
+                        correctCount++;
+                        input.classList.add('saved');
+                        input.classList.remove('incorrect');
+                    } else {
+                        input.classList.remove('saved');
+                        input.classList.add('incorrect');
+                        wrongCells.push(idx + 1);
+                    }
+                    
+                    if (!trainingState.stepData[practiceKey]) trainingState.stepData[practiceKey] = {};
+                    if (!trainingState.stepData[practiceKey].answers) trainingState.stepData[practiceKey].answers = {};
+                    trainingState.stepData[practiceKey].answers[idx] = userAnswer;
+                });
+                
+                trainingState.stepData[practiceKey].incorrectCells = {};
+                wrongCells.forEach(idx => { trainingState.stepData[practiceKey].incorrectCells[idx - 1] = true; });
+                saveProgress();
+                
+                const totalCells = cells.length;
+                const passed = (correctCount === totalCells);
+                
+                if (feedbackDiv) {
+                    feedbackDiv.style.display = 'block';
+                    if (passed) {
+                        feedbackDiv.innerHTML = `<div class="feedback feedback-success">🎉 Perfect! All ${totalCells} cells correct!</div>`;
+                        markStepComplete(step);
+                    } else {
+                        feedbackDiv.innerHTML = `<div class="feedback feedback-error">❌ ${totalCells - correctCount} incorrect. Wrong cells: ${wrongCells.join(', ')}</div>`;
+                    }
+                    setTimeout(() => { if (feedbackDiv.innerHTML) feedbackDiv.style.display = 'none'; }, 3000);
+                }
+            };
+        }
+        
+        if (showAnswersBtn) {
+            showAnswersBtn.onclick = () => {
+                cells.forEach((cell, idx) => {
+                    const input = inputs[idx];
+                    if (input) {
+                        input.value = correctAnswers[idx] || "";
+                        input.classList.add('saved');
+                        input.classList.remove('incorrect');
+                    }
+                    if (!trainingState.stepData[practiceKey]) trainingState.stepData[practiceKey] = {};
+                    if (!trainingState.stepData[practiceKey].answers) trainingState.stepData[practiceKey].answers = {};
+                    trainingState.stepData[practiceKey].answers[idx] = correctAnswers[idx] || "";
+                });
+                saveProgress();
+                if (feedbackDiv) {
+                    feedbackDiv.innerHTML = `<div class="feedback feedback-info">📝 Correct answers filled in.</div>`;
+                    feedbackDiv.style.display = 'block';
+                    setTimeout(() => feedbackDiv.style.display = 'none', 2000);
+                }
+            };
+        }
+        
+        if (resetBtn) {
+            resetBtn.onclick = () => {
+                inputs.forEach((input, idx) => {
+                    if (input) {
+                        input.value = '';
+                        input.classList.remove('saved', 'incorrect');
+                    }
+                    if (trainingState.stepData[practiceKey]?.answers) {
+                        delete trainingState.stepData[practiceKey].answers[idx];
+                    }
+                });
+                if (trainingState.stepData[practiceKey]) {
+                    delete trainingState.stepData[practiceKey].incorrectCells;
+                }
+                saveProgress();
+                if (feedbackDiv) feedbackDiv.style.display = 'none';
+            };
+        }
+    }
+
+    // ==================== THREE TIER EXERCISE ====================
+    
+    async function attachThreeTierExercise(step) {
+        const audioFile = step.audio_file;
+        const requiredDuration = step.required_duration || 1.3;
+        const container = document.getElementById('threeTierContainer');
+        
+        if (!container) return;
+        
+        const count108 = Math.ceil(requiredDuration / WINDOW_108);
+        const count216 = Math.ceil(count108 / 2);
+        const count54 = count108 * 2;
+        
+        container.innerHTML = `
+            <div class="tier-mobile">
+                <div class="tier-title">🌬️ 216ms (Merged)</div>
+                <div class="tier-cells-scroll">
+                    <div class="tier-cells-container" id="tier216Cells"></div>
+                </div>
+            </div>
+            <div class="tier-mobile">
+                <div class="tier-title">🔥 108ms (Original)</div>
+                <div class="tier-cells-scroll">
+                    <div class="tier-cells-container" id="tier108Cells"></div>
+                </div>
+            </div>
+            <div class="tier-mobile">
+                <div class="tier-title">💧 54ms (Split)</div>
+                <div class="tier-cells-scroll">
+                    <div class="tier-cells-container" id="tier54Cells"></div>
+                </div>
+            </div>
+        `;
+        
+        const tier216Container = document.getElementById('tier216Cells');
+        const tier108Container = document.getElementById('tier108Cells');
+        const tier54Container = document.getElementById('tier54Cells');
+        
+        for (let i = 0; i < count216; i++) {
+            const startTime = (i * WINDOW_216).toFixed(2);
+            const div = document.createElement('div');
+            div.className = 'tier-cell tier-216';
+            div.setAttribute('data-idx', i);
+            div.setAttribute('data-tier', '216');
+            div.innerHTML = `
+                <span class="tier-time">${startTime}s</span>
+                <input type="text" class="tier-input" data-idx="${i}" data-tier="216" maxlength="3" placeholder="___">
+            `;
+            tier216Container.appendChild(div);
+        }
+        
+        for (let i = 0; i < count108; i++) {
+            const startTime = (i * WINDOW_108).toFixed(2);
+            const div = document.createElement('div');
+            div.className = 'tier-cell tier-108';
+            div.setAttribute('data-idx', i);
+            div.setAttribute('data-tier', '108');
+            div.innerHTML = `
+                <span class="tier-time">${startTime}s</span>
+                <input type="text" class="tier-input" data-idx="${i}" data-tier="108" maxlength="3" placeholder="___">
+            `;
+            tier108Container.appendChild(div);
+        }
+        
+        for (let i = 0; i < count54; i++) {
+            const startTime = (i * WINDOW_54).toFixed(2);
+            const div = document.createElement('div');
+            div.className = 'tier-cell tier-54';
+            div.setAttribute('data-idx', i);
+            div.setAttribute('data-tier', '54');
+            div.innerHTML = `
+                <span class="tier-time">${startTime}s</span>
+                <input type="text" class="tier-input" data-idx="${i}" data-tier="54" maxlength="3" placeholder="___">
+            `;
+            tier54Container.appendChild(div);
+        }
+        
+        const allCells = document.querySelectorAll('.tier-cell');
+        allCells.forEach(cell => {
+            const tier = cell.dataset.tier;
+            const idx = parseInt(cell.dataset.idx);
+            const windowSize = tier === '216' ? WINDOW_216 : (tier === '108' ? WINDOW_108 : WINDOW_54);
+            const startTime = idx * windowSize;
+            
+            cell.addEventListener('click', async (e) => {
+                if (e.target.tagName === 'INPUT') return;
+                await playTrimmedAudio(audioFile, startTime, windowSize, cell);
+            });
+        });
+        
+        const checkBtn = document.getElementById('checkExerciseBtn');
+        if (checkBtn) {
+            checkBtn.onclick = () => {
+                const feedback = document.getElementById('exerciseFeedback');
+                if (feedback) {
+                    feedback.innerHTML = `<div class="feedback feedback-success">🎉 Great work! Three-tier exercise completed.</div>`;
+                    feedback.style.display = 'block';
+                }
+                markStepComplete(step);
+            };
+        }
+    }
+
+    // ==================== THREE TIER EXERCISE DYNAMIC ====================
+    
+    async function attachThreeTierExerciseDynamic(step) {
+        const audioFile = step.audio_file;
+        const practiceKey = `${trainingState.currentModule}_${step.id}`;
+        const savedState = trainingState.stepData[practiceKey] || {};
+        
+        const container216 = document.getElementById('tier216Row');
+        const container108 = document.getElementById('tier108Row');
+        const container54 = document.getElementById('tier54Row');
+        const sentenceInput = document.getElementById('sentenceInput');
+        const loadingDiv = document.getElementById('loadingIndicator');
+        const feedbackDiv = document.getElementById('exerciseFeedback');
+        
+        if (!container216 || !container108 || !container54) return;
+        
+        if (loadingDiv) loadingDiv.style.display = 'block';
+        container216.innerHTML = '<div style="padding: 16px; text-align: center;">Loading 216ms tier...</div>';
+        container108.innerHTML = '<div style="padding: 16px; text-align: center;">Loading 108ms tier...</div>';
+        container54.innerHTML = '<div style="padding: 16px; text-align: center;">Loading 54ms tier...</div>';
+        
+        let correct216 = [], correct108 = [], correct54 = [];
+        let numCells216 = 0, numCells108 = 0, numCells54 = 0;
+        let sentence = "";
+        
+        try {
+            const response = await fetch(`/api/mobile-training/three-tier-data/${audioFile}`);
+            
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            
+            const data = await response.json();
+            if (!data.success) throw new Error(data.error || 'Failed to load exercise data');
+            
+            numCells216 = data.num_cells_216 || 0;
+            numCells108 = data.num_cells_108 || 0;
+            numCells54 = data.num_cells_54 || 0;
+            correct216 = data.correct_answers_216 || [];
+            correct108 = data.correct_answers_108 || [];
+            correct54 = data.correct_answers_54 || [];
+            sentence = data.sentence || "";
+            
+            trainingState.stepData[practiceKey] = trainingState.stepData[practiceKey] || {};
+            trainingState.stepData[practiceKey].exerciseData = {
+                audio_file: audioFile, duration: data.duration,
+                num_cells_216: numCells216, num_cells_108: numCells108, num_cells_54: numCells54,
+                correct_216: correct216, correct_108: correct108, correct_54: correct54, sentence: sentence
+            };
+            
+            const userAnswers216 = (savedState.answers216 || {});
+            const userAnswers108 = (savedState.answers108 || {});
+            const userAnswers54 = (savedState.answers54 || {});
+            
+            if (savedState.sentence) sentenceInput.value = savedState.sentence;
+            else if (sentence) sentenceInput.value = sentence;
+            
+            if (numCells216 > 0) {
+                container216.innerHTML = '';
+                for (let idx = 0; idx < numCells216; idx++) {
+                    const savedValue = userAnswers216[idx] || '';
+                    const wasIncorrect = savedState.incorrectCells216 && savedState.incorrectCells216[idx];
+                    container216.innerHTML += `
+                        <div class="tier-cell tier-216" data-idx="${idx}" data-tier="216">
+                            <span class="tier-time">${(idx * 216 / 1000).toFixed(2)}s</span>
+                            <input type="text" class="tier-input ${wasIncorrect ? 'incorrect' : ''}" data-idx="${idx}" data-tier="216" value="${(savedValue || '').replace(/"/g, '&quot;')}" maxlength="3" placeholder="___">
+                        </div>
+                    `;
+                }
+            }
+            
+            if (numCells108 > 0) {
+                container108.innerHTML = '';
+                for (let idx = 0; idx < numCells108; idx++) {
+                    const savedValue = userAnswers108[idx] || '';
+                    const wasIncorrect = savedState.incorrectCells108 && savedState.incorrectCells108[idx];
+                    container108.innerHTML += `
+                        <div class="tier-cell tier-108" data-idx="${idx}" data-tier="108">
+                            <span class="tier-time">${(idx * 108 / 1000).toFixed(2)}s</span>
+                            <input type="text" class="tier-input ${wasIncorrect ? 'incorrect' : ''}" data-idx="${idx}" data-tier="108" value="${(savedValue || '').replace(/"/g, '&quot;')}" maxlength="3" placeholder="___">
+                        </div>
+                    `;
+                }
+            }
+            
+            if (numCells54 > 0) {
+                container54.innerHTML = '';
+                for (let idx = 0; idx < numCells54; idx++) {
+                    const savedValue = userAnswers54[idx] || '';
+                    const wasIncorrect = savedState.incorrectCells54 && savedState.incorrectCells54[idx];
+                    container54.innerHTML += `
+                        <div class="tier-cell tier-54" data-idx="${idx}" data-tier="54">
+                            <span class="tier-time">${(idx * 54 / 1000).toFixed(2)}s</span>
+                            <input type="text" class="tier-input ${wasIncorrect ? 'incorrect' : ''}" data-idx="${idx}" data-tier="54" value="${(savedValue || '').replace(/"/g, '&quot;')}" maxlength="3" placeholder="___">
+                        </div>
+                    `;
+                }
+            }
+            
+        } catch (error) {
+            console.error('Error loading exercise:', error);
+            if (loadingDiv) loadingDiv.style.display = 'none';
+            if (feedbackDiv) {
+                feedbackDiv.style.display = 'block';
+                feedbackDiv.innerHTML = `<div class="feedback feedback-error">❌ Failed to load exercise data. Please check audio file.</div>`;
+            }
+            return;
+        }
+        
+        if (loadingDiv) loadingDiv.style.display = 'none';
+        
+        const inputs216 = document.querySelectorAll('#tier216Row .tier-input');
+        const inputs108 = document.querySelectorAll('#tier108Row .tier-input');
+        const inputs54 = document.querySelectorAll('#tier54Row .tier-input');
+        const cellDivs216 = document.querySelectorAll('#tier216Row .tier-cell');
+        const cellDivs108 = document.querySelectorAll('#tier108Row .tier-cell');
+        const cellDivs54 = document.querySelectorAll('#tier54Row .tier-cell');
+        
+        if (sentenceInput) {
+            sentenceInput.addEventListener('focus', () => { setActiveInput(null); isActiveInputSentence = true; });
+            sentenceInput.addEventListener('input', (e) => {
+                if (!trainingState.stepData[practiceKey]) trainingState.stepData[practiceKey] = {};
+                trainingState.stepData[practiceKey].sentence = e.target.value;
+                saveProgress();
+            });
+        }
+        
+        cellDivs216.forEach((div, idx) => {
+            div.addEventListener('click', async (e) => {
+                if (e.target === inputs216[idx]) return;
+                await playTrimmedAudio(audioFile, idx * 0.216, 0.216, div);
+            });
+        });
+        
+        cellDivs108.forEach((div, idx) => {
+            div.addEventListener('click', async (e) => {
+                if (e.target === inputs108[idx]) return;
+                await playTrimmedAudio(audioFile, idx * 0.108, 0.108, div);
+            });
+        });
+        
+        cellDivs54.forEach((div, idx) => {
+            div.addEventListener('click', async (e) => {
+                if (e.target === inputs54[idx]) return;
+                await playTrimmedAudio(audioFile, idx * 0.054, 0.054, div);
+            });
+        });
+        
+        function setupInputHandlers(inputs, tier, answersObj) {
+            inputs.forEach((input, idx) => {
+                input.addEventListener('focus', () => setActiveInput(input));
+                input.addEventListener('click', (e) => { e.stopPropagation(); setActiveInput(input); });
+                input.addEventListener('input', (e) => {
+                    let val = filterAkshars(e.target.value);
+                    if (val !== e.target.value) e.target.value = val;
+                    input.classList.remove('saved', 'incorrect');
+                    
+                    if (!trainingState.stepData[practiceKey]) trainingState.stepData[practiceKey] = {};
+                    if (!trainingState.stepData[practiceKey][answersObj]) trainingState.stepData[practiceKey][answersObj] = {};
+                    trainingState.stepData[practiceKey][answersObj][idx] = val;
+                    saveProgress();
+                });
+            });
+        }
+        
+        setupInputHandlers(inputs216, '216', 'answers216');
+        setupInputHandlers(inputs108, '108', 'answers108');
+        setupInputHandlers(inputs54, '54', 'answers54');
+        
+        const checkAllBtn = document.getElementById('checkAllTiersBtn');
+        if (checkAllBtn) {
+            checkAllBtn.onclick = () => {
+                const inputs216New = document.querySelectorAll('#tier216Row .tier-input');
+                const inputs108New = document.querySelectorAll('#tier108Row .tier-input');
+                const inputs54New = document.querySelectorAll('#tier54Row .tier-input');
+                
+                let totalCorrect = 0, totalCells = 0, allWrongCells = [];
+                
+                inputs216New.forEach((input, idx) => {
+                    const userAnswer = input.value.trim();
+                    const expectedAnswer = (idx < correct216.length) ? (correct216[idx] || "") : "";
+                    totalCells++;
+                    if (userAnswer === expectedAnswer) { totalCorrect++; input.classList.add('saved'); input.classList.remove('incorrect'); }
+                    else { input.classList.remove('saved'); input.classList.add('incorrect'); allWrongCells.push(`216ms-${idx+1}`); }
+                });
+                
+                inputs108New.forEach((input, idx) => {
+                    const userAnswer = input.value.trim();
+                    const expectedAnswer = (idx < correct108.length) ? (correct108[idx] || "") : "";
+                    totalCells++;
+                    if (userAnswer === expectedAnswer) { totalCorrect++; input.classList.add('saved'); input.classList.remove('incorrect'); }
+                    else { input.classList.remove('saved'); input.classList.add('incorrect'); allWrongCells.push(`108ms-${idx+1}`); }
+                });
+                
+                inputs54New.forEach((input, idx) => {
+                    const userAnswer = input.value.trim();
+                    const expectedAnswer = (idx < correct54.length) ? (correct54[idx] || "") : "";
+                    totalCells++;
+                    if (userAnswer === expectedAnswer) { totalCorrect++; input.classList.add('saved'); input.classList.remove('incorrect'); }
+                    else { input.classList.remove('saved'); input.classList.add('incorrect'); allWrongCells.push(`54ms-${idx+1}`); }
+                });
+                
+                saveProgress();
+                
+                const passed = (totalCorrect === totalCells);
+                if (feedbackDiv) {
+                    feedbackDiv.style.display = 'block';
+                    if (passed && totalCells > 0) {
+                        feedbackDiv.innerHTML = `<div class="feedback feedback-success">🎉 Perfect! All ${totalCells} cells correct!</div>`;
+                        markStepComplete(step);
+                        setTimeout(() => feedbackDiv.style.display = 'none', 3000);
+                    } else if (totalCells > 0) {
+                        feedbackDiv.innerHTML = `<div class="feedback feedback-error">❌ ${totalCells - totalCorrect} incorrect. Wrong: ${allWrongCells.join(', ')}</div>`;
+                    }
+                }
+            };
+        }
+        
+        const showAllBtn = document.getElementById('showAllAnswersBtn');
+        if (showAllBtn) {
+            showAllBtn.onclick = () => {
+                const inputs216New = document.querySelectorAll('#tier216Row .tier-input');
+                const inputs108New = document.querySelectorAll('#tier108Row .tier-input');
+                const inputs54New = document.querySelectorAll('#tier54Row .tier-input');
+                
+                inputs216New.forEach((input, idx) => { input.value = (idx < correct216.length) ? (correct216[idx] || "") : ""; input.classList.add('saved'); input.classList.remove('incorrect'); });
+                inputs108New.forEach((input, idx) => { input.value = (idx < correct108.length) ? (correct108[idx] || "") : ""; input.classList.add('saved'); input.classList.remove('incorrect'); });
+                inputs54New.forEach((input, idx) => { input.value = (idx < correct54.length) ? (correct54[idx] || "") : ""; input.classList.add('saved'); input.classList.remove('incorrect'); });
+                
+                saveProgress();
+                if (feedbackDiv) {
+                    feedbackDiv.style.display = 'block';
+                    feedbackDiv.innerHTML = `<div class="feedback feedback-info">📝 Correct answers filled for all tiers.</div>`;
+                    setTimeout(() => feedbackDiv.style.display = 'none', 3000);
+                }
+            };
+        }
+        
+        const resetAllBtn = document.getElementById('resetAllTiersBtn');
+        if (resetAllBtn) {
+            resetAllBtn.onclick = () => {
+                const inputs216New = document.querySelectorAll('#tier216Row .tier-input');
+                const inputs108New = document.querySelectorAll('#tier108Row .tier-input');
+                const inputs54New = document.querySelectorAll('#tier54Row .tier-input');
+                
+                inputs216New.forEach((input, idx) => { input.value = ''; input.classList.remove('saved', 'incorrect'); if (trainingState.stepData[practiceKey]?.answers216) delete trainingState.stepData[practiceKey].answers216[idx]; });
+                inputs108New.forEach((input, idx) => { input.value = ''; input.classList.remove('saved', 'incorrect'); if (trainingState.stepData[practiceKey]?.answers108) delete trainingState.stepData[practiceKey].answers108[idx]; });
+                inputs54New.forEach((input, idx) => { input.value = ''; input.classList.remove('saved', 'incorrect'); if (trainingState.stepData[practiceKey]?.answers54) delete trainingState.stepData[practiceKey].answers54[idx]; });
+                
+                if (sentenceInput) sentenceInput.value = '';
+                
+                saveProgress();
+                if (feedbackDiv) {
+                    feedbackDiv.style.display = 'block';
+                    feedbackDiv.innerHTML = `<div class="feedback feedback-info">🗑 All tiers have been reset.</div>`;
+                    setTimeout(() => feedbackDiv.style.display = 'none', 2000);
+                }
+            };
+        }
+    }
+
+    // ==================== MULTI-LANGUAGE THREE TIER ====================
+    
+    async function attachMultiLanguageThreeTier(step) {
+        const languages = step.languages || ["hindi", "english", "telugu", "kannada", "marathi", "tamil"];
+        const practiceKey = `${trainingState.currentModule}_${step.id}`;
+        const savedState = trainingState.stepData[practiceKey] || {};
+        
+        const container216 = document.getElementById('tier216Row');
+        const container108 = document.getElementById('tier108Row');
+        const container54 = document.getElementById('tier54Row');
+        const sentenceInput = document.getElementById('sentenceInput');
+        const loadingDiv = document.getElementById('loadingIndicator');
+        const feedbackDiv = document.getElementById('exerciseFeedback');
+        const displayEl = document.getElementById('selectedLanguageDisplay');
+        
+        if (!container216 || !container108 || !container54) return;
+        
+        let currentLanguage = savedState.currentLanguage || languages[0];
+        let correct216 = [], correct108 = [], correct54 = [];
+        let currentAudioFile = "";
+        
+        async function loadLanguageData(language) {
+            if (loadingDiv) loadingDiv.style.display = 'block';
+            container216.innerHTML = '<div style="padding: 16px; text-align: center;">Loading...</div>';
+            container108.innerHTML = '<div style="padding: 16px; text-align: center;">Loading...</div>';
+            container54.innerHTML = '<div style="padding: 16px; text-align: center;">Loading...</div>';
+            
+            let audioFilename = `${language}_audio.wav`;
+            currentAudioFile = audioFilename;
+            
+            try {
+                const response = await fetch(`/api/mobile-training/multi-language-data/${language}/${audioFilename}`);
+                
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                
+                const data = await response.json();
+                if (!data.success) throw new Error(data.error || 'Failed to load');
+                
+                const numCells216 = data.num_cells_216 || 0;
+                const numCells108 = data.num_cells_108 || 0;
+                const numCells54 = data.num_cells_54 || 0;
+                
+                correct216 = data.correct_answers_216 || [];
+                correct108 = data.correct_answers_108 || [];
+                correct54 = data.correct_answers_54 || [];
+                
+                trainingState.stepData[practiceKey] = trainingState.stepData[practiceKey] || {};
+                trainingState.stepData[practiceKey].exerciseData = { language, audio_file: audioFilename, correct_216: correct216, correct_108: correct108, correct_54: correct54 };
+                trainingState.stepData[practiceKey].currentLanguage = language;
+                
+                const userAnswers216 = (savedState[`answers216_${language}`] || {});
+                const userAnswers108 = (savedState[`answers108_${language}`] || {});
+                const userAnswers54 = (savedState[`answers54_${language}`] || {});
+                
+                const savedSentenceKey = `sentence_${language}`;
+                if (sentenceInput) sentenceInput.value = savedState[savedSentenceKey] || "";
+                
+                if (numCells216 > 0) {
+                    container216.innerHTML = '';
+                    for (let idx = 0; idx < numCells216; idx++) {
+                        const savedValue = userAnswers216[idx] || '';
+                        container216.innerHTML += `
+                            <div class="tier-cell tier-216" data-idx="${idx}" data-tier="216">
+                                <span class="tier-time">${(idx * 0.216).toFixed(2)}s</span>
+                                <input type="text" class="tier-input" data-idx="${idx}" data-tier="216" value="${(savedValue || '').replace(/"/g, '&quot;')}" maxlength="3" placeholder="___">
+                            </div>
+                        `;
+                    }
+                } else container216.innerHTML = '<div style="padding: 16px;">No cells</div>';
+                
+                if (numCells108 > 0) {
+                    container108.innerHTML = '';
+                    for (let idx = 0; idx < numCells108; idx++) {
+                        const savedValue = userAnswers108[idx] || '';
+                        container108.innerHTML += `
+                            <div class="tier-cell tier-108" data-idx="${idx}" data-tier="108">
+                                <span class="tier-time">${(idx * 0.108).toFixed(2)}s</span>
+                                <input type="text" class="tier-input" data-idx="${idx}" data-tier="108" value="${(savedValue || '').replace(/"/g, '&quot;')}" maxlength="3" placeholder="___">
+                            </div>
+                        `;
+                    }
+                } else container108.innerHTML = '<div style="padding: 16px;">No cells</div>';
+                
+                if (numCells54 > 0) {
+                    container54.innerHTML = '';
+                    for (let idx = 0; idx < numCells54; idx++) {
+                        const savedValue = userAnswers54[idx] || '';
+                        container54.innerHTML += `
+                            <div class="tier-cell tier-54" data-idx="${idx}" data-tier="54">
+                                <span class="tier-time">${(idx * 0.054).toFixed(2)}s</span>
+                                <input type="text" class="tier-input" data-idx="${idx}" data-tier="54" value="${(savedValue || '').replace(/"/g, '&quot;')}" maxlength="3" placeholder="___">
+                            </div>
+                        `;
+                    }
+                } else container54.innerHTML = '<div style="padding: 16px;">No cells</div>';
+                
+                attachInputHandlers();
+                
+            } catch (error) {
+                console.error('Error loading language data:', error);
+                container216.innerHTML = `<div style="padding: 16px; color: red;">Error loading ${language}</div>`;
+                container108.innerHTML = `<div style="padding: 16px; color: red;">Make sure ${audioFilename} exists</div>`;
+                container54.innerHTML = `<div style="padding: 16px;">Please add audio file for ${language}</div>`;
+            } finally {
+                if (loadingDiv) loadingDiv.style.display = 'none';
+            }
+        }
+        
+        function attachInputHandlers() {
+            const inputs216 = document.querySelectorAll('#tier216Row .tier-input');
+            const inputs108 = document.querySelectorAll('#tier108Row .tier-input');
+            const inputs54 = document.querySelectorAll('#tier54Row .tier-input');
+            const cellDivs216 = document.querySelectorAll('#tier216Row .tier-cell');
+            const cellDivs108 = document.querySelectorAll('#tier108Row .tier-cell');
+            const cellDivs54 = document.querySelectorAll('#tier54Row .tier-cell');
+            
+            if (sentenceInput) {
+                const newSentenceInput = sentenceInput.cloneNode(true);
+                sentenceInput.parentNode.replaceChild(newSentenceInput, sentenceInput);
+                const finalSentenceInput = document.getElementById('sentenceInput');
+                finalSentenceInput.addEventListener('focus', () => { setActiveInput(null); isActiveInputSentence = true; });
+                finalSentenceInput.addEventListener('input', (e) => {
+                    if (!trainingState.stepData[practiceKey]) trainingState.stepData[practiceKey] = {};
+                    trainingState.stepData[practiceKey][`sentence_${currentLanguage}`] = e.target.value;
+                    saveProgress();
+                });
+            }
+            
+            cellDivs216.forEach((div, idx) => {
+                const newDiv = div.cloneNode(true);
+                div.parentNode.replaceChild(newDiv, div);
+                newDiv.addEventListener('click', async (e) => {
+                    if (e.target.tagName === 'INPUT') return;
+                    await playTrimmedAudio(currentAudioFile, idx * 0.216, 0.216, newDiv);
+                });
+            });
+            
+            cellDivs108.forEach((div, idx) => {
+                const newDiv = div.cloneNode(true);
+                div.parentNode.replaceChild(newDiv, div);
+                newDiv.addEventListener('click', async (e) => {
+                    if (e.target.tagName === 'INPUT') return;
+                    await playTrimmedAudio(currentAudioFile, idx * 0.108, 0.108, newDiv);
+                });
+            });
+            
+            cellDivs54.forEach((div, idx) => {
+                const newDiv = div.cloneNode(true);
+                div.parentNode.replaceChild(newDiv, div);
+                newDiv.addEventListener('click', async (e) => {
+                    if (e.target.tagName === 'INPUT') return;
+                    await playTrimmedAudio(currentAudioFile, idx * 0.054, 0.054, newDiv);
+                });
+            });
+            
+            function setupInputListeners(inputs, tier) {
+                inputs.forEach((input, idx) => {
+                    const newInput = input.cloneNode(true);
+                    input.parentNode.replaceChild(newInput, input);
+                    newInput.addEventListener('focus', () => setActiveInput(newInput));
+                    newInput.addEventListener('click', (e) => { e.stopPropagation(); setActiveInput(newInput); });
+                    newInput.addEventListener('input', (e) => {
+                        let val = filterAkshars(e.target.value);
+                        if (val !== e.target.value) e.target.value = val;
+                        newInput.classList.remove('saved', 'incorrect');
+                        
+                        if (!trainingState.stepData[practiceKey]) trainingState.stepData[practiceKey] = {};
+                        const answersKey = `answers${tier}_${currentLanguage}`;
+                        if (!trainingState.stepData[practiceKey][answersKey]) trainingState.stepData[practiceKey][answersKey] = {};
+                        trainingState.stepData[practiceKey][answersKey][idx] = val;
+                        saveProgress();
+                    });
+                });
+            }
+            
+            setupInputListeners(Array.from(inputs216), '216');
+            setupInputListeners(Array.from(inputs108), '108');
+            setupInputListeners(Array.from(inputs54), '54');
+        }
+        
+        const languageButtons = document.querySelectorAll('.lang-select-btn');
+        languageButtons.forEach(btn => {
+            const newBtn = btn.cloneNode(true);
+            btn.parentNode.replaceChild(newBtn, btn);
+            
+            const lang = newBtn.dataset.lang;
+            if (lang === currentLanguage) newBtn.classList.add('active');
+            
+            newBtn.addEventListener('click', async () => {
+                document.querySelectorAll('.lang-select-btn').forEach(b => b.classList.remove('active'));
+                newBtn.classList.add('active');
+                currentLanguage = lang;
+                if (displayEl) displayEl.textContent = `Selected: ${lang.toUpperCase()}`;
+                await loadLanguageData(lang);
+            });
+        });
+        
+        if (displayEl) displayEl.textContent = `Selected: ${currentLanguage.toUpperCase()}`;
+        await loadLanguageData(currentLanguage);
+    }
+
+    // ==================== SIMPLE EXERCISE ====================
+    
+    function attachSimpleExerciseListeners(step) {
+        const answerInput = document.getElementById('exerciseAnswer');
+        const feedbackDiv = document.getElementById('exerciseFeedback');
+        
+        if (answerInput) {
+            answerInput.addEventListener('focus', () => setActiveInput(answerInput));
+            answerInput.addEventListener('click', (e) => { e.stopPropagation(); setActiveInput(answerInput); });
+            answerInput.addEventListener('input', (e) => {
+                let val = filterAkshars(e.target.value);
+                if (val !== e.target.value) e.target.value = val;
+            });
+        }
+        
+        const checkBtn = document.getElementById('checkExerciseBtn');
+        if (checkBtn && step.correct_answer) {
+            checkBtn.onclick = () => {
+                const userAnswer = answerInput ? answerInput.value.trim() : '';
+                if (feedbackDiv) {
+                    if (userAnswer === step.correct_answer) {
+                        feedbackDiv.innerHTML = `<div class="feedback feedback-success">Correct! "${userAnswer}" is the right answer.</div>`;
+                        feedbackDiv.style.display = 'block';
+                        markStepComplete(step);
+                    } else {
+                        feedbackDiv.innerHTML = `<div class="feedback feedback-error">Incorrect. Expected "${step.correct_answer}", got "${userAnswer || 'empty'}".</div>`;
+                        feedbackDiv.style.display = 'block';
+                    }
+                }
+            };
+        }
+    }
+
+    // ==================== GAME LISTENERS ====================
+    
+    function attachGameListeners(step) {
+        const gameKey = `${trainingState.currentModule}_${step.id}`;
+        const targetAkshars = step.items || ["अ", "क", "म", "स", "त"];
+        
+        let currentIndex = 0;
+        let score = 0;
+        let canSelect = true;
+        let currentAudio = null;
+        
+        const savedState = trainingState.stepData[gameKey];
+        if (savedState && !savedState.completed) {
+            currentIndex = savedState.currentIndex || 0;
+            score = savedState.score || 0;
+        }
+        
+        const aksharCards = document.querySelectorAll('.game-card');
+        const scoreElement = document.getElementById('gameScore');
+        const progressFill = document.getElementById('gameProgressFill');
+        const currentSoundLabel = document.getElementById('currentSoundLabel');
+        const gameMessage = document.getElementById('gameMessage');
+        const playBtn = document.getElementById('playGameSoundBtn');
+        
+        function updateUI() {
+            if (scoreElement) scoreElement.innerHTML = `Score: ${score}/${targetAkshars.length}`;
+            if (progressFill) progressFill.style.width = `${(currentIndex / targetAkshars.length) * 100}%`;
+            if (currentSoundLabel) {
+                currentSoundLabel.innerHTML = currentIndex < targetAkshars.length ? `Sound ${currentIndex + 1} of ${targetAkshars.length}` : 'Game Complete!';
+            }
+        }
+        
+        function saveGameState() {
+            trainingState.stepData[gameKey] = { currentIndex, score, completed: currentIndex >= targetAkshars.length };
+            saveProgress();
+        }
+        
+        function playSound(akshar) {
+            return new Promise((resolve, reject) => {
+                const audioMap = {
+                    'अ': '/mobile-training/audio/game_sounds/a.wav',
+                    'क': '/mobile-training/audio/game_sounds/ka.wav',
+                    'म': '/mobile-training/audio/game_sounds/ma.wav',
+                    'स': '/mobile-training/audio/game_sounds/sa.wav',
+                    'त': '/mobile-training/audio/game_sounds/ta.wav'
+                };
+                
+                const audioFile = audioMap[akshar];
+                if (!audioFile) { reject('No audio file'); return; }
+                
+                if (currentAudio) { currentAudio.pause(); currentAudio = null; }
+                
+                currentAudio = new Audio(audioFile);
+                if (gameMessage) gameMessage.innerHTML = `<div class="feedback feedback-info">Playing sound for: ${akshar}</div>`;
+                
+                currentAudio.onended = () => {
+                    if (gameMessage) gameMessage.innerHTML = `<div class="feedback feedback-info">Tap the akshar you heard!</div>`;
+                    resolve();
+                };
+                
+                currentAudio.onerror = () => { reject('Audio error'); };
+                currentAudio.play().catch(reject);
+            });
+        }
+        
+        async function playCurrentSound() {
+            if (currentIndex >= targetAkshars.length) return;
+            
+            canSelect = false;
+            aksharCards.forEach(card => { card.style.pointerEvents = 'none'; card.classList.add('disabled'); });
+            
+            try {
+                await playSound(targetAkshars[currentIndex]);
+                aksharCards.forEach(card => { card.style.pointerEvents = 'auto'; card.classList.remove('disabled'); });
+                canSelect = true;
+            } catch (error) {
+                aksharCards.forEach(card => { card.style.pointerEvents = 'auto'; card.classList.remove('disabled'); });
+                canSelect = true;
+            }
+        }
+        
+        function handleAnswer(selectedAkshar, cardElement) {
+            if (!canSelect) return;
+            if (currentIndex >= targetAkshars.length) return;
+            
+            const correctAkshar = targetAkshars[currentIndex];
+            const isCorrect = (selectedAkshar === correctAkshar);
+            
+            if (isCorrect) {
+                cardElement.classList.add('correct');
+                score++;
+                if (gameMessage) gameMessage.innerHTML = `<div class="feedback feedback-success">Correct! ${selectedAkshar} is right! +1 point</div>`;
+            } else {
+                cardElement.classList.add('incorrect');
+                if (gameMessage) gameMessage.innerHTML = `<div class="feedback feedback-error">Wrong! The correct sound was "${correctAkshar}".</div>`;
+            }
+            
+            canSelect = false;
+            updateUI();
+            saveGameState();
+            
+            setTimeout(() => {
+                cardElement.classList.remove('correct', 'incorrect');
+                currentIndex++;
+                updateUI();
+                
+                if (currentIndex < targetAkshars.length) {
+                    saveGameState();
+                    canSelect = true;
+                    playCurrentSound();
+                } else {
+                    saveGameState();
+                    if (gameMessage) {
+                        gameMessage.innerHTML = score === targetAkshars.length 
+                            ? `<div class="feedback feedback-success">🎉 Perfect! You've mastered all sounds!</div>`
+                            : `<div class="feedback feedback-info">Game finished! Score: ${score}/${targetAkshars.length}.</div>`;
+                    }
+                    
+                    aksharCards.forEach(card => { card.style.pointerEvents = 'none'; });
+                    
+                    if (score === targetAkshars.length) {
+                        setTimeout(() => markStepComplete(step), 1500);
+                    } else {
+                        const retryBtn = document.createElement('button');
+                        retryBtn.className = 'btn btn-primary';
+                        retryBtn.innerHTML = 'Play Again';
+                        retryBtn.style.marginTop = '14px';
+                        retryBtn.style.width = '100%';
+                        retryBtn.onclick = () => {
+                            currentIndex = 0; score = 0; canSelect = true;
+                            aksharCards.forEach(card => { card.classList.remove('correct', 'incorrect', 'disabled'); card.style.pointerEvents = 'auto'; });
+                            updateUI();
+                            saveGameState();
+                            if (gameMessage) gameMessage.innerHTML = '';
+                            setTimeout(() => playCurrentSound(), 500);
+                        };
+                        if (gameMessage) gameMessage.appendChild(retryBtn);
+                    }
+                }
+                
+                canSelect = true;
+            }, 1500);
+        }
+        
+        aksharCards.forEach(card => {
+            card.onclick = () => handleAnswer(card.dataset.akshar, card);
+        });
+        
+        if (playBtn) {
+            playBtn.onclick = () => {
+                if (currentIndex < targetAkshars.length) {
+                    if (currentAudio) { currentAudio.pause(); currentAudio = null; }
+                    playCurrentSound();
+                }
+            };
+        }
+        
+        if (currentIndex === 0 && !trainingState.stepData[gameKey]?.completed) {
+            setTimeout(() => playCurrentSound(), 500);
+        }
+    }
+
+    // ==================== INTERACTIVE TOUR ====================
+    
+    function attachInteractiveListeners(step) {
+        const tourKey = `${trainingState.currentModule}_${step.id}`;
+        const tourItems = document.querySelectorAll('.tour-item');
+        const tourFeedback = document.getElementById('tourFeedback');
+        let completedCount = 0;
+        const totalItems = tourItems.length;
+        
+        function updateTourProgress() {
+            if (completedCount === totalItems) {
+                tourFeedback.innerHTML = `<div class="feedback feedback-success">✓ Tour completed! You're ready to annotate!</div>`;
+                tourFeedback.style.display = 'block';
+                trainingState.tourCompleted[tourKey] = true;
+                saveProgress();
+                markStepComplete(step);
+            }
+        }
+        
+        tourItems.forEach(item => {
+            const isCompleted = item.dataset.completed === 'true';
+            if (isCompleted) { completedCount++; item.classList.add('completed'); }
+            
+            item.onclick = () => {
+                if (item.dataset.completed === 'true') return;
+                item.dataset.completed = 'true';
+                item.classList.add('completed');
+                item.querySelector('.tour-check').textContent = '✓';
+                completedCount++;
+                updateTourProgress();
+                
+                if (tourFeedback) {
+                    tourFeedback.innerHTML = `<div class="feedback feedback-success">✓ Learned about ${item.querySelector('.tour-title')?.innerText || 'feature'}!</div>`;
+                    tourFeedback.style.display = 'block';
+                    setTimeout(() => tourFeedback.style.display = 'none', 1500);
+                }
+            };
+        });
+        
+        updateTourProgress();
+    }
+
+    // ==================== NAVIGATION & PROGRESS ====================
+    
+    function markStepComplete(step) {
+        const stepKey = `${trainingState.currentModule}_${step.id}`;
+        if (!trainingState.completedSteps.has(stepKey)) {
+            trainingState.completedSteps.add(stepKey);
+            saveProgress();
+            renderModulesList();
+            updateOverallProgress();
+            updateStepBar();
+            showMessage("✓ Step completed!", "success");
+        }
+    }
+
+    function navigateStep(direction) {
+        const module = modules[trainingState.currentModule - 1];
+        if (!module) return;
+        
+        const newStep = trainingState.currentStep + direction;
+        
+        if (newStep >= 0 && newStep < module.steps.length) {
+            trainingState.currentStep = newStep;
+            saveProgress();
+            renderModulesList();
+            loadCurrentStep();
+            updateStepBar();
+        } else if (direction === 1 && trainingState.currentModule < modules.length) {
+            trainingState.currentModule++;
+            trainingState.currentStep = 0;
+            saveProgress();
+            renderModulesList();
+            loadCurrentStep();
+            updateStepBar();
+        } else if (direction === -1 && trainingState.currentModule > 1) {
+            trainingState.currentModule--;
+            trainingState.currentStep = 0;
+            saveProgress();
+            renderModulesList();
+            loadCurrentStep();
+            updateStepBar();
+        }
+    }
+
+    function updateOverallProgress() {
+        let totalSteps = 0, completedSteps = 0;
+        modules.forEach(module => {
+            module.steps.forEach(step => {
+                totalSteps++;
+                if (trainingState.completedSteps.has(`${module.id}_${step.id}`)) completedSteps++;
+            });
+        });
+        const percent = totalSteps > 0 ? (completedSteps / totalSteps) * 100 : 0;
+        
+        const overallFill = document.getElementById('overallFill');
+        if (overallFill) overallFill.style.width = `${percent}%`;
+        
+        const drawerFill = document.getElementById('drawerFill');
+        if (drawerFill) drawerFill.style.width = `${percent}%`;
+        
+        const drawerPercent = document.getElementById('drawerPercent');
+        if (drawerPercent) drawerPercent.textContent = `${Math.round(percent)}%`;
+        
+        const certBadge = document.getElementById('certBadge');
+        if (certBadge) {
+            if (trainingState.certified || percent === 100) {
+                certBadge.innerHTML = '✓ Certified';
+                certBadge.className = 'cert-badge completed';
+            } else if (percent > 0) {
+                certBadge.innerHTML = 'In Progress';
+                certBadge.className = 'cert-badge in-progress';
+            } else {
+                certBadge.innerHTML = 'Training';
+                certBadge.className = 'cert-badge pending';
+            }
+        }
+    }
+
+    function showMessage(msg, type) {
+        const contentArea = document.getElementById('contentArea');
+        if (!contentArea) return;
+        
+        const msgDiv = document.createElement('div');
+        msgDiv.className = `feedback ${type === 'success' ? 'feedback-success' : (type === 'error' ? 'feedback-error' : 'feedback-info')}`;
+        msgDiv.innerHTML = msg;
+        msgDiv.style.margin = '0 0 10px';
+        
+        const existing = contentArea.querySelector('.feedback');
+        if (existing) existing.remove();
+        
+        contentArea.insertBefore(msgDiv, contentArea.firstChild);
+        setTimeout(() => msgDiv.remove(), 3000);
+    }
+
+    // ==================== INITIALIZE ====================
+    
+    loadProgress();
+    
+    window.addEventListener('beforeunload', () => {
+        if (currentSourceNode) { currentSourceNode.stop(); currentSourceNode.disconnect(); }
+        if (currentAudioContext) currentAudioContext.close();
+    });
+</script>
+</body>
+</html>
