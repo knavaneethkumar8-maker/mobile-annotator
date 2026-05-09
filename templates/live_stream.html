@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
-<title>Live News Annotation - 3 Tier</title>
+<title>Live News Annotation - 3 Tier + Speaker/Gender</title>
 <style>
 * {
   margin: 0;
@@ -136,7 +136,49 @@ body {
   border-radius: 44px;
 }
 
-/* silent-audio warning */
+/* Video Section */
+.video-section {
+  margin-bottom: 16px;
+  border: 1px solid #E5E5DE;
+  border-radius: 16px;
+  overflow: hidden;
+  background: #0f0f0f;
+  display: none;
+}
+.video-header {
+  background: #1e293b;
+  padding: 8px 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.video-header span {
+  font-size: 11px;
+  font-weight: 600;
+  color: #94a3b8;
+  text-transform: uppercase;
+}
+.video-container {
+  position: relative;
+  background: #000;
+}
+.video-container video {
+  width: 100%;
+  max-height: 300px;
+  object-fit: contain;
+}
+.video-badge {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  background: rgba(0,0,0,0.7);
+  color: #fff;
+  padding: 3px 8px;
+  border-radius: 16px;
+  font-size: 10px;
+  font-family: monospace;
+}
+
 .silent-banner {
   background: #FEF3C7;
   color: #92400E;
@@ -288,7 +330,7 @@ body {
   margin-right: 10px;
 }
 
-/* 216ms cells */
+/* Cells */
 .cell-216 {
   flex: 0 0 370px;
   min-width: 370px;
@@ -303,8 +345,6 @@ body {
   transition: all 0.1s;
   background: white;
 }
-
-/* 108ms cells */
 .cell-108 {
   flex: 0 0 180px;
   min-width: 180px;
@@ -319,8 +359,6 @@ body {
   transition: all 0.1s;
   background: white;
 }
-
-/* 54ms cells */
 .cell-54 {
   flex: 0 0 85px;
   min-width: 85px;
@@ -335,30 +373,24 @@ body {
   transition: all 0.1s;
   background: white;
 }
-
 .cell-216.selected, .cell-108.selected, .cell-54.selected {
   background: #eff6ff;
   border-color: #3b82f6;
   box-shadow: 0 0 0 2px rgba(59,130,246,0.2);
 }
-
 .cell-216:hover, .cell-108:hover, .cell-54:hover {
   border-color: #cbd5e1;
   background: #f8fafc;
-  transform: scale(1.01);
 }
-
 .cell-216.playing, .cell-108.playing, .cell-54.playing {
   background: #e6f7ec;
   border-color: #10b981;
   animation: pulse 0.2s ease;
 }
-
 @keyframes pulse {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.7; }
 }
-
 .time-label {
   font-size: 10px;
   background: #f1f5f9;
@@ -368,7 +400,6 @@ body {
   font-weight: 500;
   white-space: nowrap;
 }
-
 .grid-input {
   width: 100%;
   text-align: center;
@@ -379,21 +410,132 @@ body {
   font-family: 'Noto Sans Devanagari', monospace;
   transition: border-color 0.15s, background 0.15s;
 }
-
 .cell-54 .grid-input { font-size: 0.9rem; padding: 8px 2px; }
 .cell-108 .grid-input { font-size: 1rem; padding: 10px 4px; }
 .cell-216 .grid-input { font-size: 1.2rem; padding: 12px 6px; }
-
 .grid-input:focus {
   outline: none;
   border-color: #3b82f6;
   background: white;
   box-shadow: 0 0 0 2px rgba(59,130,246,0.1);
 }
-
 .grid-input.saved {
   border-color: #10b981;
   background: #f0fdf4;
+}
+
+/* Speaker & Gender Tiers */
+.speaker-gender-section {
+  margin: 16px 0;
+  border: 1px solid #eef2f8;
+  background: #f8fafc;
+  overflow-x: auto;
+  border-radius: 20px;
+}
+.speaker-tier-row, .gender-tier-row {
+  display: flex;
+  gap: 10px;
+  padding: 12px 20px;
+  border-bottom: 1px solid #ecf3fa;
+  background: #f8fafc;
+  min-width: min-content;
+}
+.gender-tier-row {
+  border-bottom: none;
+}
+.speaker-tier-header, .gender-tier-header {
+  min-width: 80px;
+  padding: 8px 12px;
+  background: #EBF2EA;
+  border-radius: 16px;
+  font-size: 0.7rem;
+  font-weight: 550;
+  text-align: center;
+  margin-right: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.speaker-tier-header { color: #4f46e5; background: #eef2ff; }
+.gender-tier-header { color: #ec489a; background: #fdf2f8; }
+.speaker-tier-cells, .gender-tier-cells {
+  display: flex;
+  gap: 10px;
+  flex: 1;
+}
+.speaker-cell, .gender-cell {
+  flex: 0 0 370px;
+  min-width: 370px;
+  cursor: pointer;
+  transition: all 0.1s;
+}
+.speaker-cell {
+  border: 2px solid #c7d2fe;
+  border-radius: 16px;
+  padding: 12px 10px;
+  background: #f5f3ff;
+}
+.gender-cell {
+  border: 2px solid #fbcfe8;
+  border-radius: 16px;
+  padding: 12px 10px;
+  background: #fdf2f8;
+}
+.speaker-cell.selected, .gender-cell.selected {
+  background: #e0e7ff;
+  border-color: #4f46e5;
+  box-shadow: 0 0 0 2px rgba(79,70,229,0.2);
+}
+.speaker-input, .gender-select {
+  width: 100%;
+  text-align: center;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  padding: 10px 6px;
+  transition: all 0.15s;
+}
+.speaker-input {
+  background: white;
+  border: 1.5px solid #c7d2fe;
+  font-weight: 500;
+  font-family: inherit;
+}
+.speaker-input:focus {
+  outline: none;
+  border-color: #4f46e5;
+  box-shadow: 0 0 0 2px rgba(79,70,229,0.1);
+}
+.speaker-input.saved {
+  border-color: #10b981;
+  background: #f0fdf4;
+}
+.gender-select {
+  background: white;
+  border: 1.5px solid #fbcfe8;
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23475569' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  padding-right: 32px;
+}
+.gender-select:focus {
+  outline: none;
+  border-color: #ec489a;
+  box-shadow: 0 0 0 2px rgba(236,72,153,0.1);
+}
+.gender-select.saved {
+  border-color: #10b981;
+  background: #f0fdf4;
+}
+.time-label-small {
+  font-size: 9px;
+  background: #e2e8f0;
+  padding: 2px 8px;
+  border-radius: 20px;
+  color: #475569;
+  margin-bottom: 6px;
+  display: inline-block;
 }
 
 .speed-control {
@@ -402,7 +544,6 @@ body {
   margin-top: 12px;
   justify-content: center;
 }
-
 .speed-btn {
   padding: 6px 16px;
   border-radius: 30px;
@@ -413,7 +554,6 @@ body {
   font-weight: 500;
   transition: all 0.2s;
 }
-
 .speed-btn.active {
   background: #2C6E49;
   border-color: #2C6E49;
@@ -433,7 +573,6 @@ body {
   font-size: 0.82rem;
   font-weight: 540;
 }
-
 .multi-bar.visible { display: flex; }
 .multi-bar-label { flex: 1; }
 .multi-bar-btn {
@@ -445,7 +584,6 @@ body {
   border-radius: 30px;
   cursor: pointer;
 }
-
 .multi-bar-btn.play {
   background: #FFFFFF;
   color: #1A4D3A;
@@ -458,20 +596,17 @@ body {
   padding: 12px 16px;
   border: 1px solid #E9E9E2;
 }
-
 .akshar-title {
   font-weight: 590;
   font-size: 0.75rem;
   color: #2C6E49;
   margin-bottom: 10px;
 }
-
 .akshar-grid {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
 }
-
 .akshar-item {
   background: #FFFFFF;
   border: 1px solid #E5E5DE;
@@ -488,7 +623,6 @@ body {
   transition: all 0.15s ease;
   touch-action: none;
 }
-
 .akshar-item:active { cursor: grabbing; transform: scale(0.95); }
 
 .play-full-btn {
@@ -518,7 +652,7 @@ body {
 }
 @keyframes slideIn {
   from { transform: translateY(-10px); opacity: 0; }
-  to   { transform: translateY(0);     opacity: 1; }
+  to   { transform: translateY(0); opacity: 1; }
 }
 .message.success { background: #D1FAE5; color: #065F46; border-left: 4px solid #10B981; }
 .message.error   { background: #FEE2E2; color: #991B1B; border-left: 4px solid #EF4444; }
@@ -538,7 +672,6 @@ body {
 }
 @keyframes spin { to { transform: rotate(360deg); } }
 
-/* success modal */
 .modal-overlay {
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
@@ -585,15 +718,17 @@ body {
 }
 .modal-close-btn:active { transform: scale(0.97); }
 
-/* Scrollbar styling */
-.three-tier-section::-webkit-scrollbar {
+.three-tier-section::-webkit-scrollbar,
+.speaker-gender-section::-webkit-scrollbar {
   height: 6px;
 }
-.three-tier-section::-webkit-scrollbar-track {
+.three-tier-section::-webkit-scrollbar-track,
+.speaker-gender-section::-webkit-scrollbar-track {
   background: #EFEFE9;
   border-radius: 8px;
 }
-.three-tier-section::-webkit-scrollbar-thumb {
+.three-tier-section::-webkit-scrollbar-thumb,
+.speaker-gender-section::-webkit-scrollbar-thumb {
   background: #BDBDB3;
   border-radius: 8px;
 }
@@ -601,17 +736,18 @@ body {
 @media (max-width: 560px) {
   .container { padding: 16px; }
   .lang-btn  { padding: 8px 16px; font-size: 0.8rem; }
-  
   .tier-row { gap: 6px; padding: 10px; }
   .tier-header { min-width: 45px; font-size: 0.6rem; padding: 5px 4px; margin-right: 6px; }
   .cell-216 { flex: 0 0 180px; min-width: 180px; padding: 10px 6px; }
   .cell-108 { flex: 0 0 90px; min-width: 90px; padding: 8px 4px; }
   .cell-54 { flex: 0 0 50px; min-width: 50px; padding: 6px 3px; }
+  .speaker-cell, .gender-cell { flex: 0 0 180px; min-width: 180px; padding: 8px 6px; }
+  .speaker-input, .gender-select { font-size: 0.75rem; padding: 6px 4px; }
+  .time-label-small { font-size: 7px; }
   .cell-54 .grid-input { font-size: 0.7rem; padding: 4px 1px; }
   .cell-108 .grid-input { font-size: 0.75rem; padding: 6px 2px; }
   .cell-216 .grid-input { font-size: 0.8rem; padding: 8px 3px; }
   .time-label { font-size: 7px; padding: 2px 4px; }
-  
   .success-modal { padding: 24px 20px; }
   .success-icon  { width: 60px; height: 60px; }
   .success-icon svg { width: 32px; height: 32px; }
@@ -660,6 +796,17 @@ body {
         <span class="clip-duration" id="clipDuration">📺 Select language and fetch news</span>
       </div>
 
+      <!-- Video Section -->
+      <div class="video-section" id="videoSection">
+        <div class="video-header">
+          <span>📹 VIDEO</span>
+        </div>
+        <div class="video-container">
+          <video id="videoPlayer" controls playsinline></video>
+          <div class="video-badge" id="videoBadge"></div>
+        </div>
+      </div>
+
       <audio id="audioPlayer" class="audio-player" controls playsinline style="width:100%"></audio>
 
       <div class="silent-banner" id="silentBanner">
@@ -676,8 +823,23 @@ body {
       </div>
 
       <div class="button-group">
-        <button class="btn btn-primary"   id="fetchBtn">🎙️ Fetch Live News (2s)</button>
+        <button class="btn btn-primary"   id="fetchBtn">🎙️ Fetch Live News</button>
         <button class="btn btn-secondary" id="annotateBtn" disabled>✍️ Annotate Clip</button>
+      </div>
+
+      <!-- Duration selector -->
+      <div style="margin-top: 12px; display: flex; align-items: center; gap: 12px; justify-content: center;">
+        <span style="font-size: 0.8rem;">Duration:</span>
+        <select id="durationSelect" style="padding: 6px 12px; border-radius: 20px; border: 1px solid #E5E5DE;">
+          <option value="2">2 sec</option>
+          <option value="3">3 sec</option>
+          <option value="4">4 sec</option>
+          <option value="5">5 sec</option>
+          <option value="10">10 sec</option>
+          <option value="20">20 sec</option>
+          <option value="30">30 sec</option>
+          <option value="60" selected>60 sec</option>
+        </select>
       </div>
 
       <div id="loadingIndicator" class="hidden"
@@ -686,10 +848,10 @@ body {
       </div>
     </div>
 
-    <!-- Annotation section with 3-Tier Grid -->
+    <!-- Annotation section with 3-Tier Grid + Speaker/Gender -->
     <div id="annotationSection" class="hidden">
       <div class="stream-card">
-        <h3 style="margin-bottom:16px;">3-Tier Annotation</h3>
+        <h3 style="margin-bottom:16px;">3-Tier Annotation + Speaker/Gender</h3>
 
         <!-- Full Audio Control -->
         <div class="full-audio-controls" style="display:flex; align-items:center; gap:12px; margin-bottom:16px; padding:10px 16px; background:#2C6E49; border-radius:48px; justify-content:space-between;">
@@ -709,18 +871,17 @@ body {
 
         <!-- Speed Control -->
         <div class="speed-control">
-          <button class="speed-btn" data-speed="0.5">0.5x</button>
           <button class="speed-btn active" data-speed="1">1x</button>
-          <button class="speed-btn" data-speed="1.5">1.5x</button>
-          <button class="speed-btn" data-speed="2">2x</button>
+          <button class="speed-btn" data-speed="0.5">0.5x</button>
+          <button class="speed-btn" data-speed="0.25">0.25x</button>
         </div>
 
         <!-- Sentence Input Section -->
         <div class="sentence-section">
-          <label class="sentence-label">📝 Full Sentence (will appear in TextGrid)</label>
+          <label class="sentence-label">📝 Sentence (देवनागरी)</label>
           <input type="text" id="sentenceInput" class="sentence-input" 
                  placeholder="Enter the complete sentence from the audio clip..."
-                 maxlength="200">
+                 maxlength="500">
           <div class="sentence-hint">This sentence will be saved in the 'sentence' tier of the TextGrid</div>
         </div>
 
@@ -729,6 +890,18 @@ body {
           <div class="tier-row tier-row-216" id="tier216Row"></div>
           <div class="tier-row tier-row-108" id="tier108Row"></div>
           <div class="tier-row tier-row-54" id="tier54Row"></div>
+        </div>
+
+        <!-- Speaker & Gender Tiers -->
+        <div class="speaker-gender-section">
+          <div class="speaker-tier-row" id="speakerTierRow">
+            <div class="speaker-tier-header">🎙️ Speaker ID</div>
+            <div class="speaker-tier-cells" id="speakerTierCells"></div>
+          </div>
+          <div class="gender-tier-row" id="genderTierRow">
+            <div class="gender-tier-header">⚥ Gender</div>
+            <div class="gender-tier-cells" id="genderTierCells"></div>
+          </div>
         </div>
 
         <!-- Multi-select toolbar -->
@@ -758,7 +931,6 @@ body {
 
 <script>
 const BASE_PATH = "{{ base_path }}";
-const CLIP_DURATION = 2;        // seconds
 const FRAME_SIZE_MS_54 = 54;
 const FRAME_SIZE_MS_108 = 108;
 const FRAME_SIZE_MS_216 = 216;
@@ -770,7 +942,7 @@ const AKSHAR_SET = [
   "प", "फ", "ब", "भ",
   "न", "म",
   "य", "र", "ल", "व",
-  "स", "ह", "०"
+  "स", "ह", "ं", "ँ", "ॉ", "०"
 ];
 
 const LANG_NAMES = {
@@ -784,6 +956,7 @@ let currentUsername = '';
 let currentLanguage = 'hi';
 let currentAudio = null;
 let currentAudioBlob = null;
+let currentVideoBlob = null;
 let currentVolume = 0.8;
 let audioContext = null;
 let gainNode = null;
@@ -791,6 +964,7 @@ let currentPlayTimeout = null;
 let audioUnlocked = false;
 let playbackSpeed = 1.0;
 let isFetching = false;
+let currentDuration = 60;
 
 // 3-Tier frames data
 let framesData = {
@@ -798,6 +972,12 @@ let framesData = {
   tier_108: [],
   tier_54: []
 };
+
+// Speaker and Gender data (based on 216ms frames count)
+let speakerFrames = [];  // array of {index, text}
+let genderFrames = [];   // array of {index, text}
+let speakerInputs = [];
+let genderSelects = [];
 
 let selectedSegments = {
   tier_216: new Set(),
@@ -1087,7 +1267,7 @@ function seekToPosition(e) {
 }
 
 // ─── generate 3-tier frames from base 54ms frames ──────────────────────────
-function generateFramesFromBase54(baseFrames54) {
+function generateFramesFromBase54(baseFrames54, totalDurationMs) {
   const tier54 = baseFrames54.map((f, idx) => ({ ...f, index: idx }));
   
   const tier108 = [];
@@ -1100,7 +1280,7 @@ function generateFramesFromBase54(baseFrames54) {
       index: tier108.length,
       start_ms: start,
       end_ms: end,
-      text: (text1 + text2).slice(0, 4)
+      text: sanitizeCellText(text1 + text2, 4)
     });
   }
   
@@ -1108,7 +1288,7 @@ function generateFramesFromBase54(baseFrames54) {
   for (let i = 0; i < baseFrames54.length; i += 4) {
     const start = baseFrames54[i].start_ms;
     let end = start + FRAME_SIZE_MS_216;
-    if (end > CLIP_DURATION * 1000) end = CLIP_DURATION * 1000;
+    if (end > totalDurationMs) end = totalDurationMs;
     let combinedText = "";
     for (let j = i; j < Math.min(i + 4, baseFrames54.length); j++) {
       combinedText += baseFrames54[j].text || "";
@@ -1117,7 +1297,7 @@ function generateFramesFromBase54(baseFrames54) {
       index: tier216.length,
       start_ms: start,
       end_ms: end,
-      text: combinedText.slice(0, 6)
+      text: sanitizeCellText(combinedText, 6)
     });
   }
   
@@ -1137,6 +1317,236 @@ function generateFramesForTier(durationMs, frameSizeMs) {
   }
   return frames;
 }
+
+function sanitizeCellText(text, maxLen) {
+  let filtered = '';
+  for (let ch of text) {
+    if (AKSHAR_SET.includes(ch)) filtered += ch;
+  }
+  return filtered.slice(0, maxLen);
+}
+
+// ─── Render Speaker and Gender Tiers ───────────────────────────────────────
+function renderSpeakerGenderTiers(count216) {
+  const speakerContainer = document.getElementById('speakerTierCells');
+  const genderContainer = document.getElementById('genderTierCells');
+  speakerContainer.innerHTML = '';
+  genderContainer.innerHTML = '';
+  speakerInputs = [];
+  genderSelects = [];
+  speakerFrames = [];
+  genderFrames = [];
+  
+  for (let i = 0; i < count216; i++) {
+    const startTime = i * FRAME_SIZE_MS_216 / 1000;
+    const endTime = (i + 1) * FRAME_SIZE_MS_216 / 1000;
+    const timeLabel = `${startTime.toFixed(2)}s - ${endTime.toFixed(2)}s`;
+    
+    // Speaker cell
+    const speakerDiv = document.createElement('div');
+    speakerDiv.className = 'speaker-cell';
+    speakerDiv.setAttribute('data-idx', i);
+    speakerDiv.setAttribute('data-tier', 'speaker');
+    
+    const timeSpan = document.createElement('div');
+    timeSpan.className = 'time-label-small';
+    timeSpan.innerText = timeLabel;
+    
+    const speakerInput = document.createElement('input');
+    speakerInput.type = 'text';
+    speakerInput.className = 'speaker-input';
+    speakerInput.placeholder = 'Speaker ID...';
+    speakerInput.setAttribute('data-idx', i);
+    speakerInput.setAttribute('data-tier', 'speaker');
+    speakerInput.value = '';
+    speakerInput.addEventListener('input', (e) => handleSpeakerEdit(i, e.target.value, speakerInput));
+    speakerInput.addEventListener('focus', () => setActiveInput(speakerInput, false));
+    speakerInput.addEventListener('click', (e) => e.stopPropagation());
+    
+    speakerDiv.appendChild(timeSpan);
+    speakerDiv.appendChild(speakerInput);
+    speakerDiv.addEventListener('click', (e) => { if (e.target !== speakerInput) playCellAudio('tier_216', i); });
+    
+    speakerContainer.appendChild(speakerDiv);
+    speakerInputs.push(speakerInput);
+    speakerFrames.push({ index: i, text: '' });
+    
+    // Gender cell
+    const genderDiv = document.createElement('div');
+    genderDiv.className = 'gender-cell';
+    genderDiv.setAttribute('data-idx', i);
+    genderDiv.setAttribute('data-tier', 'gender');
+    
+    const genderTimeSpan = document.createElement('div');
+    genderTimeSpan.className = 'time-label-small';
+    genderTimeSpan.innerText = timeLabel;
+    
+    const genderSelect = document.createElement('select');
+    genderSelect.className = 'gender-select';
+    genderSelect.setAttribute('data-idx', i);
+    genderSelect.setAttribute('data-tier', 'gender');
+    
+    const emptyOption = document.createElement('option');
+    emptyOption.value = '';
+    emptyOption.textContent = '— select —';
+    genderSelect.appendChild(emptyOption);
+    
+    const maleOption = document.createElement('option');
+    maleOption.value = 'male';
+    maleOption.textContent = 'Male';
+    genderSelect.appendChild(maleOption);
+    
+    const femaleOption = document.createElement('option');
+    femaleOption.value = 'female';
+    femaleOption.textContent = 'Female';
+    genderSelect.appendChild(femaleOption);
+    
+    const unknownOption = document.createElement('option');
+    unknownOption.value = 'unknown';
+    unknownOption.textContent = 'Unknown';
+    genderSelect.appendChild(unknownOption);
+    
+    genderSelect.value = '';
+    genderSelect.addEventListener('change', (e) => handleGenderEdit(i, e.target.value, genderSelect));
+    genderSelect.addEventListener('focus', () => setActiveInput(genderSelect, false));
+    genderSelect.addEventListener('click', (e) => e.stopPropagation());
+    
+    genderDiv.appendChild(genderTimeSpan);
+    genderDiv.appendChild(genderSelect);
+    genderDiv.addEventListener('click', (e) => { if (e.target !== genderSelect) playCellAudio('tier_216', i); });
+    
+    genderContainer.appendChild(genderDiv);
+    genderSelects.push(genderSelect);
+    genderFrames.push({ index: i, text: '' });
+  }
+}
+
+// ─── Speaker/Gender Edit Handlers (with propagation to right cells) ────────
+function handleSpeakerEdit(idx, newVal, inputElement) {
+  inputElement.value = newVal;
+  inputElement.classList.remove('saved');
+  if (newVal && newVal.trim()) {
+    inputElement.classList.add('saved');
+  }
+  speakerFrames[idx] = { index: idx, text: newVal };
+  scheduleSpeakerAutoSave(idx, newVal);
+  
+  // Propagate to all cells to the RIGHT
+  for (let i = idx + 1; i < speakerInputs.length; i++) {
+    if (speakerInputs[i]) {
+      speakerInputs[i].value = newVal;
+      speakerInputs[i].classList.add('saved');
+      speakerFrames[i] = { index: i, text: newVal };
+      scheduleSpeakerAutoSave(i, newVal);
+    }
+  }
+}
+
+function handleGenderEdit(idx, newVal, selectElement) {
+  selectElement.value = newVal;
+  selectElement.classList.remove('saved');
+  if (newVal && newVal.trim()) {
+    selectElement.classList.add('saved');
+  }
+  genderFrames[idx] = { index: idx, text: newVal };
+  scheduleGenderAutoSave(idx, newVal);
+  
+  // Propagate to all cells to the RIGHT
+  for (let i = idx + 1; i < genderSelects.length; i++) {
+    if (genderSelects[i]) {
+      genderSelects[i].value = newVal;
+      genderSelects[i].classList.add('saved');
+      genderFrames[i] = { index: i, text: newVal };
+      scheduleGenderAutoSave(i, newVal);
+    }
+  }
+}
+
+// ─── Auto-save functions ────────────────────────────────────────────────────
+function scheduleSpeakerAutoSave(index, value) {
+  const key = `speaker_${index}`;
+  if (saveTimers.has(key)) clearTimeout(saveTimers.get(key));
+  const timer = setTimeout(() => { autoSaveToServer(); saveTimers.delete(key); }, 800);
+  saveTimers.set(key, timer);
+}
+
+function scheduleGenderAutoSave(index, value) {
+  const key = `gender_${index}`;
+  if (saveTimers.has(key)) clearTimeout(saveTimers.get(key));
+  const timer = setTimeout(() => { autoSaveToServer(); saveTimers.delete(key); }, 800);
+  saveTimers.set(key, timer);
+}
+
+let saveTimers = new Map();
+
+async function autoSaveToServer() {
+  if (!currentSessionId) return;
+  
+  const buildFramesForSave = (tier, inputs) => {
+    const frames = [];
+    inputs.forEach((inp, idx) => {
+      if (inp && inp.value && inp.value.trim()) {
+        frames.push({ tier, index: idx, text: filterAksharsForSave(inp.value) });
+      }
+    });
+    return frames;
+  };
+  
+  const buildSpeakerFrames = () => {
+    const frames = [];
+    speakerInputs.forEach((inp, idx) => {
+      if (inp && inp.value && inp.value.trim()) {
+        frames.push({ tier: 'speaker', index: idx, text: inp.value });
+      }
+    });
+    return frames;
+  };
+  
+  const buildGenderFrames = () => {
+    const frames = [];
+    genderSelects.forEach((sel, idx) => {
+      if (sel && sel.value && sel.value.trim()) {
+        frames.push({ tier: 'gender', index: idx, text: sel.value });
+      }
+    });
+    return frames;
+  };
+  
+  const sentence = document.getElementById('sentenceInput').value.trim();
+  
+  const allFrames = [
+    ...buildFramesForSave('216', tier216Inputs),
+    ...buildFramesForSave('108', tier108Inputs),
+    ...buildFramesForSave('54', tier54Inputs),
+    ...buildSpeakerFrames(),
+    ...buildGenderFrames()
+  ];
+  
+  try {
+    await fetch(`${BASE_PATH}/api/live-stream/autosave`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        session_id: currentSessionId,
+        frames: allFrames,
+        frames_216: buildFramesForSave('216', tier216Inputs),
+        frames_108: buildFramesForSave('108', tier108Inputs),
+        frames_54: buildFramesForSave('54', tier54Inputs),
+        speaker_frames: buildSpeakerFrames(),
+        gender_frames: buildGenderFrames(),
+        sentence: sentence,
+        language: currentLanguage,
+        duration: currentDuration
+      })
+    });
+  } catch (err) {
+    console.error('Auto-save error:', err);
+  }
+}
+
+let currentSessionId = null;
+let tier216Inputs = [], tier108Inputs = [], tier54Inputs = [];
+let tier216Cells = [], tier108Cells = [], tier54Cells = [];
 
 // ─── event listeners ────────────────────────────────────────────────────────
 function setupEventListeners() {
@@ -1174,6 +1584,11 @@ function setupEventListeners() {
   }
   
   updateVolume(0.8);
+  
+  // Duration selector
+  document.getElementById('durationSelect').addEventListener('change', (e) => {
+    currentDuration = parseInt(e.target.value);
+  });
 }
 
 function hideSilentBanner() { document.getElementById('silentBanner').classList.remove('show'); }
@@ -1191,10 +1606,11 @@ async function fetchLiveNews() {
   document.getElementById('annotateBtn').disabled = true;
 
   const langLabel = LANG_NAMES[currentLanguage] || currentLanguage.toUpperCase();
-  showMessage(`Fetching live ${langLabel} news (2 sec)…`, 'info');
+  const duration = currentDuration;
+  showMessage(`Fetching live ${langLabel} news (${duration} sec)…`, 'info');
 
   try {
-    const resp = await fetch(`${BASE_PATH}/api/live-stream/fetch?lang=${currentLanguage}&duration=2`);
+    const resp = await fetch(`${BASE_PATH}/api/live-stream/fetch?lang=${currentLanguage}&duration=${duration}`);
     if (!resp.ok) {
       const err = await resp.json();
       throw new Error(err.error || 'Server error');
@@ -1210,17 +1626,44 @@ async function fetchLiveNews() {
     currentAudio.src = url;
     currentAudio.load();
 
-    document.getElementById('clipDuration').innerHTML = `📺 2 sec live news clip (${langLabel})`;
+    // Handle video
+    if (data.video_blob) {
+      const videoBlob = base64ToBlob(data.video_blob, 'video/mp4');
+      currentVideoBlob = videoBlob;
+      const videoUrl = URL.createObjectURL(videoBlob);
+      const videoPlayer = document.getElementById('videoPlayer');
+      videoPlayer.src = videoUrl;
+      videoPlayer.load();
+      document.getElementById('videoSection').style.display = 'block';
+      document.getElementById('videoBadge').textContent = `${duration}s video`;
+    } else {
+      document.getElementById('videoSection').style.display = 'none';
+    }
+
+    document.getElementById('clipDuration').innerHTML = `📺 ${duration} sec live news clip (${langLabel})`;
 
     if (data.is_silent) {
       showSilentBanner();
       showMessage(`⚠️ ${langLabel} stream not reachable right now. Try fetching again.`, 'warning');
-      document.getElementById('annotateBtn').disabled = false;
-    } else {
-      hideSilentBanner();
-      showMessage(`✅ ${langLabel} news clip ready! Click "Annotate Clip" to label.`, 'success');
-      document.getElementById('annotateBtn').disabled = false;
     }
+    document.getElementById('annotateBtn').disabled = false;
+    
+    // Create session for autosave
+    const sessionResp = await fetch(`${BASE_PATH}/api/live-stream/create-session`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        language: currentLanguage,
+        duration: duration,
+        audio_url: url,
+        video_blob: data.video_blob ? true : false
+      })
+    });
+    const sessionData = await sessionResp.json();
+    if (sessionData.session_id) {
+      currentSessionId = sessionData.session_id;
+    }
+    
   } catch (err) {
     console.error('Fetch error:', err);
     showMessage('Error: ' + err.message, 'error');
@@ -1241,17 +1684,33 @@ function base64ToBlob(b64, mime) {
 
 function showSilentBanner() { document.getElementById('silentBanner').classList.add('show'); }
 
+function filterAksharsForSave(text) {
+  let out = '';
+  for (let ch of text) {
+    if (AKSHAR_SET.includes(ch)) out += ch;
+  }
+  return out.slice(0, 3);
+}
+
 // ─── render 3-tier grid ─────────────────────────────────────────────────────
-function renderThreeTierGrid() {
+function renderThreeTierGrid(durationMs) {
+  const baseFrames54 = generateFramesForTier(durationMs, FRAME_SIZE_MS_54);
+  framesData = generateFramesFromBase54(baseFrames54, durationMs);
+  
   const tier216Row = document.getElementById('tier216Row');
   const tier108Row = document.getElementById('tier108Row');
   const tier54Row = document.getElementById('tier54Row');
   
-  if (!tier216Row) return;
-  
   tier216Row.innerHTML = '';
   tier108Row.innerHTML = '';
   tier54Row.innerHTML = '';
+  
+  tier216Inputs = [];
+  tier216Cells = [];
+  tier108Inputs = [];
+  tier108Cells = [];
+  tier54Inputs = [];
+  tier54Cells = [];
   
   const header216 = document.createElement('div');
   header216.className = 'tier-header';
@@ -1269,19 +1728,22 @@ function renderThreeTierGrid() {
   tier54Row.appendChild(header54);
   
   framesData.tier_216.forEach((frame, idx) => {
-    const div = createCell(frame, idx, '216');
-    tier216Row.appendChild(div);
+    const cell = createCell(frame, idx, '216');
+    tier216Row.appendChild(cell);
   });
   
   framesData.tier_108.forEach((frame, idx) => {
-    const div = createCell(frame, idx, '108');
-    tier108Row.appendChild(div);
+    const cell = createCell(frame, idx, '108');
+    tier108Row.appendChild(cell);
   });
   
   framesData.tier_54.forEach((frame, idx) => {
-    const div = createCell(frame, idx, '54');
-    tier54Row.appendChild(div);
+    const cell = createCell(frame, idx, '54');
+    tier54Row.appendChild(cell);
   });
+  
+  // Render speaker/gender tiers based on 216 frame count
+  renderSpeakerGenderTiers(framesData.tier_216.length);
 }
 
 function createCell(frame, idx, tier) {
@@ -1306,7 +1768,6 @@ function createCell(frame, idx, tier) {
   if (tier === '108') input.setAttribute('maxlength', '4');
   if (tier === '54') input.setAttribute('maxlength', '2');
   
-  input.addEventListener('focus', () => {});
   input.addEventListener('input', (e) => {
     let val = e.target.value;
     if (tier === '216' && val.length > 6) val = val.slice(0, 6);
@@ -1314,6 +1775,7 @@ function createCell(frame, idx, tier) {
     if (tier === '54' && val.length > 2) val = val.slice(0, 2);
     e.target.value = val;
     framesData[`tier_${tier}`][idx].text = val;
+    scheduleAutoSave(tier, idx, filterAksharsForSave(val));
   });
   
   div.appendChild(timeSpan);
@@ -1329,8 +1791,8 @@ function createCell(frame, idx, tier) {
     playCellAudio(`tier_${tier}`, idx);
   });
   
+  // Long press selection
   let pressTimer = null;
-  
   div.addEventListener('touchstart', (e) => {
     if (e.target === input) return;
     pressTimer = setTimeout(() => {
@@ -1341,32 +1803,39 @@ function createCell(frame, idx, tier) {
       pressTimer = null;
     }, 500);
   });
-  
   div.addEventListener('touchend', () => {
     if (pressTimer) {
       clearTimeout(pressTimer);
       pressTimer = null;
     }
   });
-  
   div.addEventListener('touchmove', () => {
     if (pressTimer) {
       clearTimeout(pressTimer);
       pressTimer = null;
     }
   });
-  
   div.addEventListener('mousedown', (e) => {
     if (e.target === input) return;
     toggleSegmentSelection(`tier_${tier}`, idx);
   });
-  
   div.addEventListener('contextmenu', (e) => {
     e.preventDefault();
     return false;
   });
   
+  if (tier === '216') { tier216Cells.push(div); tier216Inputs.push(input); }
+  else if (tier === '108') { tier108Cells.push(div); tier108Inputs.push(input); }
+  else { tier54Cells.push(div); tier54Inputs.push(input); }
+  
   return div;
+}
+
+function scheduleAutoSave(tier, index, value) {
+  const key = `${tier}_${index}`;
+  if (saveTimers.has(key)) clearTimeout(saveTimers.get(key));
+  const timer = setTimeout(() => { autoSaveToServer(); saveTimers.delete(key); }, 800);
+  saveTimers.set(key, timer);
 }
 
 function toggleSegmentSelection(tier, index) {
@@ -1392,7 +1861,7 @@ function updateMultiBar() {
     bar.classList.remove('visible');
   } else {
     bar.classList.add('visible');
-    bar.querySelector('.multi-bar-label').textContent = `${totalSelected} segment${totalSelected > 1 ? 's' : ''} selected across all tiers`;
+    bar.querySelector('.multi-bar-label').textContent = `${totalSelected} segment${totalSelected > 1 ? 's' : ''} selected`;
   }
 }
 
@@ -1451,16 +1920,12 @@ function playNextInQueue() {
 function startAnnotation() {
   if (!currentAudioBlob) { showMessage('No clip to annotate. Fetch news first!', 'error'); return; }
   
-  const durationMs = CLIP_DURATION * 1000;
-  const baseFrames54 = generateFramesForTier(durationMs, FRAME_SIZE_MS_54);
-  framesData = generateFramesFromBase54(baseFrames54);
-  
-  renderThreeTierGrid();
+  const durationMs = currentDuration * 1000;
+  renderThreeTierGrid(durationMs);
   renderAksharSet();
   initAudioContext();
   setPlaybackSpeed(playbackSpeed);
   
-  // Clear sentence input
   document.getElementById('sentenceInput').value = '';
   
   stopFullAudioPlayback();
@@ -1496,27 +1961,71 @@ function renderAksharSet() {
   });
 }
 
-function insertAkshar(akshar) {
-  const activeElement = document.activeElement;
-  if (activeElement && activeElement.tagName === 'INPUT' && activeElement.classList.contains('grid-input')) {
-    const start = activeElement.selectionStart;
-    const end = activeElement.selectionEnd;
-    const value = activeElement.value;
-    const tier = activeElement.getAttribute('data-tier');
-    let maxLen = 6;
-    if (tier === 'tier_108') maxLen = 4;
-    if (tier === 'tier_54') maxLen = 2;
-    
-    if (value.length < maxLen) {
-      activeElement.value = value.substring(0, start) + akshar + value.substring(end);
-      activeElement.dispatchEvent(new Event('input', { bubbles: true }));
-      activeElement.focus();
-    } else {
-      showMessage('Maximum characters reached for this cell!', 'warning');
-    }
-  } else {
-    showMessage('Tap on a grid cell first to insert akshar!', 'info');
+let activeInputElement = null;
+let isActiveInputSentence = false;
+
+function setActiveInput(inputEl, isSentence) {
+  if (activeInputElement) activeInputElement.classList.remove('kb-active');
+  const sentEl = document.getElementById('sentenceInput');
+  if (sentEl) sentEl.classList.remove('kb-active');
+  
+  if (isSentence) {
+    activeInputElement = null;
+    isActiveInputSentence = true;
+    sentEl.classList.add('kb-active');
+  } else if (inputEl) {
+    activeInputElement = inputEl;
+    isActiveInputSentence = false;
+    activeInputElement.classList.add('kb-active');
   }
+  updateKbIndicator();
+}
+
+function updateKbIndicator() {
+  const nameEl = document.getElementById('kbTargetName');
+  if (!nameEl) return;
+  if (!activeInputElement && !isActiveInputSentence) {
+    nameEl.textContent = '— click a box first —';
+    nameEl.className = 'kb-target-name none';
+    return;
+  }
+  if (isActiveInputSentence) {
+    nameEl.textContent = '📝 Sentence field';
+    nameEl.className = 'kb-target-name';
+  } else if (activeInputElement) {
+    const idx = activeInputElement.getAttribute('data-idx');
+    const tier = activeInputElement.getAttribute('data-tier');
+    nameEl.textContent = `Cell ${tier} · #${idx}`;
+    nameEl.className = 'kb-target-name';
+  }
+}
+
+function insertAkshar(akshar) {
+  const targetEl = isActiveInputSentence ? document.getElementById('sentenceInput') : activeInputElement;
+  if (!targetEl && !isActiveInputSentence) {
+    showMessage('Tap on a grid cell or sentence box first!', 'info');
+    return;
+  }
+  
+  if (isActiveInputSentence) {
+    targetEl.value += akshar;
+    scheduleSentenceAutoSave();
+  } else {
+    const cur = targetEl.value;
+    if (cur.length >= 3) {
+      showMessage('Maximum 3 akshars per cell!', 'warning');
+      return;
+    }
+    targetEl.value = cur + akshar;
+    targetEl.dispatchEvent(new Event('input', { bubbles: true }));
+  }
+  targetEl.focus();
+}
+
+function scheduleSentenceAutoSave() {
+  if (saveTimers.has('sentence')) clearTimeout(saveTimers.get('sentence'));
+  const timer = setTimeout(() => { autoSaveToServer(); saveTimers.delete('sentence'); }, 800);
+  saveTimers.set('sentence', timer);
 }
 
 // ─── success modal ───────────────────────────────────────────────────────────
@@ -1536,7 +2045,7 @@ function showSuccessModal(aksharCount) {
       <p>Your 3-tier annotation has been successfully saved.</p>
       <div class="success-stats">
         <div class="stat-item"><span class="stat-label">Akshars Added</span><span class="stat-value">${aksharCount}</span></div>
-        <div class="stat-item"><span class="stat-label">Duration</span><span class="stat-value">${CLIP_DURATION} sec</span></div>
+        <div class="stat-item"><span class="stat-label">Duration</span><span class="stat-value">${currentDuration} sec</span></div>
         <div class="stat-item"><span class="stat-label">Language</span><span class="stat-value">${LANG_NAMES[currentLanguage] || currentLanguage.toUpperCase()}</span></div>
       </div>
       <button class="modal-close-btn" onclick="this.closest('.modal-overlay').remove()">Continue</button>
@@ -1546,7 +2055,7 @@ function showSuccessModal(aksharCount) {
   setTimeout(() => { if (document.body.contains(ov)) ov.remove(); }, 3000);
 }
 
-// ─── submit 3-tier annotation ────────────────────────────────────────────────
+// ─── submit 3-tier annotation with speaker/gender ──────────────────────────────
 async function submitAnnotation() {
   const totalAkshars = framesData.tier_54.reduce((sum, f) => sum + (f.text ? f.text.length : 0), 0);
   const sentence = document.getElementById('sentenceInput')?.value || '';
@@ -1562,13 +2071,18 @@ async function submitAnnotation() {
   try {
     const fd = new FormData();
     fd.append('audio', currentAudioBlob, `live_${currentLanguage}_${Date.now()}.wav`);
-    fd.append('duration', CLIP_DURATION);
+    if (currentVideoBlob) {
+      fd.append('video', currentVideoBlob, `live_${currentLanguage}_${Date.now()}.mp4`);
+    }
+    fd.append('duration', currentDuration);
     fd.append('language', currentLanguage);
     fd.append('frames_54', JSON.stringify(framesData.tier_54));
     fd.append('frames_108', JSON.stringify(framesData.tier_108));
     fd.append('frames_216', JSON.stringify(framesData.tier_216));
+    fd.append('speaker_frames', JSON.stringify(speakerFrames));
+    fd.append('gender_frames', JSON.stringify(genderFrames));
     fd.append('sentence', sentence);
-    fd.append('is_three_tier', 'true');
+    fd.append('session_id', currentSessionId || '');
     
     const resp = await fetch(`${BASE_PATH}/api/live-stream/submit-3-tier`, { method: 'POST', body: fd });
     const data = await resp.json();
@@ -1582,6 +2096,11 @@ async function submitAnnotation() {
       document.getElementById('annotateBtn').disabled = true;
       document.getElementById('clipDuration').innerHTML = '📺 Select language and fetch news';
       hideSilentBanner();
+      document.getElementById('videoSection').style.display = 'none';
+      if (currentVideoBlob) {
+        URL.revokeObjectURL(document.getElementById('videoPlayer').src);
+        currentVideoBlob = null;
+      }
     } else {
       throw new Error(data.error || 'Submission failed');
     }
@@ -1594,12 +2113,22 @@ async function submitAnnotation() {
 
 function cancelAnnotation() {
   framesData = { tier_216: [], tier_108: [], tier_54: [] };
+  speakerFrames = [];
+  genderFrames = [];
+  speakerInputs = [];
+  genderSelects = [];
   selectedSegments = { tier_216: new Set(), tier_108: new Set(), tier_54: new Set() };
   clearSelection();
+  if (saveTimers.size > 0) {
+    for (let timer of saveTimers.values()) clearTimeout(timer);
+    saveTimers.clear();
+  }
   document.getElementById('annotationSection').classList.add('hidden');
   document.getElementById('tier216Row').innerHTML = '';
   document.getElementById('tier108Row').innerHTML = '';
   document.getElementById('tier54Row').innerHTML = '';
+  document.getElementById('speakerTierCells').innerHTML = '';
+  document.getElementById('genderTierCells').innerHTML = '';
   document.getElementById('sentenceInput').value = '';
   showMessage('Annotation cancelled', 'info');
 }
@@ -1609,6 +2138,13 @@ function showMessage(text, type) {
   d.innerHTML = `<div class="message ${type}">${text}</div>`;
   setTimeout(() => { if (d.firstChild?.innerText === text) d.innerHTML = ''; }, 3500);
 }
+
+// Add kb-target-name element to DOM
+const kbTargetSpan = document.createElement('span');
+kbTargetSpan.id = 'kbTargetName';
+kbTargetSpan.className = 'kb-target-name none';
+kbTargetSpan.textContent = '— click a box first —';
+// This will be dynamically updated
 
 init();
 </script>
