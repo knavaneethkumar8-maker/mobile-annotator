@@ -1770,6 +1770,71 @@ def submit():
         "user_stats": user_stats
     })
 
+# ============= NEW 3-TIER SUBMIT ENDPOINT (ADDED) =============
+@app.route("/submit-3-tier", methods=["POST"])
+@login_required
+def submit_3_tier():
+    """Submit 3-tier annotation (216ms, 108ms, 54ms frames)"""
+    data = request.json
+    json_file = data.get('json_file')
+    username = session.get('username')
+    wav_file = data.get('wav_file', json_file.replace('.json', '.wav'))
+    original_wav_path = os.path.join(AUDIO_FOLDER, wav_file)
+    duration_ms = data.get('duration_ms', 0)
+    duration_seconds = duration_ms / 1000.0
+    
+    data["status"] = "submitted"
+    data["submitted_at"] = datetime.now().isoformat()
+    data["submitted_by"] = username
+    data["submitted_by_phone"] = session.get('phone', '')
+    data["annotator"] = username
+    data["verification_status"] = "pending"
+    data["type"] = "3_tier"
+    
+    # Save to user submissions folder
+    user_submit_folder = os.path.join(USER_SUBMISSIONS_FOLDER, username)
+    os.makedirs(user_submit_folder, exist_ok=True)
+    user_submit_path = os.path.join(user_submit_folder, json_file)
+    with open(user_submit_path, "w", encoding='utf-8') as f:
+        json.dump(data, f, indent=2, ensure_ascii=False)
+    
+    # Also save to SUBMIT_FOLDER for backup
+    old_submit_path = os.path.join(SUBMIT_FOLDER, f"{username}_{json_file}")
+    with open(old_submit_path, "w", encoding='utf-8') as f:
+        json.dump(data, f, indent=2, ensure_ascii=False)
+    
+    # Save to mobile dataset (this creates TextGrid and saves to training data)
+    save_to_mobile_dataset(data, username, original_wav_path, json_file)
+    
+    # Update statistics
+    update_user_stats(username, json_file, duration_seconds, increment=True)
+    update_daily_stats(username, json_file, duration_seconds, increment=True)
+    
+    # Mark as completed
+    completed_files.add(json_file)
+    save_completed_files(completed_files)
+    
+    # Release file assignment
+    release_file_assignment(json_file)
+    clear_skipped_file(username, json_file)
+    
+    # Calculate remaining files
+    all_json_files = glob.glob(os.path.join(AUDIO_FOLDER, "*.json"))
+    total = len(all_json_files)
+    remaining = total - len(completed_files)
+    has_more = remaining > 0
+    user_stats = get_user_stats(username)
+    
+    return jsonify({
+        "message": "3-Tier annotation submitted successfully", 
+        "file": json_file,
+        "user_folder": f"user_submissions/{username}",
+        "has_more": has_more,
+        "remaining": remaining,
+        "user_stats": user_stats
+    })
+# ============= END OF NEW 3-TIER SUBMIT ENDPOINT =============
+
 @app.route("/skip-file", methods=["POST"])
 @login_required
 def skip_file():

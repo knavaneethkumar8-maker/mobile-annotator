@@ -401,8 +401,8 @@ audio {
   margin-right: 10px;
 }
 
-/* 216ms cells (वायु) */
-.tier-row-216 .cell-216 {
+/* 216ms cells */
+.cell-216 {
   flex: 0 0 370px;
   min-width: 370px;
   border: 2px solid #d1e0f0;
@@ -410,8 +410,8 @@ audio {
   padding: 16px 10px;
 }
 
-/* 108ms cells (अग्नि) */
-.tier-row-108 .cell-108 {
+/* 108ms cells */
+.cell-108 {
   flex: 0 0 180px;
   min-width: 180px;
   border: 2px solid #e2edf7;
@@ -419,8 +419,8 @@ audio {
   padding: 14px 8px;
 }
 
-/* 54ms cells (आकाश) */
-.tier-row-54 .cell-54 {
+/* 54ms cells */
+.cell-54 {
   flex: 0 0 85px;
   min-width: 85px;
   border: 1.5px solid #e2e8f0;
@@ -659,7 +659,7 @@ audio {
   margin-top: 6px;
 }
 
-/* ========== MOBILE RESPONSIVE - REDUCED WIDTH FOR MORE CELLS ========== */
+/* ========== MOBILE RESPONSIVE ========== */
 @media (max-width: 560px) {
   .container { padding: 10px; }
   
@@ -675,7 +675,7 @@ audio {
     margin-right: 6px;
   }
   
-  /* REDUCED CELL WIDTHS - fits more cells on screen */
+  /* REDUCED CELL WIDTHS */
   .cell-216 {
     flex: 0 0 180px;
     min-width: 180px;
@@ -694,7 +694,6 @@ audio {
     padding: 6px 3px;
   }
   
-  /* Smaller fonts for reduced cells */
   .cell-54 .grid-input { 
     font-size: 0.7rem; 
     padding: 4px 1px; 
@@ -713,13 +712,11 @@ audio {
     padding: 2px 4px;
   }
   
-  /* Touch feedback */
   .cell-216:active, .cell-108:active, .cell-54:active {
     transform: scale(0.98);
     background: #f0f0f0;
   }
   
-  /* Stack header on mobile */
   .header {
     flex-direction: column;
     align-items: stretch;
@@ -814,7 +811,6 @@ audio {
   }
 }
 
-/* Scrollbar styling */
 .three-tier-section::-webkit-scrollbar {
   height: 6px;
 }
@@ -839,7 +835,6 @@ audio {
       <button class="self-record-btn" onclick="window.location.href='{{ url_for_path('self-record') }}'">Self</button>
       <button class="live-stream-btn" onclick="window.location.href='{{ url_for_path('live-stream') }}'">Live</button>
       <button class="stats-btn" onclick="window.location.href='{{ url_for_path('stats') }}'">Stats</button>
-      <!-- FIXED: Verify button now uses direct path with base_path -->
       <button class="stats-btn" onclick="window.location.href='{{ base_path }}/verify'">Verify</button>
       <button class="training-btn" onclick="window.location.href='{{ url_for_path('mobile-training') }}'">Training</button>
       <div class="user-info">
@@ -1571,7 +1566,8 @@ async function submitAnnotation() {
   };
   
   try {
-    const response = await fetch(`${BASE_PATH}/submit-3-tier`, {
+    // FIXED: Use /submit endpoint instead of /submit-3-tier
+    const response = await fetch(`${BASE_PATH}/submit`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(submitData)
